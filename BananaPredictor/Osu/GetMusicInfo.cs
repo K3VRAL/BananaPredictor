@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace BananaPredictor.Osu
 {
-    public class GetInfo        // TODO; to clean up and make the code more readable/organized
+    public class GetMusicInfo        // TODO; to clean up and make the code more readable/organized
     {
         private String path;
         private int bmHitObjects, bmTitle, bmArtist, bmCreator, bmVersion;
 
-        public GetInfo(String path)
+        public GetMusicInfo(String path)
         {
             this.path = path;
             this.setInfo();
