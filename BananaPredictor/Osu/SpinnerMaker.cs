@@ -9,11 +9,11 @@ using osu.Game.Rulesets.Catch.UI;
 
 namespace BananaPredictor.Osu
 {
+    // TODO: Need to make this; First complete Predictor
     public class BananaMaker
     {
         public bool SpinnerMaker(string path, int startPoint, int endPoint, int startTime, int endTime)
         {
-            // TODO: First complete Predictor
             return false;
         }
     }

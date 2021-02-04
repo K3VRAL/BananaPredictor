@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 
 namespace BananaPredictor.Osu
 {
-    public class GetMusicInfo        // TODO; to clean up and make the code more readable/organized
+    // TODO: Make this useable
+    public class GetMusicInfo        // TODO: to clean up and make the code more readable/organized
     {
         private String path;
         private int bmHitObjects, bmTitle, bmArtist, bmCreator, bmVersion;

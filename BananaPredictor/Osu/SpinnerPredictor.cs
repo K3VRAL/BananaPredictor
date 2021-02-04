@@ -8,16 +8,15 @@ using osu.Game.Rulesets.Catch.UI;
 
 namespace BananaPredictor.Osu
 {
+    // Apologies for the terrible code/not using other libraries such as OsuPrasers to get the job done
+    // TODO: Fix the major bug that is preventing this code from working (see 'Error:')
+    // TODO: Clean up code and make more functions instead of hard coding
     public class BananaPredictor
     {
-        // Apologies for the terrible code/not using other libraries such as OsuPrasers to get the job done
-        // TODO: Clean up code and make more functions instead of hard coding; Fix the major bug that is preventing this code from working
         private IEnumerable<String> lines;
-        //private GetMusicInfo gmi;
         public bool SpinnerPredictor(string path)
         {
             // Read file
-            //gmi = new GetMusicInfo(path);
             lines = File.ReadLines(path);
 
             // Map info lines
@@ -38,6 +37,7 @@ namespace BananaPredictor.Osu
                 if (line.Equals("[HitObjects]"))
                 {
                     System.Diagnostics.Debug.WriteLine("Found [HitObjects]");
+                    bmHitObjects++;
                     break;
                 }
                 bmHitObjects++;
@@ -50,67 +50,73 @@ namespace BananaPredictor.Osu
                 return false;
             }
 
-            // Storing all spinners and objects found into dictionary/map
-            List<String> allObjects = new();
-            List<String> eachSpinners = new();
+            // Storing all spinners and objects found into list
+            var HitObjects = new List<GetObjectInfo>();
             for (int i = bmHitObjects; i < lines.Count(); i++)
             {
                 // Making sure that these are spinners; spinners always have x: 256 and y: 192 according to https://osu.ppy.sh/wiki/en/osu%21_File_Formats/Osu_%28file_format%29#spinners
                 String[] amount = lines.Skip(i).First().Split(",");
                 if (amount.Length.Equals(7) && Int32.Parse(amount[0]).Equals(256) && Int32.Parse(amount[1]).Equals(192))
                 {
-                    eachSpinners.Add(lines.Skip(i).First());
-                }
-                allObjects.Add(lines.Skip(i).First());
-            }
-            System.Diagnostics.Debug.WriteLine("Amount of added spinners: {0}", eachSpinners.Count);
-
-            // Processing each spinner - The logic according to the catch rulesets; all rights go to peppy and his mathematics, just trying to specifically get the important code
-            // Used according to https://github.com/ppy/osu/blob/master/osu.Game.Rulesets.Catch/Objects/BananaShower.cs
-            Dictionary<double, double> inDepthSpinner = new();
-            foreach (var item in eachSpinners)
-            {
-                String[] getitem = item.Split(",");
-                double time = Int32.Parse(getitem[2]);
-                double endtime = Int32.Parse(getitem[5]);
-                int duration = Int32.Parse(getitem[5]) - Int32.Parse(getitem[2]);
-                int i = 0;
-
-                double spacing = duration;
-                while (spacing > 100)
-                    spacing /= 2;
-                if (spacing <= 0)
+                    HitObjects.Add(new GetObjectInfo
+                    {
+                        Object = lines.Skip(i).First(),
+                        Banana = true,
+                        BananaShowerTime = new List<double>(),
+                        BananaShowerXOffset = new List<double>(),
+                        Index = i
+                    });
                     continue;
+                }
+                HitObjects.Add(new GetObjectInfo { 
+                    Object = lines.Skip(i).First(),
+                    Banana = false,
+                    Index = i
+                });
+            }
 
-                //System.Diagnostics.Debug.WriteLine("time: {0} endtime: {1} duration: {2} spacing: {3}", time, endtime, duration, spacing);
-
-                while (time <= endtime)
+            // Processing each spinner - The logic according to the catch rulesets; all rights go to peppy and his mathematics, just using the important code
+            // Used according to https://github.com/ppy/osu/blob/master/osu.Game.Rulesets.Catch/Objects/BananaShower.cs
+            foreach (var item in HitObjects)
+            {
+                switch (item.Banana)
                 {
-                    //System.Diagnostics.Debug.WriteLine("Time = {0}, index = {1}", time, i);
-                    inDepthSpinner.Add(time, i);
+                    case true:
+                        String[] getitem = item.Object.Split(",");
+                        double time = Int32.Parse(getitem[2]);
+                        double endtime = Int32.Parse(getitem[5]);
+                        int duration = Int32.Parse(getitem[5]) - Int32.Parse(getitem[2]);
 
-                    time += spacing;
-                    i++;
+                        double spacing = duration;
+                        while (spacing > 100)
+                            spacing /= 2;
+                        if (spacing <= 0)
+                            continue;
+
+                        while (time <= endtime)
+                        {
+                            item.BananaShowerTime.Add(time);
+
+                            time += spacing;
+                        }
+                        break;
                 }
             }
 
             // TODO: How each banana is processed
-            var rng = new FastRandom((int)1337);     // Must be an error here
-            foreach (double key in new List<double>(inDepthSpinner.Keys))
+            var rng = new FastRandom((int)1337);     // Error: must be here
+            foreach (var obj in HitObjects)
             {
-                inDepthSpinner[key] = (float)(rng.NextDouble() * CatchPlayfield.WIDTH);     // Or here
+                if (obj.Banana)
+                    for (int i = 0; i < obj.BananaShowerTime.Count; i++)
+                        obj.BananaShowerXOffset.Add((float)(rng.NextDouble() * CatchPlayfield.WIDTH));      // Error: must be here
             }
 
-            //System.Diagnostics.Debug.WriteLine("Amount indepth = {0}", inDepthSpinner.Count);
-            //inDepthSpinner.Select(x => "xOffset = " + x.Value + " Time = " + x.Key).ToList().ForEach(x => System.Diagnostics.Debug.WriteLine(x));
-
-            // To file - This is an analyzer so instead we make a seperate textfile in which we place beats to test if we get the same generated x offset of beats
-            // Note: This is a file only for the beats, not the entire osu file which is why it is a txt file
-            // TODO: Make so that it uses all the info as well to make a .osu file
-            String filename = String.Join("\\", path.Split('\\').Reverse().Skip(1).Reverse().ToArray()) + "\\" + this.DoThing(bmArtist) + " - " + this.DoThing(bmTitle) + " (" + this.DoThing(bmCreator) + ") [" + this.DoThing(bmVersion) + " BananaPredictor].osu";
-            File.Create(filename).Close();      // Create and override the file
+            // Put all contents as well as processed hitobjects into osu file
+            String filename = String.Join("\\", path.Split('\\').Reverse().Skip(1).Reverse().ToArray()) + "\\" + this.PutTogether(bmArtist) + " - " + this.PutTogether(bmTitle) + " (" + this.PutTogether(bmCreator) + ") [" + this.PutTogether(bmVersion) + " BananaPredictor].osu";
+            File.Create(filename).Close();
             int num = 0;
-            using (StreamWriter file = new StreamWriter(filename))
+            using (StreamWriter file = new(filename))
             {
                 foreach (var line in lines)
                 {
@@ -120,7 +126,7 @@ namespace BananaPredictor.Osu
                         num++;
                         continue;
                     }
-                    if (num.Equals(bmHitObjects + 1))
+                    if (num.Equals(bmHitObjects))
                     {
                         break;
                     }
@@ -128,15 +134,32 @@ namespace BananaPredictor.Osu
                     num++;
                 }
                 
-                foreach (var line in inDepthSpinner)
+                foreach (var line in HitObjects)
                 {
-                    file.WriteLine(line.Value + ",192," + line.Key + ",1,0,0:0:0:0:");
+                    switch (line.Banana)
+                    {
+                        case true:
+                            /*foreach (var bananaT in line.BananaShowerTime) // Need to get XOffset as well
+                                file.WriteLine(bananaX + ",192," + bananaT + ",1,0,0:0:0:0:"); // How do I fix this? Need to use BST and BSXO but can only use one at a time*/
+                            // Inefficient alternative
+                            List<int> store = new();
+                            foreach (var bananaT in line.BananaShowerTime)
+                                store.Add(Convert.ToInt32(Math.Floor(bananaT)));        // Not sure if it should use Floor or Ceiling
+                            foreach (var bananaX in line.BananaShowerXOffset)
+                                store.Add(Convert.ToInt32(Math.Floor(bananaX)));        // Not sure if it should use Floor or Ceiling
+                            for (int i = 0; i < store.Count / 2; i++)
+                                file.WriteLine(store[(store.Count / 2) + i] + ",192," + store[i] + ",1,0,0:0:0:0:");
+                            break;
+                        default:
+                            file.WriteLine(line.Object);
+                            break;
+                    }
                 }
             }
             return true;
         }
 
-        private String DoThing(int bmNumber)
+        private String PutTogether(int bmNumber)
         {
             return String.Join("", lines.Skip(bmNumber).Take(1).First().Split(':').Skip(1));
         }
