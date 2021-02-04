@@ -30,7 +30,7 @@ namespace BananaPredictor
             BananaPredictor.Osu.BananaPredictor aNew = new();
             bool did = aNew.SpinnerPredictor(tbBeatmap.Text);
             if (did) {
-                MessageBox.Show("Successfully made conversion! Make sure you copy and paste the txt contents under the [HitObjects] section of the osu file.", "Done");
+                MessageBox.Show("Successfully made conversion! Press F5 in osu and it should be there.", "Done");
                 Process.Start("explorer.exe", String.Join("\\", tbBeatmap.Text.Split('\\').Reverse().Skip(1).Reverse().ToArray()));
             } else {
                 MessageBox.Show("Failed!", "Error");
