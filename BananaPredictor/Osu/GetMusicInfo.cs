@@ -12,13 +12,13 @@ namespace BananaPredictor.Osu
         public String Path { get; set; }
         public int GetItemLine(String item)
         {
-            int bmHitObjects = 0;
+            int lineindex = 0;
             foreach (var line in File.ReadLines(Path))
             {
                 // Get map info
                 if (line.Contains(item))
-                    return bmHitObjects;
-                bmHitObjects++;
+                    return lineindex;
+                lineindex++;
             }
             return -1;
         }
