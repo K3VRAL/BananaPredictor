@@ -10,7 +10,7 @@ using osu.Game.Rulesets.Catch.Beatmaps;
 namespace BananaPredictor.Osu
 {
     // Apologies for the terrible code/not using other libraries such as OsuPrasers to get the job done
-    public class BananaPredictor
+    public class BananaSpinPredictor
     {
         private IEnumerable<String> lines;
         public bool SpinnerPredictor(string path)
