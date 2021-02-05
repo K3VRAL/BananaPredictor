@@ -7,9 +7,10 @@ using osu.Game.Rulesets.Catch.MathUtils;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Catch.Beatmaps;
 
+using BananaPredictor.Osu;
+
 namespace BananaPredictor.Osu
 {
-    // TODO: Fix inefficient method
     public class BananaSpinPredictor
     {
         public bool SpinnerPredictor(string path)
@@ -27,7 +28,7 @@ namespace BananaPredictor.Osu
                 return false;
 
             // Storing all spinners and objects found into list
-            var AllHitObjects = new List<GetObjectInfo>();
+            List<GetObjectInfo> AllHitObjects = new();
             for (int i = bmHitObjects; i < lines.Count(); i++)
             {
                 // Making sure that these are spinners; spinners always have x: 256 and y: 192 according to https://osu.ppy.sh/wiki/en/osu%21_File_Formats/Osu_%28file_format%29#spinners
@@ -93,55 +94,8 @@ namespace BananaPredictor.Osu
             }
 
             // Put all contents as well as processed hitobjects into osu file
-            String filename = String.Join("\\", path.Split('\\').Reverse().Skip(1).Reverse().ToArray()) + "\\" + this.PutTogether(MusicInfo.GetItemLine("Artist"), lines) + " - " + this.PutTogether(MusicInfo.GetItemLine("Title"), lines) + " (" + this.PutTogether(MusicInfo.GetItemLine("Creator"), lines) + ") [" + this.PutTogether(MusicInfo.GetItemLine("Version"), lines) + " BananaPredictor].osu";
-            File.Create(filename).Close();
-            int num = 0;
-            using (StreamWriter file = new(filename))
-            {
-                foreach (var line in lines)
-                {
-                    if (num == MusicInfo.GetItemLine("Version"))
-                    {
-                        file.WriteLine(line + " BananaPredictor");
-                        num++;
-                        continue;
-                    }
-                    if (num.Equals(bmHitObjects))
-                    {
-                        break;
-                    }
-                    file.WriteLine(line);
-                    num++;
-                }
-                
-                foreach (var line in AllHitObjects)
-                {
-                    switch (line.Banana)
-                    {
-                        case true:
-                            /*foreach (var bananaT in line.BananaShowerTime) // Need to get XOffset as well
-                                file.WriteLine(bananaX + ",192," + bananaT + ",1,0,0:0:0:0:"); // How do I fix this? Need to use BST and BSXO but can only use one at a time*/
-                            // TODO: Inefficient alternative
-                            List<int> store = new();
-                            foreach (var bananaT in line.BananaShowerTime)
-                                store.Add(Convert.ToInt32(Math.Floor(bananaT)));        // Not sure if it should use Floor or Ceiling
-                            foreach (var bananaX in line.BananaShowerXOffset)
-                                store.Add(Convert.ToInt32(Math.Floor(bananaX)));        // Not sure if it should use Floor or Ceiling
-                            for (int i = 0; i < store.Count / 2; i++)
-                                file.WriteLine(store[(store.Count / 2) + i] + ",192," + store[i] + ",1,0,0:0:0:0:");
-                            break;
-                        default:
-                            file.WriteLine(line.Object);
-                            break;
-                    }
-                }
-            }
-            return true;
-        }
-
-        private String PutTogether(int bmNumber, IEnumerable<String> lines)
-        {
-            return String.Join("", lines.Skip(bmNumber).Take(1).First().Split(':').Skip(1));
+            ToFile toFile = new();
+            return toFile.OsuToFile(lines, path, MusicInfo, AllHitObjects, bmHitObjects);
         }
     }
 }
