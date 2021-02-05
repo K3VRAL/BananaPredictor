@@ -43,15 +43,13 @@ namespace BananaPredictor.Osu
                         Object = lines.Skip(i).First(),
                         Banana = true,
                         BananaShowerTime = new List<double>(),
-                        BananaShowerXOffset = new List<double>(),
-                        Index = i
+                        BananaShowerXOffset = new List<double>()
                     });
                     continue;
                 }
                 HitObjects.Add(new GetObjectInfo { 
                     Object = lines.Skip(i).First(),
-                    Banana = false,
-                    Index = i
+                    Banana = false
                 });
             }
 

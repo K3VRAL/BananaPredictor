@@ -12,6 +12,5 @@ namespace BananaPredictor.Osu
         public bool Banana { get; set; }
         public List<double> BananaShowerTime { get; set; }
         public List<double> BananaShowerXOffset { get; set; }
-        public int Index { get; set; }
     }
 }
