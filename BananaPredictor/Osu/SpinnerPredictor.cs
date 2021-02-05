@@ -10,7 +10,6 @@ using osu.Game.Rulesets.Catch.Beatmaps;
 namespace BananaPredictor.Osu
 {
     // Apologies for the terrible code/not using other libraries such as OsuPrasers to get the job done
-    // TODO: Clean up code and make more functions instead of hard coding; finish music info function
     public class BananaPredictor
     {
         private IEnumerable<String> lines;
@@ -20,31 +19,12 @@ namespace BananaPredictor.Osu
             lines = File.ReadLines(path);
 
             // Map info lines (Used for the file name and such)
-            int bmHitObjects = 0, bmTitle = 0, bmArtist = 0, bmCreator = 0, bmVersion = 0;
-            foreach (var line in lines)
-            {
-                // Get map info
-                if (line.Contains("Title") && bmTitle.Equals(0))
-                    bmTitle = bmHitObjects;
-                if (line.Contains("Artist") && bmArtist.Equals(0))
-                    bmArtist = bmHitObjects;
-                if (line.Contains("Creator") && bmCreator.Equals(0))
-                    bmCreator = bmHitObjects;
-                if (line.Contains("Version") && bmVersion.Equals(0))
-                    bmVersion = bmHitObjects;
-
-                // Get start line for hitobjects
-                if (line.Equals("[HitObjects]"))
-                {
-                    System.Diagnostics.Debug.WriteLine("Found [HitObjects]");
-                    bmHitObjects++;
-                    break;
-                }
-                bmHitObjects++;
-            }
+            GetMusicInfo MusicInfo = new();
+            MusicInfo.Path = path;
+            int bmHitObjects = MusicInfo.GetItemLine("[HitObjects]");
 
             // If not found any
-            if (lines.Count().Equals(bmHitObjects))
+            if (bmHitObjects < 0)
             {
                 System.Diagnostics.Debug.WriteLine("Couldn't Find [HitObjects] | Count: {0} File: {1}", bmHitObjects, lines.Count());
                 return false;
@@ -119,14 +99,14 @@ namespace BananaPredictor.Osu
             }
 
             // Put all contents as well as processed hitobjects into osu file
-            String filename = String.Join("\\", path.Split('\\').Reverse().Skip(1).Reverse().ToArray()) + "\\" + this.PutTogether(bmArtist) + " - " + this.PutTogether(bmTitle) + " (" + this.PutTogether(bmCreator) + ") [" + this.PutTogether(bmVersion) + " BananaPredictor].osu";
+            String filename = String.Join("\\", path.Split('\\').Reverse().Skip(1).Reverse().ToArray()) + "\\" + this.PutTogether(MusicInfo.GetItemLine("Artist")) + " - " + this.PutTogether(MusicInfo.GetItemLine("Title")) + " (" + this.PutTogether(MusicInfo.GetItemLine("Creator")) + ") [" + this.PutTogether(MusicInfo.GetItemLine("Version")) + " BananaPredictor].osu";
             File.Create(filename).Close();
             int num = 0;
             using (StreamWriter file = new(filename))
             {
                 foreach (var line in lines)
                 {
-                    if (num == bmVersion)
+                    if (num == MusicInfo.GetItemLine("Version"))
                     {
                         file.WriteLine(line + " BananaPredictor");
                         num++;
