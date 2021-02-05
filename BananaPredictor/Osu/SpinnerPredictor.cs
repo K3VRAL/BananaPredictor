@@ -9,7 +9,7 @@ using osu.Game.Rulesets.Catch.Beatmaps;
 
 namespace BananaPredictor.Osu
 {
-    // Apologies for the terrible code/not using other libraries such as OsuPrasers to get the job done
+    // TODO: Fix inefficient method
     public class BananaSpinPredictor
     {
         private IEnumerable<String> lines;
@@ -25,20 +25,17 @@ namespace BananaPredictor.Osu
 
             // If not found any
             if (bmHitObjects < 0)
-            {
-                System.Diagnostics.Debug.WriteLine("Couldn't Find [HitObjects] | Count: {0} File: {1}", bmHitObjects, lines.Count());
                 return false;
-            }
 
             // Storing all spinners and objects found into list
-            var HitObjects = new List<GetObjectInfo>();
+            var AllHitObjects = new List<GetObjectInfo>();
             for (int i = bmHitObjects; i < lines.Count(); i++)
             {
                 // Making sure that these are spinners; spinners always have x: 256 and y: 192 according to https://osu.ppy.sh/wiki/en/osu%21_File_Formats/Osu_%28file_format%29#spinners
                 String[] amount = lines.Skip(i).First().Split(",");
                 if (amount.Length.Equals(7) && Int32.Parse(amount[0]).Equals(256) && Int32.Parse(amount[1]).Equals(192))
                 {
-                    HitObjects.Add(new GetObjectInfo
+                    AllHitObjects.Add(new GetObjectInfo
                     {
                         Object = lines.Skip(i).First(),
                         Banana = true,
@@ -47,7 +44,7 @@ namespace BananaPredictor.Osu
                     });
                     continue;
                 }
-                HitObjects.Add(new GetObjectInfo { 
+                AllHitObjects.Add(new GetObjectInfo { 
                     Object = lines.Skip(i).First(),
                     Banana = false
                 });
@@ -55,7 +52,7 @@ namespace BananaPredictor.Osu
 
             // Processing each spinner - The logic for generating the time interval for each banana according to the catch rulesets; all rights go to peppy and his mathematics, just using the important code
             // Used according to https://github.com/ppy/osu/blob/master/osu.Game.Rulesets.Catch/Objects/BananaShower.cs
-            foreach (var item in HitObjects)
+            foreach (var item in AllHitObjects)
             {
                 switch (item.Banana)
                 {
@@ -84,7 +81,7 @@ namespace BananaPredictor.Osu
             // How each banana is processed - The logic the banana xoffset according to the catch rulesets; all rights go to peppy and his mathematics, just using the important code
             // Used according to https://github.com/ppy/osu/blob/master/osu.Game.Rulesets.Catch/Beatmaps/CatchBeatmapProcessor.cs
             var rng = new FastRandom(CatchBeatmapProcessor.RNG_SEED);
-            foreach (var obj in HitObjects)
+            foreach (var obj in AllHitObjects)
             {
                 if (obj.Banana)
                     for (int i = 0; i < obj.BananaShowerTime.Count; i++)
@@ -118,14 +115,14 @@ namespace BananaPredictor.Osu
                     num++;
                 }
                 
-                foreach (var line in HitObjects)
+                foreach (var line in AllHitObjects)
                 {
                     switch (line.Banana)
                     {
                         case true:
                             /*foreach (var bananaT in line.BananaShowerTime) // Need to get XOffset as well
                                 file.WriteLine(bananaX + ",192," + bananaT + ",1,0,0:0:0:0:"); // How do I fix this? Need to use BST and BSXO but can only use one at a time*/
-                            // Inefficient alternative
+                            // TODO: Inefficient alternative
                             List<int> store = new();
                             foreach (var bananaT in line.BananaShowerTime)
                                 store.Add(Convert.ToInt32(Math.Floor(bananaT)));        // Not sure if it should use Floor or Ceiling

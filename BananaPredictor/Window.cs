@@ -8,6 +8,8 @@ using BananaPredictor.Osu;
 
 namespace BananaPredictor
 {
+    // Apologies for the terrible code/not using other libraries such as OsuPrasers to get the job done
+    // TODO: Finish development with the spin maker
     public partial class K3Banana : Form
     {
         private readonly OpenFileDialog fileDir = new();
@@ -36,6 +38,7 @@ namespace BananaPredictor
             {
                 var aNew = new BananaSpinMaker();
                 did = aNew.SpinnerMaker(tbBeatmap.Text);
+                MessageBox.Show("Currently under development.");
             }
 
             if (did) {
