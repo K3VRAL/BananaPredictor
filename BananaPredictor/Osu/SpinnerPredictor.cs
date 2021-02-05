@@ -12,11 +12,10 @@ namespace BananaPredictor.Osu
     // TODO: Fix inefficient method
     public class BananaSpinPredictor
     {
-        private IEnumerable<String> lines;
         public bool SpinnerPredictor(string path)
         {
             // Read file
-            lines = File.ReadLines(path);
+            IEnumerable<String> lines = File.ReadLines(path);
 
             // Map info lines (Used for the file name and such)
             GetMusicInfo MusicInfo = new();
@@ -94,7 +93,7 @@ namespace BananaPredictor.Osu
             }
 
             // Put all contents as well as processed hitobjects into osu file
-            String filename = String.Join("\\", path.Split('\\').Reverse().Skip(1).Reverse().ToArray()) + "\\" + this.PutTogether(MusicInfo.GetItemLine("Artist")) + " - " + this.PutTogether(MusicInfo.GetItemLine("Title")) + " (" + this.PutTogether(MusicInfo.GetItemLine("Creator")) + ") [" + this.PutTogether(MusicInfo.GetItemLine("Version")) + " BananaPredictor].osu";
+            String filename = String.Join("\\", path.Split('\\').Reverse().Skip(1).Reverse().ToArray()) + "\\" + this.PutTogether(MusicInfo.GetItemLine("Artist"), lines) + " - " + this.PutTogether(MusicInfo.GetItemLine("Title"), lines) + " (" + this.PutTogether(MusicInfo.GetItemLine("Creator"), lines) + ") [" + this.PutTogether(MusicInfo.GetItemLine("Version"), lines) + " BananaPredictor].osu";
             File.Create(filename).Close();
             int num = 0;
             using (StreamWriter file = new(filename))
@@ -140,7 +139,7 @@ namespace BananaPredictor.Osu
             return true;
         }
 
-        private String PutTogether(int bmNumber)
+        private String PutTogether(int bmNumber, IEnumerable<String> lines)
         {
             return String.Join("", lines.Skip(bmNumber).Take(1).First().Split(':').Skip(1));
         }
