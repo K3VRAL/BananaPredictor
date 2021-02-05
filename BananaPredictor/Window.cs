@@ -29,6 +29,8 @@ namespace BananaPredictor
 
             BananaPredictor.Osu.BananaPredictor aNew = new();
             bool did = aNew.SpinnerPredictor(tbBeatmap.Text);
+            //BananaPredictor.Osu.BananaMaker aNew = new();
+            //bool did = aNew.SpinnerMaker(tbBeatmap.Text);
             if (did) {
                 MessageBox.Show("Successfully made conversion! Press F5 in osu and it should be there.", "Done");
                 Process.Start("explorer.exe", String.Join("\\", tbBeatmap.Text.Split('\\').Reverse().Skip(1).Reverse().ToArray()));
