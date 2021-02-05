@@ -5,12 +5,12 @@ using System.Linq;
 
 using osu.Game.Rulesets.Catch.MathUtils;
 using osu.Game.Rulesets.Catch.UI;
+using osu.Game.Rulesets.Catch.Beatmaps;
 
 namespace BananaPredictor.Osu
 {
     // Apologies for the terrible code/not using other libraries such as OsuPrasers to get the job done
-    // TODO: Fix the major bug that is preventing this code from working (see 'Error:')
-    // TODO: Clean up code and make more functions instead of hard coding
+    // TODO: Clean up code and make more functions instead of hard coding; finish music info function
     public class BananaPredictor
     {
         private IEnumerable<String> lines;
@@ -19,7 +19,7 @@ namespace BananaPredictor.Osu
             // Read file
             lines = File.ReadLines(path);
 
-            // Map info lines
+            // Map info lines (Used for the file name and such)
             int bmHitObjects = 0, bmTitle = 0, bmArtist = 0, bmCreator = 0, bmVersion = 0;
             foreach (var line in lines)
             {
@@ -75,7 +75,7 @@ namespace BananaPredictor.Osu
                 });
             }
 
-            // Processing each spinner - The logic according to the catch rulesets; all rights go to peppy and his mathematics, just using the important code
+            // Processing each spinner - The logic for generating the time interval for each banana according to the catch rulesets; all rights go to peppy and his mathematics, just using the important code
             // Used according to https://github.com/ppy/osu/blob/master/osu.Game.Rulesets.Catch/Objects/BananaShower.cs
             foreach (var item in HitObjects)
             {
@@ -103,13 +103,19 @@ namespace BananaPredictor.Osu
                 }
             }
 
-            // TODO: How each banana is processed
-            var rng = new FastRandom((int)1337);     // Error: must be here
+            // How each banana is processed - The logic the banana xoffset according to the catch rulesets; all rights go to peppy and his mathematics, just using the important code
+            // Used according to https://github.com/ppy/osu/blob/master/osu.Game.Rulesets.Catch/Beatmaps/CatchBeatmapProcessor.cs
+            var rng = new FastRandom(CatchBeatmapProcessor.RNG_SEED);
             foreach (var obj in HitObjects)
             {
                 if (obj.Banana)
                     for (int i = 0; i < obj.BananaShowerTime.Count; i++)
-                        obj.BananaShowerXOffset.Add((float)(rng.NextDouble() * CatchPlayfield.WIDTH));      // Error: must be here
+                    {
+                        obj.BananaShowerXOffset.Add((float)(rng.NextDouble() * CatchPlayfield.WIDTH));
+                        rng.Next();
+                        rng.Next();
+                        rng.Next();
+                    }
             }
 
             // Put all contents as well as processed hitobjects into osu file
