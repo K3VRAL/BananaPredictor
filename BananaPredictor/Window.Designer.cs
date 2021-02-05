@@ -1,7 +1,7 @@
 ﻿
 namespace BananaPredictor
 {
-    partial class Window
+    partial class K3Banana
     {
         /// <summary>
         ///  Required designer variable.
@@ -29,10 +29,13 @@ namespace BananaPredictor
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Window));
+            this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(K3Banana));
             this.submitBeatmap = new System.Windows.Forms.Button();
             this.browseBeatmap = new System.Windows.Forms.Button();
             this.tbBeatmap = new System.Windows.Forms.TextBox();
+            this.cbDebug = new System.Windows.Forms.CheckBox();
+            this.ttDebug = new System.Windows.Forms.ToolTip(this.components);
             this.SuspendLayout();
             // 
             // submitBeatmap
@@ -65,18 +68,30 @@ namespace BananaPredictor
             this.tbBeatmap.Size = new System.Drawing.Size(300, 27);
             this.tbBeatmap.TabIndex = 2;
             // 
-            // Window
+            // cbDebug
+            // 
+            this.cbDebug.AutoSize = true;
+            this.cbDebug.Location = new System.Drawing.Point(13, 55);
+            this.cbDebug.Name = "cbDebug";
+            this.cbDebug.Size = new System.Drawing.Size(119, 24);
+            this.cbDebug.TabIndex = 3;
+            this.cbDebug.Text = "Debug Mode";
+            this.cbDebug.UseVisualStyleBackColor = true;
+            this.cbDebug.MouseHover += new System.EventHandler(this.cbDebug_MouseHover);
+            // 
+            // K3Banana
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(421, 105);
+            this.Controls.Add(this.cbDebug);
             this.Controls.Add(this.tbBeatmap);
             this.Controls.Add(this.browseBeatmap);
             this.Controls.Add(this.submitBeatmap);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.Name = "Window";
+            this.Name = "K3Banana";
             this.Text = "Banana Predictor";
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -88,6 +103,8 @@ namespace BananaPredictor
         private System.Windows.Forms.Button submitBeatmap;
         private System.Windows.Forms.Button browseBeatmap;
         private System.Windows.Forms.TextBox tbBeatmap;
+        private System.Windows.Forms.CheckBox cbDebug;
+        private System.Windows.Forms.ToolTip ttDebug;
     }
 }
 

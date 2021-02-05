@@ -8,11 +8,11 @@ using BananaPredictor.Osu;
 
 namespace BananaPredictor
 {
-    public partial class Window : Form
+    public partial class K3Banana : Form
     {
         private readonly OpenFileDialog fileDir = new();
 
-        public Window()
+        public K3Banana()
         {
             InitializeComponent();
         }
@@ -27,10 +27,17 @@ namespace BananaPredictor
                 return;
             }
 
-            BananaPredictor.Osu.BananaPredictor aNew = new();
-            bool did = aNew.SpinnerPredictor(tbBeatmap.Text);
-            //BananaPredictor.Osu.BananaMaker aNew = new();
-            //bool did = aNew.SpinnerMaker(tbBeatmap.Text);
+            bool did;
+            if (cbDebug.Checked)
+            {
+                var aNew = new BananaSpinPredictor();
+                did = aNew.SpinnerPredictor(tbBeatmap.Text);
+            } else
+            {
+                var aNew = new BananaSpinMaker();
+                did = aNew.SpinnerMaker(tbBeatmap.Text);
+            }
+
             if (did) {
                 MessageBox.Show("Successfully made conversion! Press F5 in osu and it should be there.", "Done");
                 Process.Start("explorer.exe", String.Join("\\", tbBeatmap.Text.Split('\\').Reverse().Skip(1).Reverse().ToArray()));
@@ -62,6 +69,11 @@ namespace BananaPredictor
                 MessageBox.Show("An error has occurred. Make sure you selected the correct file.", "Error"); // TODO: FIX LATER
                 return;
             }
+        }
+
+        private void cbDebug_MouseHover(object sender, EventArgs e)
+        {
+            ttDebug.Show("Using Predictor than Maker to test and see if the code works under other specific unknown situations", cbDebug);
         }
     }
 }
