@@ -32,6 +32,7 @@ namespace BananaPredictor
             InitializeComponent();
             OriginalWidth = this.Width;
             OriginalHeight = this.Height;
+            this.CenterToScreen();
         }
 
         // Main Window
