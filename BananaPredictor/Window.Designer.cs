@@ -40,7 +40,7 @@ namespace BananaPredictor
             this.wbMini = new System.Windows.Forms.Button();
             this.wbExit = new System.Windows.Forms.Button();
             this.tAnimation = new System.Windows.Forms.Timer(this.components);
-            this.bHelp = new System.Windows.Forms.Button();
+            this.cbOpen = new System.Windows.Forms.CheckBox();
             this.pTop.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -136,14 +136,16 @@ namespace BananaPredictor
             // 
             this.tAnimation.Tick += new System.EventHandler(this.tAnimation_Tick);
             // 
-            // bHelp
+            // cbOpen
             // 
-            this.bHelp.Location = new System.Drawing.Point(198, 69);
-            this.bHelp.Name = "bHelp";
-            this.bHelp.Size = new System.Drawing.Size(75, 23);
-            this.bHelp.TabIndex = 5;
-            this.bHelp.Text = "Help";
-            this.bHelp.UseVisualStyleBackColor = true;
+            this.cbOpen.AutoSize = true;
+            this.cbOpen.ForeColor = System.Drawing.SystemColors.ButtonFace;
+            this.cbOpen.Location = new System.Drawing.Point(112, 72);
+            this.cbOpen.Name = "cbOpen";
+            this.cbOpen.Size = new System.Drawing.Size(91, 19);
+            this.cbOpen.TabIndex = 5;
+            this.cbOpen.Text = "Open Folder";
+            this.cbOpen.UseVisualStyleBackColor = true;
             // 
             // K3Banana
             // 
@@ -151,7 +153,7 @@ namespace BananaPredictor
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.ClientSize = new System.Drawing.Size(368, 102);
-            this.Controls.Add(this.bHelp);
+            this.Controls.Add(this.cbOpen);
             this.Controls.Add(this.pTop);
             this.Controls.Add(this.cbDebug);
             this.Controls.Add(this.tbBeatmap);
@@ -178,7 +180,7 @@ namespace BananaPredictor
         private System.Windows.Forms.Button wbExit;
         private System.Windows.Forms.Button wbMini;
         private System.Windows.Forms.Timer tAnimation;
-        private System.Windows.Forms.Button bHelp;
+        private System.Windows.Forms.CheckBox cbOpen;
     }
 }
 

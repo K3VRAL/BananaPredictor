@@ -45,23 +45,19 @@ namespace BananaPredictor
                 return;
             }
 
-            bool did;
-            if (cbDebug.Checked)
-            {
-                BananaSpinPredictor aNew = new();
-                did = aNew.SpinnerPredictor(tbBeatmap.Text);
-            } else
-            {
-                BananaSpinMaker aNew = new();
-                did = aNew.SpinnerMaker(tbBeatmap.Text);
-                MessageBox.Show("Currently under development.");
-            }
-
-            if (did) {
+            if (new BananaSpinPredictor().SpinnerPredictor(tbBeatmap.Text, cbDebug.Checked))
                 MessageBox.Show("Successfully made conversion! Press F5 in osu and it should be there.", "Done");
-                Process.Start("explorer.exe", String.Join("\\", tbBeatmap.Text.Split('\\').Reverse().Skip(1).Reverse().ToArray()));
-            } else {
+            else
                 MessageBox.Show("Failed!", "Error");
+
+
+            if (cbOpen.Checked)
+            {
+                String dir = String.Join("\\", tbBeatmap.Text.Split('\\').Reverse().Skip(1).Reverse().ToArray());
+                if (Directory.Exists(dir))
+                    Process.Start("explorer.exe", String.Join("\\", tbBeatmap.Text.Split('\\').Reverse().Skip(1).Reverse().ToArray()));
+                else
+                    MessageBox.Show("Directory doesn't exist!", "Error");
             }
         }
 
@@ -79,6 +75,15 @@ namespace BananaPredictor
                 tbBeatmap.Text = fileDir.FileName;
                 return;
             }
+        }
+        private void bOpen_Click(object sender, EventArgs e)
+        {
+            String getPath = String.Join("\\", tbBeatmap.Text.Split('\\').Reverse().Skip(1).Reverse().ToArray() + "\\");
+            Process.Start("explorer.exe", getPath);
+            if (Directory.Exists(getPath))
+                Process.Start("explorer.exe", getPath);
+            else
+                MessageBox.Show("Path doesn't exist. " + getPath, "Error");
         }
 
         private void cbDebug_MouseHover(object sender, EventArgs e)
