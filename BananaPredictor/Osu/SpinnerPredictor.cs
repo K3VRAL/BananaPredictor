@@ -7,13 +7,12 @@ using osu.Game.Rulesets.Catch.MathUtils;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Catch.Beatmaps;
 
-using BananaPredictor.Osu;
-
 namespace BananaPredictor.Osu
 {
+    // Used for debugging if program/initial logic works
     public class BananaSpinPredictor
     {
-        public bool SpinnerPredictor(string path)
+        public bool SpinnerPredictor(string path, bool debugging)
         {
             // Read file
             IEnumerable<String> lines = File.ReadLines(path);
@@ -106,7 +105,7 @@ namespace BananaPredictor.Osu
                         rng.Next();
                         rng.Next();
                     }
-                // TODO: figure out how this works
+                // TODO: Need to code in how it works
                 //else if (obj.Slider)
                 //{
                     //foreach(var item in obj.SliderList)
@@ -120,8 +119,17 @@ namespace BananaPredictor.Osu
             }
 
             // Put all contents as well as processed hitobjects into osu file
-            ToFile toFile = new();
-            return toFile.OsuToFile(lines, path, MusicInfo, AllHitObjects, bmHitObjects);
+            if (debugging)
+            {
+                // For debugging
+                ToFilePredictor toFile = new();
+                return toFile.OsuToFile(lines, path, MusicInfo, AllHitObjects, bmHitObjects);
+            } else
+            {
+                // For Final
+                ToFileMaker toFile = new();
+                return toFile.OsuToFile(lines, path, MusicInfo, AllHitObjects, bmHitObjects);
+            }
         }
     }
 }

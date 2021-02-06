@@ -5,7 +5,8 @@ using System.Linq;
 
 namespace BananaPredictor.Osu
 {
-    public class ToFile
+    // Places beats - used for debugging with Predictor
+    public class ToFilePredictor
     {
         public bool OsuToFile(IEnumerable<String> lines, String path, GetMusicInfo MusicInfo, List<GetObjectInfo> AllHitObjects, int bmHitObjects)
         {
@@ -38,7 +39,7 @@ namespace BananaPredictor.Osu
                         case true:
                             //foreach (var bananaT in line.BananaShowerTime) // Need to get XOffset as well
                                 //file.WriteLine(bananaX + ",192," + bananaT + ",1,0,0:0:0:0:"); // How do I fix this? Need to use BST and BSXO but can only use one at a time*/
-                            // TODO: Inefficient alternative
+                            // TODO: Inefficient alternative, figure out how to use one above
                             List<int> store = new();
                             foreach (var bananaT in line.BananaShowerTime)
                                 store.Add(Convert.ToInt32(Math.Floor(bananaT)));        // Not sure if it should use Floor or Ceiling
