@@ -36,7 +36,7 @@ namespace BananaPredictor
         }
 
         // Main Window
-        private void SubmitBeatmap_Click(object sender, EventArgs e)
+        private void bSubmit_Click(object sender, EventArgs e)
         {
             System.Diagnostics.Debug.WriteLine("Submission Clicked");
 
@@ -66,7 +66,7 @@ namespace BananaPredictor
             }
         }
 
-        private void BrowseBeatmap_Click(object sender, EventArgs e)
+        private void bBrowse_Click(object sender, EventArgs e)
         {
             System.Diagnostics.Debug.WriteLine("Browse Clicked");
 
@@ -78,15 +78,6 @@ namespace BananaPredictor
             if (fileDir.ShowDialog().Equals(DialogResult.OK))
             {
                 tbBeatmap.Text = fileDir.FileName;
-                return;
-            }
-            else if (fileDir.ShowDialog().Equals(DialogResult.Cancel)) // TODO: Fix issue where it opens again
-            {
-                return;
-            }
-            else
-            {
-                MessageBox.Show("An error has occurred. Make sure you selected the correct file.", "Error");
                 return;
             }
         }

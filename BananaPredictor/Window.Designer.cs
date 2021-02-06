@@ -31,8 +31,8 @@ namespace BananaPredictor
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(K3Banana));
-            this.submitBeatmap = new System.Windows.Forms.Button();
-            this.browseBeatmap = new System.Windows.Forms.Button();
+            this.bSubmit = new System.Windows.Forms.Button();
+            this.bBrowse = new System.Windows.Forms.Button();
             this.tbBeatmap = new System.Windows.Forms.TextBox();
             this.cbDebug = new System.Windows.Forms.CheckBox();
             this.ttDebug = new System.Windows.Forms.ToolTip(this.components);
@@ -40,46 +40,45 @@ namespace BananaPredictor
             this.wbMini = new System.Windows.Forms.Button();
             this.wbExit = new System.Windows.Forms.Button();
             this.tAnimation = new System.Windows.Forms.Timer(this.components);
+            this.bHelp = new System.Windows.Forms.Button();
             this.pTop.SuspendLayout();
             this.SuspendLayout();
             // 
-            // submitBeatmap
+            // bSubmit
             // 
-            this.submitBeatmap.Location = new System.Drawing.Point(321, 92);
-            this.submitBeatmap.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.submitBeatmap.Name = "submitBeatmap";
-            this.submitBeatmap.Size = new System.Drawing.Size(86, 31);
-            this.submitBeatmap.TabIndex = 0;
-            this.submitBeatmap.Text = "Submit";
-            this.submitBeatmap.UseVisualStyleBackColor = true;
-            this.submitBeatmap.Click += new System.EventHandler(this.SubmitBeatmap_Click);
+            this.bSubmit.Location = new System.Drawing.Point(281, 69);
+            this.bSubmit.Name = "bSubmit";
+            this.bSubmit.Size = new System.Drawing.Size(75, 23);
+            this.bSubmit.TabIndex = 0;
+            this.bSubmit.Text = "Submit";
+            this.bSubmit.UseVisualStyleBackColor = true;
+            this.bSubmit.Click += new System.EventHandler(this.bSubmit_Click);
             // 
-            // browseBeatmap
+            // bBrowse
             // 
-            this.browseBeatmap.Location = new System.Drawing.Point(321, 53);
-            this.browseBeatmap.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.browseBeatmap.Name = "browseBeatmap";
-            this.browseBeatmap.Size = new System.Drawing.Size(86, 31);
-            this.browseBeatmap.TabIndex = 1;
-            this.browseBeatmap.Text = "Browse";
-            this.browseBeatmap.UseVisualStyleBackColor = true;
-            this.browseBeatmap.Click += new System.EventHandler(this.BrowseBeatmap_Click);
+            this.bBrowse.Location = new System.Drawing.Point(281, 40);
+            this.bBrowse.Name = "bBrowse";
+            this.bBrowse.Size = new System.Drawing.Size(75, 23);
+            this.bBrowse.TabIndex = 1;
+            this.bBrowse.Text = "Browse";
+            this.bBrowse.UseVisualStyleBackColor = true;
+            this.bBrowse.Click += new System.EventHandler(this.bBrowse_Click);
             // 
             // tbBeatmap
             // 
-            this.tbBeatmap.Location = new System.Drawing.Point(12, 53);
-            this.tbBeatmap.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.tbBeatmap.Location = new System.Drawing.Point(10, 40);
             this.tbBeatmap.Name = "tbBeatmap";
-            this.tbBeatmap.Size = new System.Drawing.Size(300, 27);
+            this.tbBeatmap.Size = new System.Drawing.Size(263, 23);
             this.tbBeatmap.TabIndex = 2;
             // 
             // cbDebug
             // 
             this.cbDebug.AutoSize = true;
             this.cbDebug.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.cbDebug.Location = new System.Drawing.Point(12, 96);
+            this.cbDebug.Location = new System.Drawing.Point(10, 72);
+            this.cbDebug.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.cbDebug.Name = "cbDebug";
-            this.cbDebug.Size = new System.Drawing.Size(119, 24);
+            this.cbDebug.Size = new System.Drawing.Size(95, 19);
             this.cbDebug.TabIndex = 3;
             this.cbDebug.Text = "Debug Mode";
             this.cbDebug.UseVisualStyleBackColor = true;
@@ -93,8 +92,9 @@ namespace BananaPredictor
             this.pTop.Controls.Add(this.wbExit);
             this.pTop.Dock = System.Windows.Forms.DockStyle.Top;
             this.pTop.Location = new System.Drawing.Point(0, 0);
+            this.pTop.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.pTop.Name = "pTop";
-            this.pTop.Size = new System.Drawing.Size(421, 35);
+            this.pTop.Size = new System.Drawing.Size(368, 27);
             this.pTop.TabIndex = 4;
             this.pTop.MouseDown += new System.Windows.Forms.MouseEventHandler(this.tPanel_MouseDown);
             // 
@@ -106,9 +106,10 @@ namespace BananaPredictor
             this.wbMini.FlatAppearance.MouseOverBackColor = System.Drawing.Color.White;
             this.wbMini.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.wbMini.ForeColor = System.Drawing.SystemColors.Control;
-            this.wbMini.Location = new System.Drawing.Point(305, 0);
+            this.wbMini.Location = new System.Drawing.Point(266, 0);
+            this.wbMini.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.wbMini.Name = "wbMini";
-            this.wbMini.Size = new System.Drawing.Size(57, 33);
+            this.wbMini.Size = new System.Drawing.Size(50, 25);
             this.wbMini.TabIndex = 6;
             this.wbMini.Text = "_";
             this.wbMini.UseVisualStyleBackColor = false;
@@ -122,9 +123,10 @@ namespace BananaPredictor
             this.wbExit.FlatAppearance.MouseOverBackColor = System.Drawing.Color.White;
             this.wbExit.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.wbExit.ForeColor = System.Drawing.SystemColors.Control;
-            this.wbExit.Location = new System.Drawing.Point(362, 0);
+            this.wbExit.Location = new System.Drawing.Point(316, 0);
+            this.wbExit.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.wbExit.Name = "wbExit";
-            this.wbExit.Size = new System.Drawing.Size(57, 33);
+            this.wbExit.Size = new System.Drawing.Size(50, 25);
             this.wbExit.TabIndex = 5;
             this.wbExit.Text = "X";
             this.wbExit.UseVisualStyleBackColor = false;
@@ -134,20 +136,29 @@ namespace BananaPredictor
             // 
             this.tAnimation.Tick += new System.EventHandler(this.tAnimation_Tick);
             // 
+            // bHelp
+            // 
+            this.bHelp.Location = new System.Drawing.Point(198, 69);
+            this.bHelp.Name = "bHelp";
+            this.bHelp.Size = new System.Drawing.Size(75, 23);
+            this.bHelp.TabIndex = 5;
+            this.bHelp.Text = "Help";
+            this.bHelp.UseVisualStyleBackColor = true;
+            // 
             // K3Banana
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.ClientSize = new System.Drawing.Size(421, 136);
+            this.ClientSize = new System.Drawing.Size(368, 102);
+            this.Controls.Add(this.bHelp);
             this.Controls.Add(this.pTop);
             this.Controls.Add(this.cbDebug);
             this.Controls.Add(this.tbBeatmap);
-            this.Controls.Add(this.browseBeatmap);
-            this.Controls.Add(this.submitBeatmap);
+            this.Controls.Add(this.bBrowse);
+            this.Controls.Add(this.bSubmit);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.Name = "K3Banana";
             this.Text = "Banana Predictor";
             this.pTop.ResumeLayout(false);
@@ -158,8 +169,8 @@ namespace BananaPredictor
 
         #endregion
 
-        private System.Windows.Forms.Button submitBeatmap;
-        private System.Windows.Forms.Button browseBeatmap;
+        private System.Windows.Forms.Button bSubmit;
+        private System.Windows.Forms.Button bBrowse;
         private System.Windows.Forms.TextBox tbBeatmap;
         private System.Windows.Forms.CheckBox cbDebug;
         private System.Windows.Forms.ToolTip ttDebug;
@@ -167,6 +178,7 @@ namespace BananaPredictor
         private System.Windows.Forms.Button wbExit;
         private System.Windows.Forms.Button wbMini;
         private System.Windows.Forms.Timer tAnimation;
+        private System.Windows.Forms.Button bHelp;
     }
 }
 
