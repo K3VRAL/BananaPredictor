@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-using BananaPredictor.Osu;
-
 namespace BananaPredictor.Osu
 {
     public class ToFile
