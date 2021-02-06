@@ -38,16 +38,31 @@ namespace BananaPredictor.Osu
                     AllHitObjects.Add(new GetObjectInfo
                     {
                         Object = lines.Skip(i).First(),
+                        Slider = false,
                         Banana = true,
                         BananaShowerTime = new List<double>(),
                         BananaShowerXOffset = new List<double>()
                     });
-                    continue;
+                } else if (amount.Length > 8 && amount[5].Contains("|"))    // TODO: JuiceStream has RNG as well, need to fix
+                {
+                    // Checks for sliders; they use the rng class as well like spinners
+                    AllHitObjects.Add(new GetObjectInfo
+                    {
+                        Object = lines.Skip(i).First(),
+                        Slider = true,
+                        Banana = false
+                    });
                 }
-                AllHitObjects.Add(new GetObjectInfo { 
-                    Object = lines.Skip(i).First(),
-                    Banana = false
-                });
+                else
+                {
+                    // Normal objects added
+                    AllHitObjects.Add(new GetObjectInfo
+                    {
+                        Object = lines.Skip(i).First(),
+                        Slider = false,
+                        Banana = false
+                    });
+                }
             }
 
             // Processing each spinner - The logic for generating the time interval for each banana according to the catch rulesets; all rights go to peppy and his mathematics, just using the important code
@@ -91,6 +106,17 @@ namespace BananaPredictor.Osu
                         rng.Next();
                         rng.Next();
                     }
+                // TODO: figure out how this works
+                //else if (obj.Slider)
+                //{
+                    //foreach(var item in obj.SliderList)
+                    //{
+                        //else if (item.TinyDroplet)
+                            //rng.Next(20, 20);
+                        //else if (item.Droplet)
+                            //rng.Next();
+                    //}
+                //}
             }
 
             // Put all contents as well as processed hitobjects into osu file
