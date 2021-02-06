@@ -38,8 +38,8 @@ namespace BananaPredictor.Osu
                     switch (line.Banana)
                     {
                         case true:
-                            /*foreach (var bananaT in line.BananaShowerTime) // Need to get XOffset as well
-                                file.WriteLine(bananaX + ",192," + bananaT + ",1,0,0:0:0:0:"); // How do I fix this? Need to use BST and BSXO but can only use one at a time*/
+                            //foreach (var bananaT in line.BananaShowerTime) // Need to get XOffset as well
+                                //file.WriteLine(bananaX + ",192," + bananaT + ",1,0,0:0:0:0:"); // How do I fix this? Need to use BST and BSXO but can only use one at a time*/
                             // TODO: Inefficient alternative
                             List<int> store = new();
                             foreach (var bananaT in line.BananaShowerTime)
