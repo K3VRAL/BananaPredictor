@@ -46,20 +46,10 @@ namespace BananaPredictor
                 return;
             }
 
-            if (new BananaSpinPredictor().SpinnerPredictor(tbBeatmap.Text, cbDebug.Checked))
+            if (new BananaSpinPredictor().SpinnerPredictor(tbBeatmap.Text, cbDebug.Checked, 100, 300))
                 MessageBox.Show("Successfully made conversion! Press F5 in osu and it should be there.", "Done");
             else
                 MessageBox.Show("Failed!", "Error");
-
-
-            if (cbOpen.Checked)
-            {
-                String dir = String.Join("\\", tbBeatmap.Text.Split('\\').Reverse().Skip(1).Reverse().ToArray());
-                if (Directory.Exists(dir))
-                    Process.Start("explorer.exe", String.Join("\\", tbBeatmap.Text.Split('\\').Reverse().Skip(1).Reverse().ToArray()));
-                else
-                    MessageBox.Show("Directory doesn't exist!", "Error");
-            }
         }
 
         private void bBrowse_Click(object sender, EventArgs e)
@@ -79,12 +69,11 @@ namespace BananaPredictor
         }
         private void bOpen_Click(object sender, EventArgs e)
         {
-            String getPath = String.Join("\\", tbBeatmap.Text.Split('\\').Reverse().Skip(1).Reverse().ToArray() + "\\");
-            Process.Start("explorer.exe", getPath);
-            if (Directory.Exists(getPath))
-                Process.Start("explorer.exe", getPath);
+            String dir = String.Join("\\", tbBeatmap.Text.Split('\\').Reverse().Skip(1).Reverse().ToArray());
+            if (Directory.Exists(dir))
+                Process.Start("explorer.exe", String.Join("\\", tbBeatmap.Text.Split('\\').Reverse().Skip(1).Reverse().ToArray()));
             else
-                MessageBox.Show("Path doesn't exist. " + getPath, "Error");
+                MessageBox.Show("Directory doesn't exist!", "Error");
         }
 
         private void cbDebug_MouseHover(object sender, EventArgs e)
