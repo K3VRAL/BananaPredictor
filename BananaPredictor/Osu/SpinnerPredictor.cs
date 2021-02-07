@@ -12,7 +12,7 @@ namespace BananaPredictor.Osu
     // Used for debugging if program/initial logic works
     public class BananaSpinPredictor
     {
-        public bool SpinnerPredictor(string path, bool debugging)
+        public bool SpinnerPredictor(string path, bool debugging, int startPoint, int endPoint)
         {
             // Read file
             IEnumerable<String> lines = File.ReadLines(path);
@@ -64,6 +64,12 @@ namespace BananaPredictor.Osu
                 }
             }
 
+            // If not debugging, make even more spinners; according to spinners, even at a length of 1, it will make a banana count of 2 minimum making it so that we have more inflation to work with
+            if (!debugging)
+            {
+                // TODO: Do this
+            }
+
             // Processing each spinner - The logic for generating the time interval for each banana according to the catch rulesets; all rights go to peppy and his mathematics, just using the important code
             // Used according to https://github.com/ppy/osu/blob/master/osu.Game.Rulesets.Catch/Objects/BananaShower.cs
             foreach (var item in AllHitObjects)
@@ -94,17 +100,31 @@ namespace BananaPredictor.Osu
 
             // How each banana is processed - The logic the banana xoffset according to the catch rulesets; all rights go to peppy and his mathematics, just using the important code
             // Used according to https://github.com/ppy/osu/blob/master/osu.Game.Rulesets.Catch/Beatmaps/CatchBeatmapProcessor.cs
-            var rng = new FastRandom(CatchBeatmapProcessor.RNG_SEED);
+            var rng = new FastRandom(CatchBeatmapProcessor.RNG_SEED); // Why is the seed 1337?
+            var temp = new FastRandom(CatchBeatmapProcessor.RNG_SEED);
             foreach (var obj in AllHitObjects)
             {
                 if (obj.Banana)
+                {
                     for (int i = 0; i < obj.BananaShowerTime.Count; i++)
                     {
-                        obj.BananaShowerXOffset.Add((float)(rng.NextDouble() * CatchPlayfield.WIDTH));
+                        double xOffSetCheck = (float)(rng.NextDouble() * CatchPlayfield.WIDTH);
+                        if (xOffSetCheck < startPoint && xOffSetCheck > endPoint)     // TODO: Figure out why this isn't working
+                        {
+                            rng = temp;
+                            obj.BananaShowerXOffset.Clear();
+                            break;
+                        }
+                        obj.BananaShowerXOffset.Add(xOffSetCheck);
+                        temp.NextDouble();
+                        temp.Next();
+                        temp.Next();
+                        temp.Next();
                         rng.Next();
                         rng.Next();
                         rng.Next();
                     }
+                }
                 // TODO: Need to code in how it works
                 //else if (obj.Slider)
                 //{

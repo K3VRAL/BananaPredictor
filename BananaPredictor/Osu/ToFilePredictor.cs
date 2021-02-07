@@ -11,7 +11,7 @@ namespace BananaPredictor.Osu
         public bool OsuToFile(IEnumerable<String> lines, String path, GetMusicInfo MusicInfo, List<GetObjectInfo> AllHitObjects, int bmHitObjects)
         {
             PutTogether pt = new();
-            String filename = String.Join("\\", path.Split('\\').Reverse().Skip(1).Reverse().ToArray()) + "\\" + pt.PutLineTogether(MusicInfo.GetItemLine("Artist"), lines) + " - " + pt.PutLineTogether(MusicInfo.GetItemLine("Title"), lines) + " (" + pt.PutLineTogether(MusicInfo.GetItemLine("Creator"), lines) + ") [" + pt.PutLineTogether(MusicInfo.GetItemLine("Version"), lines) + " (BananaPredictor)].osu";
+            String filename = String.Join("\\", path.Split('\\').Reverse().Skip(1).Reverse().ToArray()) + "\\" + pt.PutLineTogether(MusicInfo.GetItemLine("Artist"), lines) + " - " + pt.PutLineTogether(MusicInfo.GetItemLine("Title"), lines) + " (" + pt.PutLineTogether(MusicInfo.GetItemLine("Creator"), lines) + ") [" + pt.PutLineTogether(MusicInfo.GetItemLine("Version"), lines) + " (BananaPredictor Debugger)].osu";
             File.Create(filename).Close();
             int num = 0;
             using (StreamWriter file = new(filename))
@@ -20,7 +20,7 @@ namespace BananaPredictor.Osu
                 {
                     if (num == MusicInfo.GetItemLine("Version"))
                     {
-                        file.WriteLine(line + " (BananaPredictor)");
+                        file.WriteLine(line + " (BananaPredictor Debugger)");
                         num++;
                         continue;
                     }
@@ -38,8 +38,8 @@ namespace BananaPredictor.Osu
                     {
                         case true:
                             //foreach (var bananaT in line.BananaShowerTime) // Need to get XOffset as well
-                                //file.WriteLine(bananaX + ",192," + bananaT + ",1,0,0:0:0:0:"); // How do I fix this? Need to use BST and BSXO but can only use one at a time*/
-                            // TODO: Inefficient alternative, figure out how to use one above
+                                //file.WriteLine(bananaX + ",192," + bananaT + ",1,0,0:0:0:0:");*/
+                            // Inefficient alternative, figure out how to use one above - I'll just have to cut my losses if I am unable to solve this
                             List<int> store = new();
                             foreach (var bananaT in line.BananaShowerTime)
                                 store.Add(Convert.ToInt32(Math.Floor(bananaT)));        // Not sure if it should use Floor or Ceiling

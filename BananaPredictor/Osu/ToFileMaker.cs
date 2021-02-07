@@ -9,8 +9,6 @@ namespace BananaPredictor.Osu
     {
         public bool OsuToFile(IEnumerable<String> lines, String path, GetMusicInfo MusicInfo, List<GetObjectInfo> AllHitObjects, int bmHitObjects)
         {
-            // TODO: Remove this and add end with true - return true;
-            return false;
             PutTogether pt = new();
             String filename = String.Join("\\", path.Split('\\').Reverse().Skip(1).Reverse().ToArray()) + "\\" + pt.PutLineTogether(MusicInfo.GetItemLine("Artist"), lines) + " - " + pt.PutLineTogether(MusicInfo.GetItemLine("Title"), lines) + " (" + pt.PutLineTogether(MusicInfo.GetItemLine("Creator"), lines) + ") [" + pt.PutLineTogether(MusicInfo.GetItemLine("Version"), lines) + " (BananaPredictor)].osu";
             File.Create(filename).Close();
@@ -39,6 +37,13 @@ namespace BananaPredictor.Osu
                     {
                         case true:
                             // TODO: Figure this out
+                            List<int> store = new();
+                            foreach (var bananaT in line.BananaShowerTime)
+                                store.Add(Convert.ToInt32(Math.Floor(bananaT)));        // Not sure if it should use Floor or Ceiling
+                            foreach (var bananaX in line.BananaShowerXOffset)
+                                store.Add(Convert.ToInt32(Math.Floor(bananaX)));        // Not sure if it should use Floor or Ceiling
+                            for (int i = 0; i < store.Count / 2; i++)
+                                file.WriteLine("256,192," + store[i] + ",12,0," + (store[i] + 1) + ",0:0:0:0:");
                             break;
                         default:
                             file.WriteLine(line.Object);
@@ -46,6 +51,7 @@ namespace BananaPredictor.Osu
                     }
                 }
             }
+            return true;
         }
     }
 }
