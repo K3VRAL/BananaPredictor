@@ -7,7 +7,8 @@ namespace BananaPredictor.Osu
     {
         public String Object { get; set; }
         public bool Slider { get; set; }
-        public List<double> SliderList { get; set; }
+        public double SliderInheritedPoint { get; set; }
+        public double SliderUninheritedPoint { get; set; }
         public bool Banana { get; set; }
         public List<double> BananaShowerTime { get; set; }
         public List<double> BananaShowerXOffset { get; set; }

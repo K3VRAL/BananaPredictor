@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Game.Rulesets.Catch.MathUtils;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Catch.Beatmaps;
+using osu.Game.Screens.Play;
 
 namespace BananaPredictor.Osu
 {
@@ -19,8 +20,7 @@ namespace BananaPredictor.Osu
 
             // Map info lines (Used for the file name and such)
             GetMusicInfo MusicInfo = new();
-            MusicInfo.Path = path;
-            int bmHitObjects = MusicInfo.GetItemLine("[HitObjects]");
+            int bmHitObjects = MusicInfo.GetItemLine("[HitObjects]", lines);
 
             // If not found any
             if (bmHitObjects < 0)
@@ -28,6 +28,7 @@ namespace BananaPredictor.Osu
 
             // Storing all spinners and objects found into list
             List<GetObjectInfo> AllHitObjects = new();
+            SliderProcess sp = new();
             for (int i = bmHitObjects; i < lines.Count(); i++)
             {
                 // Making sure that these are spinners; spinners always have x: 256 and y: 192 according to https://osu.ppy.sh/wiki/en/osu%21_File_Formats/Osu_%28file_format%29#spinners
@@ -42,13 +43,17 @@ namespace BananaPredictor.Osu
                         BananaShowerTime = new List<double>(),
                         BananaShowerXOffset = new List<double>()
                     });
-                } else if (amount.Length > 8 && amount[5].Contains("|"))    // TODO: JuiceStream has RNG as well, need to fix
+                } else if (amount.Length > 7)
                 {
                     // Checks for sliders; they use the rng class as well like spinners
+                    // According to https://osu.ppy.sh/wiki/en/osu%21_File_Formats/Osu_%28file_format%29#sliders; they are pretty dynamic whereas hitobjects and spinners are static, so I hope this line of code doesn't break anything with other beatmaps
                     AllHitObjects.Add(new GetObjectInfo
                     {
                         Object = lines.Skip(i).First(),
                         Slider = true,
+                        // The line of code below is broken; this is because I lack knowledge on how sliders works and they are really confusing to work with
+                        //SliderInheritedPoint = sp.GoingThroughTimingPoints(lines.Skip(i).First()[2], MusicInfo.GetItemLine("[TimingPoints]", lines) + 1, true, lines),
+                        //SliderUninheritedPoint = sp.GoingThroughTimingPoints(lines.Skip(i).First()[2], MusicInfo.GetItemLine("[TimingPoints]", lines) + 1, false, lines),
                         Banana = false
                     });
                 }
@@ -62,12 +67,6 @@ namespace BananaPredictor.Osu
                         Banana = false
                     });
                 }
-            }
-
-            // If not debugging, make even more spinners; according to spinners, even at a length of 1, it will make a banana count of 2 minimum making it so that we have more inflation to work with
-            if (!debugging)
-            {
-                // TODO: Do this
             }
 
             // Processing each spinner - The logic for generating the time interval for each banana according to the catch rulesets; all rights go to peppy and his mathematics, just using the important code
@@ -102,6 +101,7 @@ namespace BananaPredictor.Osu
             // Used according to https://github.com/ppy/osu/blob/master/osu.Game.Rulesets.Catch/Beatmaps/CatchBeatmapProcessor.cs
             var rng = new FastRandom(CatchBeatmapProcessor.RNG_SEED); // Why is the seed 1337?
             var temp = new FastRandom(CatchBeatmapProcessor.RNG_SEED);
+            bool wentwrong = false;
             foreach (var obj in AllHitObjects)
             {
                 if (obj.Banana)
@@ -113,16 +113,23 @@ namespace BananaPredictor.Osu
                         {
                             rng = temp;
                             obj.BananaShowerXOffset.Clear();
+                            wentwrong = true;
                             break;
                         }
                         obj.BananaShowerXOffset.Add(xOffSetCheck);
-                        temp.NextDouble();
-                        temp.Next();
-                        temp.Next();
-                        temp.Next();
                         rng.Next();
                         rng.Next();
                         rng.Next();
+                    }
+                    if (!wentwrong)
+                    {
+                        for (int i = 0; i < obj.BananaShowerXOffset.Count; i++)
+                        {
+                            temp.NextDouble();
+                            temp.Next();
+                            temp.Next();
+                            temp.Next();
+                        }
                     }
                 }
                 // TODO: Need to code in how it works

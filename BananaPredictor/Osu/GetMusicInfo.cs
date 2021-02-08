@@ -1,15 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace BananaPredictor.Osu
 {
     public class GetMusicInfo
     {
-        public String Path { get; set; }
-        public int GetItemLine(String item)
+        public int GetItemLine(String item, IEnumerable<String> Path)
         {
             int lineindex = 0;
-            foreach (var line in File.ReadLines(Path))
+            foreach (var line in Path)
             {
                 // Get map info
                 if (line.Contains(item))
