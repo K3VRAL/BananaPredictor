@@ -33,6 +33,7 @@ namespace BananaPredictor
             OriginalWidth = this.Width;
             OriginalHeight = this.Height;
             this.CenterToScreen();
+            this.ActiveControl = tbBeatmap;
         }
 
         // Main Window
