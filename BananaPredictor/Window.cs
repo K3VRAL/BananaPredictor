@@ -39,7 +39,7 @@ namespace BananaPredictor
         // Main Window
         private void bSubmit_Click(object sender, EventArgs e)
         {
-            System.Diagnostics.Debug.WriteLine("Submission Clicked");
+            //System.Diagnostics.Debug.WriteLine("Submission Clicked");
 
             if (!File.Exists(tbBeatmap.Text) || !Path.GetExtension(fileDir.FileName).Equals(".osu"))
             {
@@ -55,7 +55,7 @@ namespace BananaPredictor
 
         private void bBrowse_Click(object sender, EventArgs e)
         {
-            System.Diagnostics.Debug.WriteLine("Browse Clicked");
+            //System.Diagnostics.Debug.WriteLine("Browse Clicked");
 
             fileDir.Filter = "osu Files (*.osu)|*.osu";
             fileDir.FilterIndex = 0;
