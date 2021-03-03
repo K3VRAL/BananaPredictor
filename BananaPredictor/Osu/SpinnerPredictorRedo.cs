@@ -7,9 +7,6 @@ using osu.Game.Rulesets.Catch.MathUtils;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Catch.Beatmaps;
 using osu.Game.Screens.Play;
-using osu.Game.Rulesets.Objects;
-using osu.Game.Migrations;
-using System.CodeDom.Compiler;
 
 namespace BananaPredictor.Osu
 {
@@ -32,7 +29,7 @@ namespace BananaPredictor.Osu
 
             // Storing all spinners and objects found into list
             List<GetObjectInfo> AllHitObjects = new();
-            SliderProcess sp = new();
+            //SliderProcess sp = new();
             for (int i = bmHitObjects; i < lines.Count(); i++)
             {
                 // Making sure that these are spinners; spinners always have x: 256 and y: 192 according to https://osu.ppy.sh/wiki/en/osu%21_File_Formats/Osu_%28file_format%29#spinners
@@ -78,11 +75,11 @@ namespace BananaPredictor.Osu
             {
                 if (AllHitObjects[i].Banana)
                 {
-                    for (int j = AllHitObjects[i].BananaStart; j < AllHitObjects[i].BananaEnd - 1; j++)
+                    for (int j = AllHitObjects[i].BananaStart; j < AllHitObjects[i].BananaEnd - 1; j += 120)
                     {
                         AllHitObjects.Add(new GetObjectInfo
                         {
-                            Object = "256,192," + j + ",12,0," + ++j + ",0:0:0:0:",
+                            Object = "256,192," + j + ",12,0," + (j + 1) + ",0:0:0:0:",
                             Banana = true,
                             BananaStart = j,
                             BananaEnd = j + 1,
@@ -135,34 +132,40 @@ namespace BananaPredictor.Osu
             int indx = 0;
             while (indx < AllHitObjects.Count)
             {
-                System.Diagnostics.Debug.WriteLine("Processing {0} in indx {1}", AllHitObjects[indx].Object, indx);
+                //System.Diagnostics.Debug.WriteLine("Processing {0} in indx {1}", AllHitObjects[indx].Object, indx);
                 if (AllHitObjects[indx].Banana)
                 {
                     for (int i = 0; i < AllHitObjects[indx].BananaShowerTime.Count; i++)
                     {
                         temp = rng;
                         double xOffSetCheck = (float)(rng.NextDouble() * CatchPlayfield.WIDTH);
-                        System.Diagnostics.Debug.WriteLine("Banana in {0} with {1}", AllHitObjects[indx].BananaShowerTime[i], xOffSetCheck);
+                        //System.Diagnostics.Debug.WriteLine("Banana in {0} with {1}", AllHitObjects[indx].BananaShowerTime[i], xOffSetCheck);
                         if (xOffSetCheck < startPoint || xOffSetCheck > endPoint)     // TODO: Figure out why this isn't working
                         {
                             AllHitObjects.Insert(indx, new GetObjectInfo
                             {
-                                Object = "256,144," + AllHitObjects[indx].BananaShowerTime[i] + ",6,0,L|256:166,1,20",
+                                Object = "256,144," + AllHitObjects[indx].BananaStart + ",6,0,L|256:166,1,20",
                                 Banana = false
                             });
                             rng = temp;
                             //indx = 0;
                             AllHitObjects = ms.Merge(AllHitObjects);
+                            for (int k = 0; k < indx; k++)
+                                if (AllHitObjects[k].Banana && AllHitObjects[k].BananaShowerXOffset.Count > 0)
+                                    AllHitObjects[k].BananaShowerXOffset.Clear();
                             break;
                         }
+                        AllHitObjects[indx].BananaShowerXOffset.Add(xOffSetCheck);
                         rng.Next();
                         rng.Next();
                         rng.Next();
+                        temp = rng;
                     }
                     indx++;
                 } else
                 {
                     rng.Next();
+                    temp = rng;
                     indx++;
                 }
                 // TODO: Need to code in how it works
