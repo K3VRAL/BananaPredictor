@@ -24,9 +24,8 @@ namespace BananaPredictor
         public static extern bool ReleaseCapture();
 
         // Window Related Animations
-        int OriginalHeight, OriginalWidth;
-        int ScreenHeight = Screen.PrimaryScreen.Bounds.Height, ScreenWidth = Screen.PrimaryScreen.Bounds.Width;
-
+        readonly int OriginalHeight, OriginalWidth;
+        
         public K3Banana()
         {
             InitializeComponent();
