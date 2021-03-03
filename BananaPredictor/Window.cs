@@ -47,7 +47,7 @@ namespace BananaPredictor
                 return;
             }
 
-            if (new BananaSpinPredictor().SpinnerPredictor(tbBeatmap.Text, cbDebug.Checked, 100, 300))
+            if (new BananaSpinPredictorRedo().SpinnerPredictor(tbBeatmap.Text, cbDebug.Checked, 160, 352))
                 MessageBox.Show("Successfully made conversion! Press F5 in osu and it should be there.", "Done");
             else
                 MessageBox.Show("Failed!", "Error");
