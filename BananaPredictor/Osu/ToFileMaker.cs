@@ -33,22 +33,20 @@ namespace BananaPredictor.Osu
 
                 foreach (var line in AllHitObjects)
                 {
-                    switch (line.Banana)
+                    /*if (line.Banana)
                     {
-                        case true:
-                            // TODO: Figure this out with sliders as well
-                            List<int> store = new();
-                            foreach (var bananaT in line.BananaShowerTime)
-                                store.Add(Convert.ToInt32(Math.Floor(bananaT)));        // Not sure if it should use Floor or Ceiling
-                            foreach (var bananaX in line.BananaShowerXOffset)
-                                store.Add(Convert.ToInt32(Math.Floor(bananaX)));        // Not sure if it should use Floor or Ceiling
-                            for (int i = 0; i < store.Count / 2; i++)
-                                file.WriteLine("256,192," + store[i] + ",12,0," + (store[i] + 1) + ",0:0:0:0:");
-                            break;
-                        default:
-                            file.WriteLine(line.Object);
-                            break;
-                    }
+                        // TODO: Figure this out with sliders as well
+                        //List<int> store = new();
+                        //foreach (var bananaT in line.BananaShowerTime)
+                        //    store.Add(Convert.ToInt32(Math.Floor(bananaT)));        // Not sure if it should use Floor or Ceiling
+                        //foreach (var bananaX in line.BananaShowerXOffset)
+                        //    store.Add(Convert.ToInt32(Math.Floor(bananaX)));        // Not sure if it should use Floor or Ceiling
+                        file.WriteLine(line.Object);
+                    } else
+                    {
+                        file.WriteLine(line.Object);
+                    }*/
+                    file.WriteLine(line.Object);
                 }
             }
             return true;
