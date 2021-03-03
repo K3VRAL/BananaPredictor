@@ -28,7 +28,7 @@ namespace BananaPredictor.Osu
 
             // Storing all spinners and objects found into list
             List<GetObjectInfo> AllHitObjects = new();
-            SliderProcess sp = new();
+            //SliderProcess sp = new();
             for (int i = bmHitObjects; i < lines.Count(); i++)
             {
                 // Making sure that these are spinners; spinners always have x: 256 and y: 192 according to https://osu.ppy.sh/wiki/en/osu%21_File_Formats/Osu_%28file_format%29#spinners
