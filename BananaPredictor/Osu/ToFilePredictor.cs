@@ -34,24 +34,22 @@ namespace BananaPredictor.Osu
 
                 foreach (var line in AllHitObjects)
                 {
-                    switch (line.Banana)
+                    if (line.Banana)
                     {
-                        case true:
-                            //foreach (var bananaT in line.BananaShowerTime) // Need to get XOffset as well
-                                //file.WriteLine(bananaX + ",192," + bananaT + ",1,0,0:0:0:0:");*/
-                            // Inefficient alternative, figure out how to use one above - I'll just have to cut my losses if I am unable to solve this
-                            List<int> store = new();
-                            foreach (var bananaT in line.BananaShowerTime)
-                                store.Add(Convert.ToInt32(Math.Floor(bananaT)));        // Not sure if it should use Floor or Ceiling
-                            foreach (var bananaX in line.BananaShowerXOffset)
-                                store.Add(Convert.ToInt32(Math.Floor(bananaX)));        // Not sure if it should use Floor or Ceiling
-                            for (int i = 0; i < store.Count / 2; i++)
-                                file.WriteLine(store[(store.Count / 2) + i] + ",192," + store[i] + ",1,0,0:0:0:0:");
-                            break;
-                        default:
-                            file.WriteLine(line.Object);
-                            break;
-                    }
+                        // TODO: Fix this
+                        //foreach (var bananaT in line.BananaShowerTime) // Need to get XOffset as well
+                        //file.WriteLine(bananaX + ",192," + bananaT + ",1,0,0:0:0:0:");*/
+                        // Inefficient alternative, figure out how to use one above - I'll just have to cut my losses if I am unable to solve this
+                        List<int> storeX = new();
+                        List<int> storeTime = new();
+                        foreach (var bananaT in line.BananaShowerTime)
+                            storeTime.Add(Convert.ToInt32(Math.Floor(bananaT)));        // Not sure if it should use Floor or Ceiling
+                        foreach (var bananaX in line.BananaShowerXOffset)
+                            storeX.Add(Convert.ToInt32(Math.Floor(bananaX)));        // Not sure if it should use Floor or Ceiling
+                        for (int i = 0; i < storeX.Count; i++)
+                            file.WriteLine(storeX[i] + ",192," + storeTime[i] + ",1,0,0:0:0:0:");
+                    } else
+                        file.WriteLine(line.Object);
                 }
             }
             return true;
