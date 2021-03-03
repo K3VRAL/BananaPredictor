@@ -35,7 +35,7 @@ namespace BananaPredictor.Osu
             MergeSort doingright = new();
 
             doingleft.Merge(left);
-            doingleft.Merge(right);
+            doingright.Merge(right);
 
             while (left.Count != 0 && right.Count != 0)
             {
