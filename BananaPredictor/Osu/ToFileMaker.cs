@@ -48,6 +48,8 @@ namespace BananaPredictor.Osu
                     }*/
                     file.WriteLine(line.Object);
                 }
+                // TODO: Add in final hitobject for platter reset
+                //file.WriteLine("256,192," + AllHitObjects[AllHitObjects.Count - 1].BananaEnd + ",5,0,0:0:0:0:");
             }
             return true;
         }
