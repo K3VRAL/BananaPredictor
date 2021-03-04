@@ -1,11 +1,12 @@
 # BananaPredictor
 
+Working now but need to allow for other maps to be compatible with this program (no more hard coded values)
+
 Using .Net Core 5 and osu Catch Rulesets from lazer
 
 This program will be able to predict where the next banana xoffset will be placed and either remove or leave it be depending on the area you want the banana to be placed in.
 
-
-PROJECT CURRENTLY DEAD
+PROJECT CURRENTLY DEAD - Nope, I'm back working on this
 
 UPDATE:
 At the moment, I've realized how difficult this project will be in order to be able to complete it. RNG is generated through the amount of spinners/sliders(/HR Objects?) are used; not when they are: placed differently, placed in different times, BPM changed, Velocity changes, etc.
