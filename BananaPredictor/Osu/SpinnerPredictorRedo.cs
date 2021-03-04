@@ -41,7 +41,7 @@ namespace BananaPredictor.Osu
                     AllHitObjects.Add(new GetObjectInfo
                     {
                         Object = lines.Skip(i).First(),
-                        //Slider = false,
+                        Slider = false,
                         Banana = true,
                         BananaStart = Int32.Parse(amount[2]),
                         BananaEnd = Int32.Parse(amount[5])
@@ -62,11 +62,12 @@ namespace BananaPredictor.Osu
                 }*/
                 else
                 {
+                    // TODO: Fix why normal objects arn't being processed normally
                     // Normal objects added
                     AllHitObjects.Add(new GetObjectInfo
                     {
                         Object = lines.Skip(i).First(),
-                        //Slider = false,
+                        Slider = false,
                         Banana = false
                     });
                 }
@@ -86,6 +87,7 @@ namespace BananaPredictor.Osu
                         {
                             Object = "256,192," + j + ",12,0," + (j + 1) + ",0:0:0:0:",
                             Banana = true,
+                            Slider = false,
                             BananaStart = j,
                             BananaEnd = j + 1,
                             BananaShowerXOffset = new(),
@@ -144,48 +146,55 @@ namespace BananaPredictor.Osu
             // How each banana is processed - The logic the banana xoffset according to the catch rulesets; all rights go to peppy and his mathematics, just using the important code
             // Used according to https://github.com/ppy/osu/blob/master/osu.Game.Rulesets.Catch/Beatmaps/CatchBeatmapProcessor.cs
             var rng = new FastRandom(CatchBeatmapProcessor.RNG_SEED); // Why is the seed 1337?
-            var temp = new FastRandom(CatchBeatmapProcessor.RNG_SEED);
+            //var temp = new FastRandom(CatchBeatmapProcessor.RNG_SEED);
             int indx = 0;
+            bool restart = false;
             while (indx < AllHitObjects.Count)
             {
+                restart = false;
                 Console.WriteLine("Processing {0} in indx {1}", AllHitObjects[indx].Object, indx);
                 if (AllHitObjects[indx].Banana)
                 {
                     for (int i = 0; i < AllHitObjects[indx].BananaShowerTime.Count; i++)
                     {
-                        temp = rng;
+                        //temp = rng;
                         double xOffSetCheck = (float)(rng.NextDouble() * CatchPlayfield.WIDTH);
-                        Console.WriteLine("xOffset {0} | Adding new slider {1}", xOffSetCheck, (xOffSetCheck < startPoint || xOffSetCheck > endPoint));
+                        //Console.WriteLine("{0} {1}", xOffSetCheck, (xOffSetCheck < startPoint || xOffSetCheck > endPoint));
+                        Console.WriteLine("xOffset {0} | Adding new slider {1}", xOffSetCheck, !(xOffSetCheck < startPoint || xOffSetCheck > endPoint));
                         //Console.WriteLine("Banana in {0} with {1}", AllHitObjects[indx].BananaShowerTime[i], xOffSetCheck);
-                        if (xOffSetCheck < startPoint || xOffSetCheck > endPoint)     // TODO: Figure out why this isn't working
+                        if (!(xOffSetCheck < startPoint || xOffSetCheck > endPoint))     // TODO: Figure out why this isn't working
                         {
                             AllHitObjects.Insert(indx, new GetObjectInfo
                             {
                                 Object = "256,144," + AllHitObjects[indx].BananaStart + ",6,0,L|256:166,1,20",
-                                Banana = false
+                                Banana = false,
+                                Slider = true
                             });
-                            rng = temp;
-                            //indx = 0;
+                            //rng = temp;
+                            // TODO: IT WORKS. IT ACTUALLY WORKS. BUT ITS SO FUCKING INEFFICIENT
+                            rng = new FastRandom(CatchBeatmapProcessor.RNG_SEED);
+                            indx = 0;
                             AllHitObjects = ms.Merge(AllHitObjects);
+                            restart = true;
                             // TODO: For debugging
                             //for (int k = 0; k < indx; k++)
                             //    if (AllHitObjects[k].Banana && AllHitObjects[k].BananaShowerXOffset.Count > 0)
                             //        AllHitObjects[k].BananaShowerXOffset.Clear();
                             break;
                         }
-                        AllHitObjects[indx].BananaShowerXOffset.Add(xOffSetCheck);
+                        //AllHitObjects[indx].BananaShowerXOffset.Add(xOffSetCheck);
                         rng.Next();
                         rng.Next();
                         rng.Next();
-                        temp = rng;
                     }
-                    indx++;
-                } else
+                    if (!restart)
+                        indx++;
+                } else if (AllHitObjects[indx].Slider)
                 {
                     rng.Next();
-                    temp = rng;
                     indx++;
-                }
+                } else
+                    indx++;
                 // TODO: Need to code in how it works
                 //else if (obj.Slider)
                 //{
@@ -206,8 +215,9 @@ namespace BananaPredictor.Osu
             if (debugging)
             {
                 // For debugging
-                ToFilePredictor toFile = new();
-                return toFile.OsuToFile(lines, path, MusicInfo, AllHitObjects, bmHitObjects);
+                //ToFilePredictor toFile = new();
+                //return toFile.OsuToFile(lines, path, MusicInfo, AllHitObjects, bmHitObjects);
+                return false;
             } else
             {
                 // For Final
