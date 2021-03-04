@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows.Forms;
 
 using BananaPredictor.Osu;
@@ -25,20 +26,40 @@ namespace BananaPredictor
 
         // Window Related Animations
         readonly int OriginalHeight, OriginalWidth;
+
+        // Thread
+        Thread processingThread;
+        BananaSpinPredictorRedo bspr;
         
+        // Loading and Initializing
         public K3Banana()
         {
             InitializeComponent();
+            consoleOutput();
+
             OriginalWidth = this.Width;
             OriginalHeight = this.Height;
             this.CenterToScreen();
             this.ActiveControl = tbBeatmap;
+            this.bCancel.Hide();
+
+            Console.WriteLine("Application Started Up");
         }
+
+        // Output type won't let me use console application. Thanks stackoverflow for the help
+        private void consoleOutput()
+        {
+            AllocConsole();
+            Console.WriteLine("Console Window Started Up\nDon't close this window. It's more to look at how the program is working or if it is");
+        }
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool AllocConsole();
 
         // Main Window
         private void bSubmit_Click(object sender, EventArgs e)
         {
-            //System.Diagnostics.Debug.WriteLine("Submission Clicked");
+            Console.WriteLine("Submit Clicked");
 
             if (!File.Exists(tbBeatmap.Text) || !Path.GetExtension(fileDir.FileName).Equals(".osu"))
             {
@@ -46,15 +67,33 @@ namespace BananaPredictor
                 return;
             }
 
-            if (new BananaSpinPredictorRedo().SpinnerPredictor(tbBeatmap.Text, cbDebug.Checked, 160, 352))
+            bCancel.Show();
+            bSubmit.Hide();
+            bspr = new();
+            processingThread = new(new ThreadStart(threadMethod));
+            processingThread.Start();
+        }
+
+        private void threadMethod()
+        {
+            if (bspr.SpinnerPredictor(tbBeatmap.Text, cbDebug.Checked, 160, 352))
                 MessageBox.Show("Successfully made conversion! Press F5 in osu and it should be there.", "Done");
+            else if (bspr.getFlag())
+                MessageBox.Show("Canceled", "Error");
             else
-                MessageBox.Show("Failed!", "Error");
+                MessageBox.Show("Failed", "Error");
+            Console.WriteLine("Program Ended");
+
+            Invoke(new MethodInvoker(() =>
+            {
+                bCancel.Hide();
+                bSubmit.Show();
+            }));
         }
 
         private void bBrowse_Click(object sender, EventArgs e)
         {
-            //System.Diagnostics.Debug.WriteLine("Browse Clicked");
+            Console.WriteLine("Browse Clicked");
 
             fileDir.Filter = "osu Files (*.osu)|*.osu";
             fileDir.FilterIndex = 0;
@@ -69,11 +108,28 @@ namespace BananaPredictor
         }
         private void bOpen_Click(object sender, EventArgs e)
         {
+            Console.WriteLine("Directory Clicked");
             String dir = String.Join("\\", tbBeatmap.Text.Split('\\').Reverse().Skip(1).Reverse().ToArray());
             if (Directory.Exists(dir))
                 Process.Start("explorer.exe", String.Join("\\", tbBeatmap.Text.Split('\\').Reverse().Skip(1).Reverse().ToArray()));
             else
                 MessageBox.Show("Directory doesn't exist!", "Error");
+        }
+
+        private void bCancel_Click(object sender, EventArgs e)
+        {
+            Console.WriteLine("Cancel Clicked");
+            if (processingThread.IsAlive)
+            {
+                bspr.Stop();
+                processingThread.Join();
+                bSubmit.Show();
+                bCancel.Hide();
+            } else
+            {
+                bSubmit.Show();
+                bCancel.Hide();
+            }
         }
 
         private void cbDebug_MouseHover(object sender, EventArgs e)
@@ -93,12 +149,14 @@ namespace BananaPredictor
 
         private void wbMini_Click(object sender, EventArgs e)
         {
+            Console.WriteLine("Minimize Clicked");
             tAnimation.Interval = 15;
             tAnimation.Start();
         }
 
         private void wbExit_Click(object sender, EventArgs e)
         {
+            Console.WriteLine("Exit Clicked");
             Application.Exit();
         }
 
@@ -112,9 +170,9 @@ namespace BananaPredictor
             else
             {
                 tAnimation.Stop();
-                this.WindowState = FormWindowState.Minimized;
                 this.Height = OriginalHeight;
                 this.Width = OriginalWidth;
+                this.WindowState = FormWindowState.Minimized;
             }
         }
     }

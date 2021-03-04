@@ -41,6 +41,7 @@ namespace BananaPredictor
             this.wbExit = new System.Windows.Forms.Button();
             this.tAnimation = new System.Windows.Forms.Timer(this.components);
             this.bOpen = new System.Windows.Forms.Button();
+            this.bCancel = new System.Windows.Forms.Button();
             this.pTop.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -165,12 +166,29 @@ namespace BananaPredictor
             this.bOpen.UseVisualStyleBackColor = false;
             this.bOpen.Click += new System.EventHandler(this.bOpen_Click);
             // 
+            // bCancel
+            // 
+            this.bCancel.BackColor = System.Drawing.Color.Red;
+            this.bCancel.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Maroon;
+            this.bCancel.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(128)))));
+            this.bCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.bCancel.ForeColor = System.Drawing.SystemColors.Control;
+            this.bCancel.Location = new System.Drawing.Point(321, 92);
+            this.bCancel.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.bCancel.Name = "bCancel";
+            this.bCancel.Size = new System.Drawing.Size(85, 31);
+            this.bCancel.TabIndex = 8;
+            this.bCancel.Text = "Cancel";
+            this.bCancel.UseVisualStyleBackColor = false;
+            this.bCancel.Click += new System.EventHandler(this.bCancel_Click);
+            // 
             // K3Banana
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.ClientSize = new System.Drawing.Size(420, 135);
+            this.Controls.Add(this.bCancel);
             this.Controls.Add(this.bOpen);
             this.Controls.Add(this.pTop);
             this.Controls.Add(this.cbDebug);
@@ -200,6 +218,7 @@ namespace BananaPredictor
         private System.Windows.Forms.Button wbMini;
         private System.Windows.Forms.Timer tAnimation;
         private System.Windows.Forms.Button bOpen;
+        private System.Windows.Forms.Button bCancel;
     }
 }
 
