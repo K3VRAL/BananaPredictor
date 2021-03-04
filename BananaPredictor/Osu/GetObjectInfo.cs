@@ -6,7 +6,7 @@ namespace BananaPredictor.Osu
     public class GetObjectInfo
     {
         public String Object { get; set; }
-        //public bool Slider { get; set; }
+        public bool Slider { get; set; }
         //public double SliderInheritedPoint { get; set; }
         //public double SliderUninheritedPoint { get; set; }
         public bool Banana { get; set; }
