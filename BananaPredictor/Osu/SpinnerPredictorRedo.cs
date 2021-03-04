@@ -13,6 +13,8 @@ namespace BananaPredictor.Osu
     // Used for debugging if program/initial logic works
     public class BananaSpinPredictorRedo
     {
+        private bool flag = false;
+
         public bool SpinnerPredictor(string path, bool debugging, int startPoint, int endPoint)
         {
             // Read file
@@ -68,6 +70,9 @@ namespace BananaPredictor.Osu
                         Banana = false
                     });
                 }
+
+                if (flag)
+                    return false;
             }
 
             int num = AllHitObjects.Count;
@@ -75,7 +80,7 @@ namespace BananaPredictor.Osu
             {
                 if (AllHitObjects[i].Banana)
                 {
-                    for (int j = AllHitObjects[i].BananaStart; j < AllHitObjects[i].BananaEnd - 1; j += 120)
+                    for (int j = AllHitObjects[i].BananaStart; j < AllHitObjects[i].BananaEnd - 1; j += 30)
                     {
                         AllHitObjects.Add(new GetObjectInfo
                         {
@@ -86,10 +91,16 @@ namespace BananaPredictor.Osu
                             BananaShowerXOffset = new(),
                             BananaShowerTime = new()
                         });
+
+                        if (flag)
+                            return false;
                     }
 
                     AllHitObjects.RemoveAt(i);
                 }
+
+                if (flag)
+                    return false;
             }
 
             // Processing each spinner - The logic for generating the time interval for each banana according to the catch rulesets; all rights go to peppy and his mathematics, just using the important code
@@ -112,10 +123,15 @@ namespace BananaPredictor.Osu
                     while (time <= endtime)
                     {
                         obj.BananaShowerTime.Add(time);
-
                         time += spacing;
+
+                        if (flag)
+                            return false;
                     }
                 }
+
+                if (flag)
+                    return false;
             }
 
             // Mergesort
@@ -132,14 +148,15 @@ namespace BananaPredictor.Osu
             int indx = 0;
             while (indx < AllHitObjects.Count)
             {
-                //System.Diagnostics.Debug.WriteLine("Processing {0} in indx {1}", AllHitObjects[indx].Object, indx);
+                Console.WriteLine("Processing {0} in indx {1}", AllHitObjects[indx].Object, indx);
                 if (AllHitObjects[indx].Banana)
                 {
                     for (int i = 0; i < AllHitObjects[indx].BananaShowerTime.Count; i++)
                     {
                         temp = rng;
                         double xOffSetCheck = (float)(rng.NextDouble() * CatchPlayfield.WIDTH);
-                        //System.Diagnostics.Debug.WriteLine("Banana in {0} with {1}", AllHitObjects[indx].BananaShowerTime[i], xOffSetCheck);
+                        Console.WriteLine("xOffset {0} | Adding new slider {1}", xOffSetCheck, (xOffSetCheck < startPoint || xOffSetCheck > endPoint));
+                        //Console.WriteLine("Banana in {0} with {1}", AllHitObjects[indx].BananaShowerTime[i], xOffSetCheck);
                         if (xOffSetCheck < startPoint || xOffSetCheck > endPoint)     // TODO: Figure out why this isn't working
                         {
                             AllHitObjects.Insert(indx, new GetObjectInfo
@@ -150,9 +167,10 @@ namespace BananaPredictor.Osu
                             rng = temp;
                             //indx = 0;
                             AllHitObjects = ms.Merge(AllHitObjects);
-                            for (int k = 0; k < indx; k++)
-                                if (AllHitObjects[k].Banana && AllHitObjects[k].BananaShowerXOffset.Count > 0)
-                                    AllHitObjects[k].BananaShowerXOffset.Clear();
+                            // TODO: For debugging
+                            //for (int k = 0; k < indx; k++)
+                            //    if (AllHitObjects[k].Banana && AllHitObjects[k].BananaShowerXOffset.Count > 0)
+                            //        AllHitObjects[k].BananaShowerXOffset.Clear();
                             break;
                         }
                         AllHitObjects[indx].BananaShowerXOffset.Add(xOffSetCheck);
@@ -179,6 +197,9 @@ namespace BananaPredictor.Osu
                 //rng.Next();
                 //}
                 //}
+
+                if (flag)
+                    return false;
             }
 
             // Put all contents as well as processed hitobjects into osu file
@@ -193,6 +214,17 @@ namespace BananaPredictor.Osu
                 ToFileMaker toFile = new();
                 return toFile.OsuToFile(lines, path, MusicInfo, AllHitObjects, bmHitObjects);
             }
+        }
+
+        public void Stop()
+        {
+            Console.WriteLine("Stop flag triggered");
+            flag = true;
+        }
+
+        public bool getFlag()
+        {
+            return flag;
         }
     }
 }
