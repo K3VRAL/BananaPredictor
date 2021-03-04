@@ -76,7 +76,7 @@ namespace BananaPredictor
 
         private void threadMethod()
         {
-            if (bspr.SpinnerPredictor(tbBeatmap.Text, cbDebug.Checked, 160, 352))
+            if (bspr.SpinnerPredictor(tbBeatmap.Text, cbDebug.Checked, 112, 400))
                 MessageBox.Show("Successfully made conversion! Press F5 in osu and it should be there.", "Done");
             else if (bspr.getFlag())
                 MessageBox.Show("Canceled", "Error");
@@ -123,13 +123,9 @@ namespace BananaPredictor
             {
                 bspr.Stop();
                 processingThread.Join();
-                bSubmit.Show();
-                bCancel.Hide();
-            } else
-            {
-                bSubmit.Show();
-                bCancel.Hide();
             }
+            bSubmit.Show();
+            bCancel.Hide();
         }
 
         private void cbDebug_MouseHover(object sender, EventArgs e)
