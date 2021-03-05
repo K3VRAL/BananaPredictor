@@ -42,6 +42,7 @@ namespace BananaPredictor
             this.tAnimation = new System.Windows.Forms.Timer(this.components);
             this.bOpen = new System.Windows.Forms.Button();
             this.bCancel = new System.Windows.Forms.Button();
+            this.bOptions = new System.Windows.Forms.Button();
             this.pTop.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -160,7 +161,7 @@ namespace BananaPredictor
             this.bOpen.Location = new System.Drawing.Point(127, 92);
             this.bOpen.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.bOpen.Name = "bOpen";
-            this.bOpen.Size = new System.Drawing.Size(187, 31);
+            this.bOpen.Size = new System.Drawing.Size(104, 31);
             this.bOpen.TabIndex = 6;
             this.bOpen.Text = "Open Folder";
             this.bOpen.UseVisualStyleBackColor = false;
@@ -182,12 +183,29 @@ namespace BananaPredictor
             this.bCancel.UseVisualStyleBackColor = false;
             this.bCancel.Click += new System.EventHandler(this.bCancel_Click);
             // 
+            // bOptions
+            // 
+            this.bOptions.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
+            this.bOptions.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Gray;
+            this.bOptions.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.Control;
+            this.bOptions.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.bOptions.ForeColor = System.Drawing.SystemColors.Control;
+            this.bOptions.Location = new System.Drawing.Point(239, 92);
+            this.bOptions.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.bOptions.Name = "bOptions";
+            this.bOptions.Size = new System.Drawing.Size(73, 31);
+            this.bOptions.TabIndex = 9;
+            this.bOptions.Text = "Options";
+            this.bOptions.UseVisualStyleBackColor = false;
+            this.bOptions.Click += new System.EventHandler(this.bOptions_Click);
+            // 
             // K3Banana
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.ClientSize = new System.Drawing.Size(420, 135);
+            this.Controls.Add(this.bOptions);
             this.Controls.Add(this.bCancel);
             this.Controls.Add(this.bOpen);
             this.Controls.Add(this.pTop);
@@ -219,6 +237,7 @@ namespace BananaPredictor
         private System.Windows.Forms.Timer tAnimation;
         private System.Windows.Forms.Button bOpen;
         private System.Windows.Forms.Button bCancel;
+        private System.Windows.Forms.Button bOptions;
     }
 }
 

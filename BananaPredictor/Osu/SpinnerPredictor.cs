@@ -61,7 +61,6 @@ namespace BananaPredictor.Osu
                 }*/
                 else
                 {
-                    // TODO: Fix why normal objects arn't being processed normally
                     // Normal objects added
                     AllHitObjects.Add(new GetObjectInfo
                     {
@@ -80,7 +79,7 @@ namespace BananaPredictor.Osu
             {
                 if (AllHitObjects[i].Banana)
                 {
-                    for (int j = AllHitObjects[i].BananaStart; j < AllHitObjects[i].BananaEnd - 1; j += 30)
+                    for (int j = AllHitObjects[i].BananaStart; j < AllHitObjects[i].BananaEnd - 1; j += 60)
                     {
                         AllHitObjects.Add(new GetObjectInfo
                         {

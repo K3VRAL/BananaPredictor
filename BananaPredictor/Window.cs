@@ -43,6 +43,10 @@ namespace BananaPredictor
             this.ActiveControl = tbBeatmap;
             this.bCancel.Hide();
 
+            // For options button
+            cbDebug.Hide();
+            bOptions.Hide();
+
             Console.WriteLine("Application Started Up");
         }
 
@@ -131,6 +135,13 @@ namespace BananaPredictor
         private void cbDebug_MouseHover(object sender, EventArgs e)
         {
             ttDebug.Show("Using Predictor than Maker to test and see if the code works under other specific unknown situations", cbDebug);
+        }
+
+        // TODO: Make options and put debug as one of them as well as many other ideas
+        private void bOptions_Click(object sender, EventArgs e)
+        {
+            // Open another winform and click on avaiable features
+            // Learn from https://www.youtube.com/watch?v=wgcrxUjXR-I and others
         }
 
         // Window Panel/Top Bar
