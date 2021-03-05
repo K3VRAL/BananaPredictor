@@ -29,7 +29,7 @@ namespace BananaPredictor
 
         // Thread
         Thread processingThread;
-        BananaSpinPredictorRedo bspr;
+        BananaSpinPredictor bspr;
         
         // Loading and Initializing
         public K3Banana()
@@ -76,7 +76,7 @@ namespace BananaPredictor
 
         private void threadMethod()
         {
-            if (bspr.SpinnerPredictor(tbBeatmap.Text, cbDebug.Checked, 112, 400))
+            if (bspr.SpinnerPredictor(tbBeatmap.Text, cbDebug.Checked, 64, 448))
                 MessageBox.Show("Successfully made conversion! Press F5 in osu and it should be there.", "Done");
             else if (bspr.getFlag())
                 MessageBox.Show("Canceled", "Error");
