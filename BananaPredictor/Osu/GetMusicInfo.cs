@@ -11,7 +11,6 @@ namespace BananaPredictor.Osu
             int lineindex = 0;
             foreach (var line in Path)
             {
-                // Get map info
                 if (line.Contains(item))
                     return lineindex;
                 lineindex++;

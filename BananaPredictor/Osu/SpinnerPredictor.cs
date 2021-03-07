@@ -14,7 +14,7 @@ namespace BananaPredictor.Osu
     {
         private bool flag = false;
 
-        public bool SpinnerPredictor(string path, bool debugging, int startPoint, int endPoint)
+        public bool SpinnerPredictor(string path, /*bool debugging,*/ int startPoint, int endPoint)
         {
             // Read file
             IEnumerable<String> lines = File.ReadLines(path);
@@ -30,13 +30,13 @@ namespace BananaPredictor.Osu
 
             // Storing all spinners and objects found into list
             List<GetObjectInfo> AllHitObjects = new();
-            //SliderProcess sp = new();
             for (int i = bmHitObjects; i < lines.Count(); i++)
             {
                 // Making sure that these are spinners; spinners always have x: 256 and y: 192 according to https://osu.ppy.sh/wiki/en/osu%21_File_Formats/Osu_%28file_format%29#spinners
                 String[] amount = lines.Skip(i).First().Split(",");
                 if (amount.Length.Equals(7) && Int32.Parse(amount[0]).Equals(256) && Int32.Parse(amount[1]).Equals(192))
                 {
+                    // Spinner added
                     AllHitObjects.Add(new GetObjectInfo
                     {
                         Object = lines.Skip(i).First(),
@@ -45,7 +45,8 @@ namespace BananaPredictor.Osu
                         BananaStart = Int32.Parse(amount[2]),
                         BananaEnd = Int32.Parse(amount[5])
                     });
-                }/* else if (amount.Length > 7)
+                } // TODO: For sliders
+                /* else if (amount.Length > 7)
                 {
                     // Checks for sliders; they use the rng class as well like spinners
                     // According to https://osu.ppy.sh/wiki/en/osu%21_File_Formats/Osu_%28file_format%29#sliders; they are pretty dynamic whereas hitobjects and spinners are static, so I hope this line of code doesn't break anything with other beatmaps
@@ -61,7 +62,7 @@ namespace BananaPredictor.Osu
                 }*/
                 else
                 {
-                    // Normal objects added
+                    // Hitobject added
                     AllHitObjects.Add(new GetObjectInfo
                     {
                         Object = lines.Skip(i).First(),
@@ -88,7 +89,6 @@ namespace BananaPredictor.Osu
                             Slider = false,
                             BananaStart = j,
                             BananaEnd = j + 1,
-                            BananaShowerXOffset = new(),
                             BananaShowerTime = new()
                         });
 
@@ -157,9 +157,7 @@ namespace BananaPredictor.Osu
                     {
                         //temp = rng;
                         double xOffSetCheck = (float)(rng.NextDouble() * CatchPlayfield.WIDTH);
-                        //Console.WriteLine("{0} {1}", xOffSetCheck, (xOffSetCheck < startPoint || xOffSetCheck > endPoint));
                         Console.WriteLine("xOffset {0} | Adding new slider {1}", xOffSetCheck, !(xOffSetCheck < startPoint || xOffSetCheck > endPoint));
-                        //Console.WriteLine("Banana in {0} with {1}", AllHitObjects[indx].BananaShowerTime[i], xOffSetCheck);
                         if (!(xOffSetCheck < startPoint || xOffSetCheck > endPoint))     // TODO: Figure out why this isn't working
                         {
                             AllHitObjects.Insert(indx, new GetObjectInfo
@@ -189,39 +187,29 @@ namespace BananaPredictor.Osu
                         indx++;
                 } else if (AllHitObjects[indx].Slider)
                 {
+                    // TODO: Later
+                    //foreach(var drop in obj.SliderList)
+                    //{
+                    //else if (drop.TinyDroplet)
+                    //rng.Next(20, 20);
+                    //else if (drop.Droplet)
+                    //rng.Next();
+                    //}
                     rng.Next();
                     indx++;
                 } else
                     indx++;
-                // TODO: Need to code in how it works
-                //else if (obj.Slider)
-                //{
-                //foreach(var item in obj.SliderList)
-                //{
-                //else if (item.TinyDroplet)
-                //rng.Next(20, 20);
-                //else if (item.Droplet)
-                //rng.Next();
-                //}
-                //}
 
                 if (flag)
                     return false;
             }
 
             // Put all contents as well as processed hitobjects into osu file
-            if (debugging)
-            {
-                // For debugging
-                //ToFilePredictor toFile = new();
-                //return toFile.OsuToFile(lines, path, MusicInfo, AllHitObjects, bmHitObjects);
-                return false;
-            } else
-            {
-                // For Final
-                ToFileMaker toFile = new();
-                return toFile.OsuToFile(lines, path, MusicInfo, AllHitObjects, bmHitObjects);
-            }
+            ToFileMaker toFile = new();
+            return toFile.OsuToFile(lines, path, MusicInfo, AllHitObjects, bmHitObjects);
+
+            // For Debugging
+            //if (debugging)
         }
 
         public void Stop()

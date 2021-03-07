@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace BananaPredictor.Osu
 {
-    // TODO: Do this for spacing to prevent lag
+    // TODO: Do this for slider spacing to prevent lag
+    // Need to get inheritage and uninheritage to influence how to process the slider
     public class GetMapSpacing
     {
         public int Spacing(String spinnerStart, IEnumerable<String> Path)

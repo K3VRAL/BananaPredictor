@@ -80,7 +80,7 @@ namespace BananaPredictor
 
         private void threadMethod()
         {
-            if (bspr.SpinnerPredictor(tbBeatmap.Text, cbDebug.Checked, 64, 448))
+            if (bspr.SpinnerPredictor(tbBeatmap.Text,/* cbDebug.Checked,*/ 64, 448))
                 MessageBox.Show("Successfully made conversion! Press F5 in osu and it should be there.", "Done");
             else if (bspr.getFlag())
                 MessageBox.Show("Canceled", "Error");
@@ -142,6 +142,14 @@ namespace BananaPredictor
         {
             // Open another winform and click on avaiable features
             // Learn from https://www.youtube.com/watch?v=wgcrxUjXR-I and others
+
+            // IDEAS:
+            // + Add in final hitobject for platter reset
+            // + Make list on where to place sliders (maybe as well as changing where the end slider will go)
+            // + Scale from beginning to end on where the spinner will be
+            // + Have the ability to change where the banana will be placed (static)
+            // + Scale of randomness from 0 to specifically
+            // + Debug mode
         }
 
         // Window Panel/Top Bar
