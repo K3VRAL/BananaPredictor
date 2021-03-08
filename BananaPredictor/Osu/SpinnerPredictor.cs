@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Game.Rulesets.Catch.MathUtils;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Catch.Beatmaps;
+using AlsaSharp;
 
 namespace BananaPredictor.Osu
 {
@@ -14,7 +15,7 @@ namespace BananaPredictor.Osu
     {
         private bool flag = false;
 
-        public bool SpinnerPredictor(string path, /*bool debugging,*/ int startPoint, int endPoint)
+        public bool SpinnerPredictor(string path, int startPoint, int endPoint)
         {
             // Read file
             IEnumerable<String> lines = File.ReadLines(path);
@@ -40,8 +41,7 @@ namespace BananaPredictor.Osu
                     AllHitObjects.Add(new GetObjectInfo
                     {
                         Object = lines.Skip(i).First(),
-                        Slider = false,
-                        Banana = true,
+                        OType = GetObjectInfo.Type.Spinner,
                         BananaStart = Int32.Parse(amount[2]),
                         BananaEnd = Int32.Parse(amount[5])
                     });
@@ -53,11 +53,7 @@ namespace BananaPredictor.Osu
                     AllHitObjects.Add(new GetObjectInfo
                     {
                         Object = lines.Skip(i).First(),
-                        Slider = true,
-                        // The line of code below is broken; this is because I lack knowledge on how sliders works and they are really confusing to work with
-                        //SliderInheritedPoint = sp.GoingThroughTimingPoints(lines.Skip(i).First()[2], MusicInfo.GetItemLine("[TimingPoints]", lines) + 1, true, lines),
-                        //SliderUninheritedPoint = sp.GoingThroughTimingPoints(lines.Skip(i).First()[2], MusicInfo.GetItemLine("[TimingPoints]", lines) + 1, false, lines),
-                        Banana = false
+                        OType = GetObjectInfo.Type.Slider
                     });
                 }*/
                 else
@@ -66,8 +62,7 @@ namespace BananaPredictor.Osu
                     AllHitObjects.Add(new GetObjectInfo
                     {
                         Object = lines.Skip(i).First(),
-                        Slider = false,
-                        Banana = false
+                        OType = GetObjectInfo.Type.Normal
                     });
                 }
 
@@ -78,15 +73,14 @@ namespace BananaPredictor.Osu
             int num = AllHitObjects.Count;
             for (int i = num - 1; i >= 0; i--)
             {
-                if (AllHitObjects[i].Banana)
+                if (AllHitObjects[i].OType.Equals(GetObjectInfo.Type.Spinner))
                 {
                     for (int j = AllHitObjects[i].BananaStart; j < AllHitObjects[i].BananaEnd - 1; j += 60)
                     {
                         AllHitObjects.Add(new GetObjectInfo
                         {
                             Object = "256,192," + j + ",12,0," + (j + 1) + ",0:0:0:0:",
-                            Banana = true,
-                            Slider = false,
+                            OType = GetObjectInfo.Type.Spinner,
                             BananaStart = j,
                             BananaEnd = j + 1,
                             BananaShowerTime = new()
@@ -107,7 +101,7 @@ namespace BananaPredictor.Osu
             // Used according to https://github.com/ppy/osu/blob/master/osu.Game.Rulesets.Catch/Objects/BananaShower.cs
             foreach (var obj in AllHitObjects)
             {
-                if (obj.Banana)
+                if (obj.OType.Equals(GetObjectInfo.Type.Spinner))
                 {
                     String[] getitem = obj.Object.Split(",");
                     double time = Int32.Parse(getitem[2]);
@@ -143,41 +137,37 @@ namespace BananaPredictor.Osu
 
             // How each banana is processed - The logic the banana xoffset according to the catch rulesets; all rights go to peppy and his mathematics, just using the important code
             // Used according to https://github.com/ppy/osu/blob/master/osu.Game.Rulesets.Catch/Beatmaps/CatchBeatmapProcessor.cs
-            var rng = new FastRandom(CatchBeatmapProcessor.RNG_SEED); // Why is the seed 1337?
-            //var temp = new FastRandom(CatchBeatmapProcessor.RNG_SEED);
+            FastRandom rng = new(CatchBeatmapProcessor.RNG_SEED); // Why is the seed 1337?
+            //FastRandom temp = new(CatchBeatmapProcessor.RNG_SEED);
             int indx = 0;
             bool restart = false;
             while (indx < AllHitObjects.Count)
             {
                 restart = false;
                 Console.WriteLine("Processing {0} in indx {1}", AllHitObjects[indx].Object, indx);
-                if (AllHitObjects[indx].Banana)
+                if (AllHitObjects[indx].OType.Equals(GetObjectInfo.Type.Spinner))
                 {
                     for (int i = 0; i < AllHitObjects[indx].BananaShowerTime.Count; i++)
                     {
-                        //temp = rng;
                         double xOffSetCheck = (float)(rng.NextDouble() * CatchPlayfield.WIDTH);
                         Console.WriteLine("xOffset {0} | Adding new slider {1}", xOffSetCheck, !(xOffSetCheck < startPoint || xOffSetCheck > endPoint));
-                        if (!(xOffSetCheck < startPoint || xOffSetCheck > endPoint))     // TODO: Figure out why this isn't working
+                        if (!(xOffSetCheck < startPoint || xOffSetCheck > endPoint))
                         {
                             AllHitObjects.Insert(indx, new GetObjectInfo
                             {
                                 Object = "256,144," + AllHitObjects[indx].BananaStart + ",6,0,L|256:166,1,20",
-                                Banana = false,
-                                Slider = true
+                                OType = GetObjectInfo.Type.Slider
                             });
                             //rng = temp;
-                            // TODO: IT WORKS. IT ACTUALLY WORKS. BUT ITS SO FUCKING INEFFICIENT
+                            // TODO: IT WORKS. IT ACTUALLY WORKS. BUT ITS SO FUCKING INEFFICIENT. USE TEMPS INSTEAD OF RESETTING. HUGE MEMORY LEAKS
+                            // If I try using temp, the whole thing breaks and I get different values.
                             rng = new FastRandom(CatchBeatmapProcessor.RNG_SEED);
                             indx = 0;
                             AllHitObjects = ms.Merge(AllHitObjects);
                             restart = true;
-                            // TODO: For debugging
-                            //for (int k = 0; k < indx; k++)
-                            //    if (AllHitObjects[k].Banana && AllHitObjects[k].BananaShowerXOffset.Count > 0)
-                            //        AllHitObjects[k].BananaShowerXOffset.Clear();
                             break;
                         }
+                        // TODO: For debugging
                         //AllHitObjects[indx].BananaShowerXOffset.Add(xOffSetCheck);
                         rng.Next();
                         rng.Next();
@@ -185,9 +175,9 @@ namespace BananaPredictor.Osu
                     }
                     if (!restart)
                         indx++;
-                } else if (AllHitObjects[indx].Slider)
+                } else if (AllHitObjects[indx].OType.Equals(GetObjectInfo.Type.Slider))
                 {
-                    // TODO: Later
+                    // TODO: For sliders
                     //foreach(var drop in obj.SliderList)
                     //{
                     //else if (drop.TinyDroplet)
@@ -202,13 +192,15 @@ namespace BananaPredictor.Osu
 
                 if (flag)
                     return false;
+
+                //temp = rng;
             }
 
             // Put all contents as well as processed hitobjects into osu file
             ToFileMaker toFile = new();
             return toFile.OsuToFile(lines, path, MusicInfo, AllHitObjects, bmHitObjects);
 
-            // For Debugging
+            // TODO: For debugging
             //if (debugging)
         }
 
