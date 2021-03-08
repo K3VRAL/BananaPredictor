@@ -5,12 +5,20 @@ namespace BananaPredictor.Osu
 {
     public class GetObjectInfo
     {
+        public enum Type
+        {
+            Normal,
+            Slider,
+            Spinner
+        }
+
         public String Object { get; set; }
-        public bool Slider { get; set; }
-        public bool Banana { get; set; }
-        public List<double> BananaShowerTime { get; set; }
+        public Type OType { get; set; }
+        // Spinner start to spinner end
         public int BananaStart { get; set; }
         public int BananaEnd { get; set; }
+        // Getting the specific time of the spinner
+        public List<double> BananaShowerTime { get; set; }
         // TODO: For debugging
         //public List<double> BananaShowerXOffset { get; set; }
     }
