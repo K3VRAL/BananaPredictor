@@ -13,12 +13,12 @@ namespace BananaPredictor.Osu
         public int Spacing(String spinnerStart, IEnumerable<String> Path)
         {
             GetMusicInfo gmi = new();
-            int store = gmi.GetItemLine("[TimingPoints]", Path) + 1;
+            int store = gmi.GetItemLine("[TimingPoints]", Path);
 
             //int minimum = 0;
             //int maximum = 0;
 
-            for (int i = store; i < Path.Count(); i++)
+            for (int i = store + 1; i < Path.Count(); i++)
             {
                 //if ()
                 //return i;
