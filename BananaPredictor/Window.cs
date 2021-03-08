@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -7,6 +8,7 @@ using System.Threading;
 using System.Windows.Forms;
 
 using BananaPredictor.Osu;
+using SixLabors.ImageSharp;
 
 namespace BananaPredictor
 {
@@ -30,6 +32,7 @@ namespace BananaPredictor
         // Thread
         Thread processingThread;
         BananaSpinPredictor bspr;
+        bool cancel = true;
         
         // Loading and Initializing
         public K3Banana()
@@ -41,7 +44,6 @@ namespace BananaPredictor
             OriginalHeight = this.Height;
             this.CenterToScreen();
             this.ActiveControl = tbBeatmap;
-            this.bCancel.Hide();
 
             // For options button
             cbDebug.Hide();
@@ -63,36 +65,46 @@ namespace BananaPredictor
         // Main Window
         private void bSubmit_Click(object sender, EventArgs e)
         {
-            Console.WriteLine("Submit Clicked");
-
             if (!File.Exists(tbBeatmap.Text) || !Path.GetExtension(fileDir.FileName).Equals(".osu"))
             {
                 MessageBox.Show("There was an error trying to get the file. Make sure it either exists or has the \".osu\" extension.");
                 return;
             }
+            cancel = !cancel;
 
-            bCancel.Show();
-            bSubmit.Hide();
-            bspr = new();
-            processingThread = new(new ThreadStart(threadMethod));
-            processingThread.Start();
+            if (cancel)
+            {
+                Console.WriteLine("Cancel Clicked");
+
+                if (processingThread.IsAlive)
+                {
+                    bspr.Stop();
+                    processingThread.Join();
+                }
+
+                bSubmit.Text = "Submit";
+                bSubmit.BackColor = System.Drawing.Color.Transparent;
+            } else
+            {
+                Console.WriteLine("Submit Clicked");
+
+                bSubmit.Text = "Cancel";
+                bSubmit.BackColor = System.Drawing.Color.Red;
+                bspr = new();
+                processingThread = new(new ThreadStart(threadMethod));
+                processingThread.Start();
+            }
         }
 
         private void threadMethod()
         {
-            if (bspr.SpinnerPredictor(tbBeatmap.Text,/* cbDebug.Checked,*/ 64, 448))
+            if (bspr.SpinnerPredictor(tbBeatmap.Text, 132, 380))
                 MessageBox.Show("Successfully made conversion! Press F5 in osu and it should be there.", "Done");
             else if (bspr.getFlag())
                 MessageBox.Show("Canceled", "Error");
             else
                 MessageBox.Show("Failed", "Error");
             Console.WriteLine("Program Ended");
-
-            Invoke(new MethodInvoker(() =>
-            {
-                bCancel.Hide();
-                bSubmit.Show();
-            }));
         }
 
         private void bBrowse_Click(object sender, EventArgs e)
@@ -118,18 +130,6 @@ namespace BananaPredictor
                 Process.Start("explorer.exe", String.Join("\\", tbBeatmap.Text.Split('\\').Reverse().Skip(1).Reverse().ToArray()));
             else
                 MessageBox.Show("Directory doesn't exist!", "Error");
-        }
-
-        private void bCancel_Click(object sender, EventArgs e)
-        {
-            Console.WriteLine("Cancel Clicked");
-            if (processingThread.IsAlive)
-            {
-                bspr.Stop();
-                processingThread.Join();
-            }
-            bSubmit.Show();
-            bCancel.Hide();
         }
 
         private void cbDebug_MouseHover(object sender, EventArgs e)
