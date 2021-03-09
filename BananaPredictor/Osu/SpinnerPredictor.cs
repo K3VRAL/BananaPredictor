@@ -12,7 +12,7 @@ namespace BananaPredictor.Osu
     // Used for debugging if program/initial logic works
     public class BananaSpinPredictor
     {
-        public bool debug = false, newSpinner = false;
+        public bool debug = false;
         public int startTime, endTime, startPos, endPos;
 
         private bool flag = false;
@@ -74,18 +74,16 @@ namespace BananaPredictor.Osu
                     return false;
             }
 
-            // TODO: Fix this later
-            if (newSpinner)
+            // Make Spinner
+            // TODO: Allow for the ability for add more spinners
+            AllHitObjects.Add(new GetObjectInfo
             {
-                AllHitObjects.Add(new GetObjectInfo
-                {
-                    Object = "256,192," + startTime + ",12,0," + endTime + ",0:0:0:0:",
-                    OType = GetObjectInfo.Type.Spinner,
-                    BananaStart = startTime,
-                    BananaEnd = endTime,
-                    BananaShowerTime = new()
-                });
-            }
+                Object = "256,192," + startTime + ",12,0," + endTime + ",0:0:0:0:",
+                OType = GetObjectInfo.Type.Spinner,
+                BananaStart = startTime,
+                BananaEnd = endTime,
+                BananaShowerTime = new()
+            });
 
             int num = AllHitObjects.Count;
             for (int i = num - 1; i >= 0; i--)

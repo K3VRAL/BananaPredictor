@@ -46,7 +46,6 @@ namespace BananaPredictor
             win.bspr.endTime = Int32.Parse(tbEndTime.Text);
             win.bspr.startPos = Int32.Parse(tbStartPos.Text);
             win.bspr.endPos = Int32.Parse(tbEndPos.Text);
-            win.bspr.newSpinner = cbNewSpin.Checked;
             win.lStatus.Text = "Values inputted";
 
             // TODO: Fix this

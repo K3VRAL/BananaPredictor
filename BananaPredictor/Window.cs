@@ -169,13 +169,14 @@ namespace BananaPredictor
             // Learn from https://www.youtube.com/watch?v=wgcrxUjXR-I and others
 
             // IDEAS:
+            // + For each spinner, have it's own propertise
             // + Add in final hitobject for platter reset
-            // + Make list on where to place sliders (maybe as well as changing where the end slider will go)
             // + Scale from beginning to end on where the spinner will be
             // + Have the ability to change where the banana will be placed (static)
             // + Scale of randomness from 0 to specifically
             // + Debug mode
             // + Invert bananas
+            // + Allow to add more spinners
         }
 
         // Window Panel/Top Bar
