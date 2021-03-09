@@ -6,16 +6,18 @@ using System.Linq;
 using osu.Game.Rulesets.Catch.MathUtils;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Catch.Beatmaps;
-using AlsaSharp;
 
 namespace BananaPredictor.Osu
 {
     // Used for debugging if program/initial logic works
     public class BananaSpinPredictor
     {
+        public bool debug = false, newSpinner = false;
+        public int startTime, endTime, startPos, endPos;
+
         private bool flag = false;
 
-        public bool SpinnerPredictor(string path, int startPoint, int endPoint)
+        public bool SpinnerPredictor(string path)
         {
             // Read file
             IEnumerable<String> lines = File.ReadLines(path);
@@ -35,7 +37,9 @@ namespace BananaPredictor.Osu
             {
                 // Making sure that these are spinners; spinners always have x: 256 and y: 192 according to https://osu.ppy.sh/wiki/en/osu%21_File_Formats/Osu_%28file_format%29#spinners
                 String[] amount = lines.Skip(i).First().Split(",");
-                if (amount.Length.Equals(7) && Int32.Parse(amount[0]).Equals(256) && Int32.Parse(amount[1]).Equals(192))
+                if (amount.Length.Equals(7)
+                    && Int32.Parse(amount[0]).Equals(256)
+                    && Int32.Parse(amount[1]).Equals(192))
                 {
                     // Spinner added
                     AllHitObjects.Add(new GetObjectInfo
@@ -70,10 +74,25 @@ namespace BananaPredictor.Osu
                     return false;
             }
 
+            // TODO: FIx this later
+            if (newSpinner)
+            {
+                AllHitObjects.Add(new GetObjectInfo
+                {
+                    Object = "256,192," + startTime + ",12,0," + endTime + ",0:0:0:0:",
+                    OType = GetObjectInfo.Type.Spinner,
+                    BananaStart = startTime,
+                    BananaEnd = endTime,
+                    BananaShowerTime = new()
+                });
+            }
+
             int num = AllHitObjects.Count;
             for (int i = num - 1; i >= 0; i--)
             {
-                if (AllHitObjects[i].OType.Equals(GetObjectInfo.Type.Spinner))
+                if (AllHitObjects[i].OType.Equals(GetObjectInfo.Type.Spinner)
+                    && AllHitObjects[i].BananaStart.Equals(startTime)
+                    && AllHitObjects[i].BananaEnd.Equals(endTime))
                 {
                     for (int j = AllHitObjects[i].BananaStart; j < AllHitObjects[i].BananaEnd - 1; j += 60)
                     {
@@ -101,7 +120,9 @@ namespace BananaPredictor.Osu
             // Used according to https://github.com/ppy/osu/blob/master/osu.Game.Rulesets.Catch/Objects/BananaShower.cs
             foreach (var obj in AllHitObjects)
             {
-                if (obj.OType.Equals(GetObjectInfo.Type.Spinner))
+                if (obj.OType.Equals(GetObjectInfo.Type.Spinner)
+                    && obj.BananaStart.Equals(startTime)
+                    && obj.BananaEnd.Equals(endTime))
                 {
                     String[] getitem = obj.Object.Split(",");
                     double time = Int32.Parse(getitem[2]);
@@ -145,13 +166,15 @@ namespace BananaPredictor.Osu
             {
                 restart = false;
                 Console.WriteLine("Processing {0} in indx {1}", AllHitObjects[indx].Object, indx);
-                if (AllHitObjects[indx].OType.Equals(GetObjectInfo.Type.Spinner))
+                if (AllHitObjects[indx].OType.Equals(GetObjectInfo.Type.Spinner)
+                    && AllHitObjects[indx].BananaStart.Equals(startTime)
+                    && AllHitObjects[indx].BananaEnd.Equals(endTime))
                 {
                     for (int i = 0; i < AllHitObjects[indx].BananaShowerTime.Count; i++)
                     {
                         double xOffSetCheck = (float)(rng.NextDouble() * CatchPlayfield.WIDTH);
-                        Console.WriteLine("xOffset {0} | Adding new slider {1}", xOffSetCheck, !(xOffSetCheck < startPoint || xOffSetCheck > endPoint));
-                        if (!(xOffSetCheck < startPoint || xOffSetCheck > endPoint))
+                        Console.WriteLine("xOffset {0} | Adding new slider {1}", xOffSetCheck, !(xOffSetCheck < startPos || xOffSetCheck > endPos));
+                        if (!(xOffSetCheck < startPos || xOffSetCheck > endPos))
                         {
                             AllHitObjects.Insert(indx, new GetObjectInfo
                             {
