@@ -74,7 +74,7 @@ namespace BananaPredictor.Osu
                     return false;
             }
 
-            // TODO: FIx this later
+            // TODO: Fix this later
             if (newSpinner)
             {
                 AllHitObjects.Add(new GetObjectInfo
