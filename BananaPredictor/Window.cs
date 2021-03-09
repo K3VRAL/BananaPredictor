@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -13,7 +12,7 @@ using SixLabors.ImageSharp;
 namespace BananaPredictor
 {
     // Apologies for the terrible code/not using other libraries such as OsuPrasers to get the job done
-    public partial class K3Banana : Form
+    public partial class K3BananaWindow : Form
     {
         // For Dialog Box
         private readonly OpenFileDialog fileDir = new();
@@ -31,29 +30,28 @@ namespace BananaPredictor
 
         // Thread
         Thread processingThread;
-        BananaSpinPredictor bspr;
+        public BananaSpinPredictor bspr;
         bool cancel = true;
-        
+
+        // Option Windows
+        WindowOptions oWin;
+
         // Loading and Initializing
-        public K3Banana()
+        public K3BananaWindow()
         {
             InitializeComponent();
-            consoleOutput();
+
+            bspr = new();
 
             OriginalWidth = this.Width;
             OriginalHeight = this.Height;
             this.CenterToScreen();
-            this.ActiveControl = tbBeatmap;
-
-            // For options button
-            cbDebug.Hide();
-            bOptions.Hide();
 
             Console.WriteLine("Application Started Up");
         }
 
         // Output type won't let me use console application. Thanks stackoverflow for the help
-        private void consoleOutput()
+        public void consoleOutput()
         {
             AllocConsole();
             Console.WriteLine("Console Window Started Up\nDon't close this window. It's more to look at how the program is working or if it is");
@@ -67,9 +65,16 @@ namespace BananaPredictor
         {
             if (!File.Exists(tbBeatmap.Text) || !Path.GetExtension(fileDir.FileName).Equals(".osu"))
             {
-                MessageBox.Show("There was an error trying to get the file. Make sure it either exists or has the \".osu\" extension.");
+                MessageBox.Show("There was an error trying to get the file. Make sure it either exists or has the \".osu\" extension");
                 return;
             }
+
+            if (bspr.startTime <= 0 && bspr.endTime <= 0 && bspr.startPos <= 0 && bspr.endPos <= 0)
+            {
+                MessageBox.Show("Please go to options and input the neccessary values", "Error");
+                return;
+            }
+
             cancel = !cancel;
 
             if (cancel)
@@ -81,16 +86,10 @@ namespace BananaPredictor
                     bspr.Stop();
                     processingThread.Join();
                 }
-
-                bSubmit.Text = "Submit";
-                bSubmit.BackColor = System.Drawing.Color.Transparent;
             } else
             {
                 Console.WriteLine("Submit Clicked");
 
-                bSubmit.Text = "Cancel";
-                bSubmit.BackColor = System.Drawing.Color.Red;
-                bspr = new();
                 processingThread = new(new ThreadStart(threadMethod));
                 processingThread.Start();
             }
@@ -98,13 +97,38 @@ namespace BananaPredictor
 
         private void threadMethod()
         {
-            if (bspr.SpinnerPredictor(tbBeatmap.Text, 132, 380))
-                MessageBox.Show("Successfully made conversion! Press F5 in osu and it should be there.", "Done");
+            Invoke(new Action(() =>
+            {
+                lStatus.Text = "Processing";
+                bSubmit.Text = "Cancel";
+                bSubmit.BackColor = System.Drawing.Color.Red;
+            }));
+
+            if (bspr.SpinnerPredictor(tbBeatmap.Text))
+            {
+                Invoke(new Action(() => { lStatus.Text = "Success"; }));
+                Console.WriteLine("Program Success");
+                MessageBox.Show("Successfully made conversion! Press F5 in osu and it should be there", "Done");
+            }
             else if (bspr.getFlag())
+            {
+                Invoke(new Action(() => { lStatus.Text = "Canceled"; }));
+                Console.WriteLine("Program Canceled");
                 MessageBox.Show("Canceled", "Error");
+            }
             else
+            {
+                Invoke(new Action(() => { lStatus.Text = "Failed"; }));
+                Console.WriteLine("Program Failed");
                 MessageBox.Show("Failed", "Error");
-            Console.WriteLine("Program Ended");
+            }
+
+            Invoke(new Action(() =>
+            {
+                Console.WriteLine("Program Ended");
+                bSubmit.Text = "Submit";
+                bSubmit.BackColor = System.Drawing.Color.Transparent;
+            }));
         }
 
         private void bBrowse_Click(object sender, EventArgs e)
@@ -129,17 +153,17 @@ namespace BananaPredictor
             if (Directory.Exists(dir))
                 Process.Start("explorer.exe", String.Join("\\", tbBeatmap.Text.Split('\\').Reverse().Skip(1).Reverse().ToArray()));
             else
-                MessageBox.Show("Directory doesn't exist!", "Error");
+                MessageBox.Show("Directory doesn't exist", "Error");
         }
 
-        private void cbDebug_MouseHover(object sender, EventArgs e)
-        {
-            ttDebug.Show("Using Predictor than Maker to test and see if the code works under other specific unknown situations", cbDebug);
-        }
-
-        // TODO: Make options and put debug as one of them as well as many other ideas
         private void bOptions_Click(object sender, EventArgs e)
         {
+            Console.WriteLine("Options Clicked");
+            if (Application.OpenForms.OfType<WindowOptions>().Count() == 1)
+                Application.OpenForms.OfType<WindowOptions>().First().Close();
+            oWin = new(this);
+            oWin.StartPosition = FormStartPosition.CenterScreen;
+            oWin.Show();
             // Open another winform and click on avaiable features
             // Learn from https://www.youtube.com/watch?v=wgcrxUjXR-I and others
 
@@ -150,6 +174,7 @@ namespace BananaPredictor
             // + Have the ability to change where the banana will be placed (static)
             // + Scale of randomness from 0 to specifically
             // + Debug mode
+            // + Invert bananas
         }
 
         // Window Panel/Top Bar
