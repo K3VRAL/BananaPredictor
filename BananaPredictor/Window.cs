@@ -50,6 +50,7 @@ namespace BananaPredictor
             Console.WriteLine("Application Started Up");
         }
 
+        // TODO: Fix issue where nothing is being written to the console
         // Output type won't let me use console application. Thanks stackoverflow for the help
         public void consoleOutput()
         {
