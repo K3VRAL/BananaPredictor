@@ -21,6 +21,7 @@ namespace BananaPredictor
         {
             MessageBox.Show("If you close the console, you would have to restart the whole program", "Warning");
             WinConsole.Initialize();
+            Console.WriteLine("Opened Console Window");
             win.Focus();
             this.Focus();
         }
