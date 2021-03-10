@@ -59,7 +59,7 @@ namespace BananaPredictor
                 return;
             }
 
-            if (bspr.startTime <= 0 && bspr.endTime <= 0 && bspr.startPos <= 0 && bspr.endPos <= 0)
+            if (bspr.spinnerSpecs[0][0] <= 0 && bspr.spinnerSpecs[0][1] <= 0 && bspr.spinnerSpecs[0][2] <= 0 && bspr.spinnerSpecs[0][3] <= 0)
             {
                 MessageBox.Show("Please go to options and input the neccessary values", "Error");
                 return;
@@ -118,6 +118,7 @@ namespace BananaPredictor
                 Console.WriteLine("Program Ended");
                 bSubmit.Text = "Submit";
                 bSubmit.BackColor = System.Drawing.Color.Transparent;
+                cancel = !cancel;
             }));
         }
 

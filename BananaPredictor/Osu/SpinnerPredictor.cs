@@ -14,8 +14,9 @@ namespace BananaPredictor.Osu
     public class BananaSpinPredictor
     {
         public bool debug = false;
-        public int startTime, endTime, startPos, endPos;
-        public Dictionary<int, List<int>> spinnerSpecs = new();
+
+        // [0] = startTime, [1] = endTime, [2] = startPos, [3] = endPos
+        public Dictionary<int, int[]> spinnerSpecs = new();
 
         private bool flag = false;
 
@@ -82,10 +83,10 @@ namespace BananaPredictor.Osu
             // TODO: Allow for the ability for add more spinners
             AllHitObjects.Add(new GetObjectInfo
             {
-                Object = "256,192," + startTime + ",12,0," + endTime + ",0:0:0:0:",
+                Object = "256,192," + spinnerSpecs[0][0] + ",12,0," + spinnerSpecs[0][1] + ",0:0:0:0:",
                 OType = GetObjectInfo.Type.Spinner,
-                BananaStart = startTime,
-                BananaEnd = endTime,
+                BananaStart = spinnerSpecs[0][0],
+                BananaEnd = spinnerSpecs[0][1],
                 BananaShowerTime = new()
             });
 
@@ -93,8 +94,8 @@ namespace BananaPredictor.Osu
             for (int i = num - 1; i >= 0; i--)
             {
                 if (AllHitObjects[i].OType.Equals(GetObjectInfo.Type.Spinner)
-                    && AllHitObjects[i].BananaStart.Equals(startTime)
-                    && AllHitObjects[i].BananaEnd.Equals(endTime))
+                    && AllHitObjects[i].BananaStart.Equals(spinnerSpecs[0][0])
+                    && AllHitObjects[i].BananaEnd.Equals(spinnerSpecs[0][1]))
                 {
                     for (int j = AllHitObjects[i].BananaStart; j < AllHitObjects[i].BananaEnd - 1; j += 60)
                     {
@@ -123,8 +124,8 @@ namespace BananaPredictor.Osu
             foreach (var obj in AllHitObjects)
             {
                 if (obj.OType.Equals(GetObjectInfo.Type.Spinner)
-                    && obj.BananaStart.Equals(startTime)
-                    && obj.BananaEnd.Equals(endTime))
+                    && obj.BananaStart.Equals(spinnerSpecs[0][0])
+                    && obj.BananaEnd.Equals(spinnerSpecs[0][1]))
                 {
                     String[] getitem = obj.Object.Split(",");
                     double time = Int32.Parse(getitem[2]);
@@ -168,34 +169,37 @@ namespace BananaPredictor.Osu
             {
                 restart = false;
                 Console.WriteLine("Processing {0} in indx {1}", AllHitObjects[indx].Object, indx);
-                if (AllHitObjects[indx].OType.Equals(GetObjectInfo.Type.Spinner)
-                    && AllHitObjects[indx].BananaStart.Equals(startTime)
-                    && AllHitObjects[indx].BananaEnd.Equals(endTime))
+                if (AllHitObjects[indx].OType.Equals(GetObjectInfo.Type.Spinner))
                 {
-                    for (int i = 0; i < AllHitObjects[indx].BananaShowerTime.Count; i++)
-                    {
-                        double xOffSetCheck = (float)(rng.NextDouble() * CatchPlayfield.WIDTH);
-                        Console.WriteLine("xOffset {0} | Adding new slider {1}", xOffSetCheck, !(xOffSetCheck < startPos || xOffSetCheck > endPos));
-                        if (!(xOffSetCheck < startPos || xOffSetCheck > endPos))
+                    // TODO: Fix this
+                    if (AllHitObjects[indx].BananaStart > spinnerSpecs[0][0]
+                    && AllHitObjects[indx].BananaEnd < spinnerSpecs[0][1])
+                        for (int i = 0; i < AllHitObjects[indx].BananaShowerTime.Count; i++)
                         {
-                            AllHitObjects.Insert(indx, new GetObjectInfo
+                            double xOffSetCheck = (float)(rng.NextDouble() * CatchPlayfield.WIDTH);
+                            Console.WriteLine("xOffset {0} | Adding new slider {1}", xOffSetCheck, !(xOffSetCheck < spinnerSpecs[0][2] || xOffSetCheck > spinnerSpecs[0][3]));
+                            if (!(xOffSetCheck < spinnerSpecs[0][2] || xOffSetCheck > spinnerSpecs[0][3]))
                             {
-                                Object = "256,144," + AllHitObjects[indx].BananaStart + ",6,0,L|256:166,1,20",
-                                OType = GetObjectInfo.Type.Slider
-                            });
-                            //rng = temp;
-                            // TODO: IT WORKS. IT ACTUALLY WORKS. BUT ITS SO FUCKING INEFFICIENT. USE TEMPS INSTEAD OF RESETTING; HUGE MEMORY LEAKS
-                            // If I try using temp, the whole thing breaks and I get different values.
-                            rng = new FastRandom(CatchBeatmapProcessor.RNG_SEED);
-                            indx = 0;
-                            AllHitObjects = ms.Merge(AllHitObjects);
-                            restart = true;
-                            break;
+                                AllHitObjects.Insert(indx, new GetObjectInfo
+                                {
+                                    Object = "256,144," + AllHitObjects[indx].BananaStart + ",6,0,L|256:166,1,20",
+                                    OType = GetObjectInfo.Type.Slider
+                                });
+                                //rng = temp;
+                                // TODO: IT WORKS. IT ACTUALLY WORKS. BUT ITS SO FUCKING INEFFICIENT. USE TEMPS INSTEAD OF RESETTING; HUGE MEMORY LEAKS
+                                // If I try using temp, the whole thing breaks and I get different values.
+                                rng = new FastRandom(CatchBeatmapProcessor.RNG_SEED);
+                                indx = 0;
+                                AllHitObjects = ms.Merge(AllHitObjects);
+                                restart = true;
+                                break;
+                            }
                         }
-                        rng.Next();
-                        rng.Next();
-                        rng.Next();
-                    }
+                    else
+                        rng.NextDouble();
+                    rng.Next();
+                    rng.Next();
+                    rng.Next();
                     if (!restart)
                         indx++;
                 } else if (AllHitObjects[indx].OType.Equals(GetObjectInfo.Type.Slider))
