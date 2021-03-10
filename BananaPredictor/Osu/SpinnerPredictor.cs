@@ -9,11 +9,13 @@ using osu.Game.Rulesets.Catch.Beatmaps;
 
 namespace BananaPredictor.Osu
 {
+    // TODO: Need to get inherit and uninherit lines to see how they affect the slider
     // Used for debugging if program/initial logic works
     public class BananaSpinPredictor
     {
         public bool debug = false;
         public int startTime, endTime, startPos, endPos;
+        public Dictionary<int, List<int>> spinnerSpecs = new();
 
         private bool flag = false;
 
@@ -49,20 +51,22 @@ namespace BananaPredictor.Osu
                         BananaStart = Int32.Parse(amount[2]),
                         BananaEnd = Int32.Parse(amount[5])
                     });
-                } // TODO: For sliders
-                /* else if (amount.Length > 7)
+                }
+                else if (amount.Length > 7)
                 {
+                    // Slider added
                     // Checks for sliders; they use the rng class as well like spinners
                     // According to https://osu.ppy.sh/wiki/en/osu%21_File_Formats/Osu_%28file_format%29#sliders; they are pretty dynamic whereas hitobjects and spinners are static, so I hope this line of code doesn't break anything with other beatmaps
                     AllHitObjects.Add(new GetObjectInfo
                     {
                         Object = lines.Skip(i).First(),
-                        OType = GetObjectInfo.Type.Slider
+                        OType = GetObjectInfo.Type.Slider,
+                        nestedSlider = new()
                     });
-                }*/
+                }
                 else
                 {
-                    // Hitobject added
+                    // Circle added
                     AllHitObjects.Add(new GetObjectInfo
                     {
                         Object = lines.Skip(i).First(),
@@ -180,7 +184,7 @@ namespace BananaPredictor.Osu
                                 OType = GetObjectInfo.Type.Slider
                             });
                             //rng = temp;
-                            // TODO: IT WORKS. IT ACTUALLY WORKS. BUT ITS SO FUCKING INEFFICIENT. USE TEMPS INSTEAD OF RESETTING. HUGE MEMORY LEAKS
+                            // TODO: IT WORKS. IT ACTUALLY WORKS. BUT ITS SO FUCKING INEFFICIENT. USE TEMPS INSTEAD OF RESETTING; HUGE MEMORY LEAKS
                             // If I try using temp, the whole thing breaks and I get different values.
                             rng = new FastRandom(CatchBeatmapProcessor.RNG_SEED);
                             indx = 0;
@@ -188,8 +192,6 @@ namespace BananaPredictor.Osu
                             restart = true;
                             break;
                         }
-                        // TODO: For debugging
-                        //AllHitObjects[indx].BananaShowerXOffset.Add(xOffSetCheck);
                         rng.Next();
                         rng.Next();
                         rng.Next();
@@ -199,12 +201,14 @@ namespace BananaPredictor.Osu
                 } else if (AllHitObjects[indx].OType.Equals(GetObjectInfo.Type.Slider))
                 {
                     // TODO: For sliders
-                    //foreach(var drop in obj.SliderList)
+                    //foreach(var drop in AllHitObjects[indx].nestedSlider)
                     //{
-                    //else if (drop.TinyDroplet)
+                    //if (drop.TinyDroplet)
                     //rng.Next(20, 20);
                     //else if (drop.Droplet)
                     //rng.Next();
+                    //else
+                    //return false;
                     //}
                     rng.Next();
                     indx++;
@@ -220,9 +224,6 @@ namespace BananaPredictor.Osu
             // Put all contents as well as processed hitobjects into osu file
             ToFileMaker toFile = new();
             return toFile.OsuToFile(lines, path, MusicInfo, AllHitObjects, bmHitObjects);
-
-            // TODO: For debugging
-            //if (debugging)
         }
 
         public void Stop()
