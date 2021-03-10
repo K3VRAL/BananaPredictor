@@ -34,7 +34,7 @@ namespace BananaPredictor
         bool cancel = true;
 
         // Option Windows
-        WindowOptions oWin;
+        WinOptions oWin;
 
         // Loading and Initializing
         public K3BananaWindow()
@@ -49,17 +49,6 @@ namespace BananaPredictor
 
             Console.WriteLine("Application Started Up");
         }
-
-        // TODO: Fix issue where nothing is being written to the console
-        // Output type won't let me use console application. Thanks stackoverflow for the help
-        public void consoleOutput()
-        {
-            AllocConsole();
-            Console.WriteLine("Console Window Started Up\nDon't close this window. It's more to look at how the program is working or if it is");
-        }
-        [DllImport("kernel32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        static extern bool AllocConsole();
 
         // Main Window
         private void bSubmit_Click(object sender, EventArgs e)
@@ -100,7 +89,7 @@ namespace BananaPredictor
         {
             Invoke(new Action(() =>
             {
-                lStatus.Text = "Processing";
+                lStatus.Text = "Processing...";
                 bSubmit.Text = "Cancel";
                 bSubmit.BackColor = System.Drawing.Color.Red;
             }));
@@ -160,8 +149,8 @@ namespace BananaPredictor
         private void bOptions_Click(object sender, EventArgs e)
         {
             Console.WriteLine("Options Clicked");
-            if (Application.OpenForms.OfType<WindowOptions>().Count() == 1)
-                Application.OpenForms.OfType<WindowOptions>().First().Close();
+            if (Application.OpenForms.OfType<WinOptions>().Count() == 1)
+                Application.OpenForms.OfType<WinOptions>().First().Close();
             oWin = new(this);
             oWin.StartPosition = FormStartPosition.CenterScreen;
             oWin.Show();
