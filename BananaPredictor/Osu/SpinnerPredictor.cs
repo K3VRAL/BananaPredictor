@@ -10,6 +10,7 @@ using osu.Game.Rulesets.Catch.Beatmaps;
 namespace BananaPredictor.Osu
 {
     // TODO: Need to get inherit and uninherit lines to see how they affect the slider
+    // TODO: Need to process how sliders will be placed
     // Used for debugging if program/initial logic works
     public class BananaSpinPredictor
     {
@@ -98,7 +99,7 @@ namespace BananaPredictor.Osu
                     && AllHitObjects[i].BananaStart.Equals(spinnerSpecs[0][0])
                     && AllHitObjects[i].BananaEnd.Equals(spinnerSpecs[0][1]))
                 {
-                    for (int j = AllHitObjects[i].BananaStart; j < AllHitObjects[i].BananaEnd - 2; j += 58)
+                    for (int j = AllHitObjects[i].BananaStart; j < AllHitObjects[i].BananaEnd - 2; j += 60)
                     {
                         AllHitObjects.Add(new GetObjectInfo
                         {
@@ -170,33 +171,29 @@ namespace BananaPredictor.Osu
                 Console.WriteLine("Processing {0} in indx {1}", AllHitObjects[indx].Object, indx);
                 if (AllHitObjects[indx].OType.Equals(GetObjectInfo.Type.Spinner))
                 {
-                    // TODO: Fix issue where placing a spinner in front of it breaks the system
                     for (int i = 0; i < AllHitObjects[indx].BananaShowerTime.Count; i++)
                     {
+                        double xOffSetCheck = (float)(rng.NextDouble() * CatchPlayfield.WIDTH);
+                        Console.WriteLine("xOffset {0} | Adding new slider {1}", xOffSetCheck, !(xOffSetCheck < spinnerSpecs[0][2] || xOffSetCheck > spinnerSpecs[0][3]));
                         if (AllHitObjects[indx].BananaStart > spinnerSpecs[0][0]
-                        && AllHitObjects[indx].BananaEnd < spinnerSpecs[0][1])
+                            && AllHitObjects[indx].BananaEnd < spinnerSpecs[0][1]
+                            && !(xOffSetCheck < spinnerSpecs[0][2] || xOffSetCheck > spinnerSpecs[0][3]))
                         {
-                            double xOffSetCheck = (float)(rng.NextDouble() * CatchPlayfield.WIDTH);
-                            Console.WriteLine("xOffset {0} | Adding new slider {1}", xOffSetCheck, !(xOffSetCheck < spinnerSpecs[0][2] || xOffSetCheck > spinnerSpecs[0][3]));
-                            if (!(xOffSetCheck < spinnerSpecs[0][2] || xOffSetCheck > spinnerSpecs[0][3]))
+                            AllHitObjects.Insert(indx, new GetObjectInfo
                             {
-                                AllHitObjects.Insert(indx, new GetObjectInfo
-                                {
-                                    Object = "256,144," + AllHitObjects[indx].BananaStart + ",6,0,L|256:166,1,20",
-                                    OType = GetObjectInfo.Type.Slider
-                                });
-                                //rng = temp;
-                                // TODO: IT WORKS. IT ACTUALLY WORKS. BUT ITS SO FUCKING INEFFICIENT. USE TEMPS INSTEAD OF RESETTING; HUGE MEMORY LEAKS
-                                // If I try using temp, the whole thing breaks and I get different values.
-                                rng = new FastRandom(CatchBeatmapProcessor.RNG_SEED);
-                                indx = 0;
-                                AllHitObjects = ms.Merge(AllHitObjects);
-                                restart = true;
-                                break;
-                            }
+                                Object = "256,144," + AllHitObjects[indx].BananaStart + ",6,0,L|256:166,1,20",
+                                OType = GetObjectInfo.Type.Slider,
+                                nestedSlider = new()
+                            });
+                            //rng = temp;
+                            // TODO: IT WORKS. IT ACTUALLY WORKS. BUT ITS SO FUCKING INEFFICIENT. USE TEMPS INSTEAD OF RESETTING; HUGE MEMORY LEAKS
+                            // If I try using temp, the whole thing breaks and I get different values.
+                            rng = new FastRandom(CatchBeatmapProcessor.RNG_SEED);
+                            indx = 0;
+                            AllHitObjects = ms.Merge(AllHitObjects);
+                            restart = true;
+                            break;
                         }
-                        else
-                            rng.NextDouble();
                         rng.Next();
                         rng.Next();
                         rng.Next();
