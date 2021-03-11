@@ -50,7 +50,8 @@ namespace BananaPredictor.Osu
                         Object = lines.Skip(i).First(),
                         OType = GetObjectInfo.Type.Spinner,
                         BananaStart = Int32.Parse(amount[2]),
-                        BananaEnd = Int32.Parse(amount[5])
+                        BananaEnd = Int32.Parse(amount[5]),
+                        BananaShowerTime = new()
                     });
                 }
                 else if (amount.Length > 7)
@@ -97,7 +98,7 @@ namespace BananaPredictor.Osu
                     && AllHitObjects[i].BananaStart.Equals(spinnerSpecs[0][0])
                     && AllHitObjects[i].BananaEnd.Equals(spinnerSpecs[0][1]))
                 {
-                    for (int j = AllHitObjects[i].BananaStart; j < AllHitObjects[i].BananaEnd - 1; j += 60)
+                    for (int j = AllHitObjects[i].BananaStart; j < AllHitObjects[i].BananaEnd - 2; j += 58)
                     {
                         AllHitObjects.Add(new GetObjectInfo
                         {
@@ -123,9 +124,7 @@ namespace BananaPredictor.Osu
             // Used according to https://github.com/ppy/osu/blob/master/osu.Game.Rulesets.Catch/Objects/BananaShower.cs
             foreach (var obj in AllHitObjects)
             {
-                if (obj.OType.Equals(GetObjectInfo.Type.Spinner)
-                    && obj.BananaStart.Equals(spinnerSpecs[0][0])
-                    && obj.BananaEnd.Equals(spinnerSpecs[0][1]))
+                if (obj.OType.Equals(GetObjectInfo.Type.Spinner))
                 {
                     String[] getitem = obj.Object.Split(",");
                     double time = Int32.Parse(getitem[2]);
@@ -171,10 +170,11 @@ namespace BananaPredictor.Osu
                 Console.WriteLine("Processing {0} in indx {1}", AllHitObjects[indx].Object, indx);
                 if (AllHitObjects[indx].OType.Equals(GetObjectInfo.Type.Spinner))
                 {
-                    // TODO: Fix this
-                    if (AllHitObjects[indx].BananaStart > spinnerSpecs[0][0]
-                    && AllHitObjects[indx].BananaEnd < spinnerSpecs[0][1])
-                        for (int i = 0; i < AllHitObjects[indx].BananaShowerTime.Count; i++)
+                    // TODO: Fix issue where placing a spinner in front of it breaks the system
+                    for (int i = 0; i < AllHitObjects[indx].BananaShowerTime.Count; i++)
+                    {
+                        if (AllHitObjects[indx].BananaStart > spinnerSpecs[0][0]
+                        && AllHitObjects[indx].BananaEnd < spinnerSpecs[0][1])
                         {
                             double xOffSetCheck = (float)(rng.NextDouble() * CatchPlayfield.WIDTH);
                             Console.WriteLine("xOffset {0} | Adding new slider {1}", xOffSetCheck, !(xOffSetCheck < spinnerSpecs[0][2] || xOffSetCheck > spinnerSpecs[0][3]));
@@ -195,11 +195,12 @@ namespace BananaPredictor.Osu
                                 break;
                             }
                         }
-                    else
-                        rng.NextDouble();
-                    rng.Next();
-                    rng.Next();
-                    rng.Next();
+                        else
+                            rng.NextDouble();
+                        rng.Next();
+                        rng.Next();
+                        rng.Next();
+                    }
                     if (!restart)
                         indx++;
                 } else if (AllHitObjects[indx].OType.Equals(GetObjectInfo.Type.Slider))
