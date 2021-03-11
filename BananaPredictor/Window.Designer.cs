@@ -30,7 +30,6 @@ namespace BananaPredictor
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(K3BananaWindow));
             this.bSubmit = new System.Windows.Forms.Button();
             this.bBrowse = new System.Windows.Forms.Button();
             this.tbBeatmap = new System.Windows.Forms.TextBox();
@@ -78,6 +77,7 @@ namespace BananaPredictor
             // 
             // tbBeatmap
             // 
+            this.tbBeatmap.BackColor = System.Drawing.SystemColors.Control;
             this.tbBeatmap.Location = new System.Drawing.Point(12, 54);
             this.tbBeatmap.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.tbBeatmap.Name = "tbBeatmap";
@@ -192,7 +192,6 @@ namespace BananaPredictor
             this.Controls.Add(this.bBrowse);
             this.Controls.Add(this.bSubmit);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Name = "K3BananaWindow";
             this.Text = "Banana Predictor";

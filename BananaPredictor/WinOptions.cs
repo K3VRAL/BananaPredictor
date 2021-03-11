@@ -61,7 +61,8 @@ namespace BananaPredictor
             spinnerAOR[(int)cbList.SelectedItem][3] = Int32.Parse(tbEndPos.Text);
             
             foreach (KeyValuePair<int, int[]> kvp in spinnerAOR)
-                Console.WriteLine(String.Format("Key = {0}, [0] = {1},  [1] = {2},  [2] = {3},  [3] = {4}, ", kvp.Key, kvp.Value[0], kvp.Value[1], kvp.Value[2], kvp.Value[3]));
+                Console.WriteLine("Index: {0}, StartTime: {1},  EndTime: {2},  StartPos: {3},  EndPos: {4}",
+                    kvp.Key, kvp.Value[0], kvp.Value[1], kvp.Value[2], kvp.Value[3]);
 
             win.bspr.spinnerSpecs = spinnerAOR;
             win.lStatus.Text = "Values saved";

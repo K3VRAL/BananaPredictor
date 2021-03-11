@@ -92,6 +92,12 @@ namespace BananaPredictor
                 lStatus.Text = "Processing...";
                 bSubmit.Text = "Cancel";
                 bSubmit.BackColor = System.Drawing.Color.Red;
+                bBrowse.Enabled = false;
+                bBrowse.BackColor = System.Drawing.Color.DarkGray;
+                bOptions.Enabled = false;
+                bOptions.BackColor = System.Drawing.Color.DarkGray;
+                tbBeatmap.ReadOnly = true;
+                tbBeatmap.BackColor = System.Drawing.Color.DarkGray;
             }));
 
             if (bspr.SpinnerPredictor(tbBeatmap.Text))
@@ -118,6 +124,12 @@ namespace BananaPredictor
                 Console.WriteLine("Program Ended");
                 bSubmit.Text = "Submit";
                 bSubmit.BackColor = System.Drawing.Color.Transparent;
+                bBrowse.Enabled = true;
+                bBrowse.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
+                bOptions.Enabled = true;
+                bOptions.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
+                tbBeatmap.ReadOnly = false;
+                tbBeatmap.BackColor = System.Drawing.SystemColors.Control;
                 cancel = !cancel;
             }));
         }
