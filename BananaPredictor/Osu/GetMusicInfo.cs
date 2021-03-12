@@ -5,7 +5,8 @@ namespace BananaPredictor.Osu
 {
     public class GetMusicInfo
     {
-        public int GetItemLine(String item, IEnumerable<String> Path)
+        public IEnumerable<String> Path { get; set; }
+        public int GetItemLine(String item)
         {
             int lineindex = 0;
             foreach (var line in Path)
