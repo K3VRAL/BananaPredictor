@@ -51,7 +51,7 @@ namespace BananaPredictor
         }
 
         // Main Window
-        private void bSubmit_Click(object sender, EventArgs e)
+        private void BSubmit_Click(object sender, EventArgs e)
         {
             if (!File.Exists(tbBeatmap.Text) || !Path.GetExtension(fileDir.FileName).Equals(".osu"))
             {
@@ -80,12 +80,12 @@ namespace BananaPredictor
             {
                 Console.WriteLine("Submit Clicked");
 
-                processingThread = new(new ThreadStart(threadMethod));
+                processingThread = new(new ThreadStart(ThreadMethod));
                 processingThread.Start();
             }
         }
 
-        private void threadMethod()
+        private void ThreadMethod()
         {
             Invoke(new Action(() =>
             {
@@ -106,7 +106,7 @@ namespace BananaPredictor
                 Console.WriteLine("Program Success");
                 MessageBox.Show("Successfully made conversion! Press F5 in osu and it should be there", "Done");
             }
-            else if (bspr.getFlag())
+            else if (bspr.GetFlag())
             {
                 Invoke(new Action(() => { lStatus.Text = "Canceled"; }));
                 Console.WriteLine("Program Canceled");
@@ -134,7 +134,7 @@ namespace BananaPredictor
             }));
         }
 
-        private void bBrowse_Click(object sender, EventArgs e)
+        private void BBrowse_Click(object sender, EventArgs e)
         {
             Console.WriteLine("Browse Clicked");
 
@@ -149,7 +149,7 @@ namespace BananaPredictor
                 return;
             }
         }
-        private void bOpen_Click(object sender, EventArgs e)
+        private void BOpen_Click(object sender, EventArgs e)
         {
             Console.WriteLine("Directory Clicked");
             String dir = String.Join("\\", tbBeatmap.Text.Split('\\').Reverse().Skip(1).Reverse().ToArray());
@@ -159,7 +159,7 @@ namespace BananaPredictor
                 MessageBox.Show("Directory doesn't exist", "Error");
         }
 
-        private void bOptions_Click(object sender, EventArgs e)
+        private void BOptions_Click(object sender, EventArgs e)
         {
             Console.WriteLine("Options Clicked");
             if (Application.OpenForms.OfType<WinOptions>().Count() == 1)
@@ -182,7 +182,7 @@ namespace BananaPredictor
         }
 
         // Window Panel/Top Bar
-        private void tPanel_MouseDown(object sender, MouseEventArgs e)
+        private void TPanel_MouseDown(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
             {
@@ -191,20 +191,20 @@ namespace BananaPredictor
             }
         }
 
-        private void wbMini_Click(object sender, EventArgs e)
+        private void WbMini_Click(object sender, EventArgs e)
         {
             Console.WriteLine("Minimize Clicked");
             tAnimation.Interval = 15;
             tAnimation.Start();
         }
 
-        private void wbExit_Click(object sender, EventArgs e)
+        private void WbExit_Click(object sender, EventArgs e)
         {
             Console.WriteLine("Exit Clicked");
             Application.Exit();
         }
 
-        private void tAnimation_Tick(object sender, EventArgs e)
+        private void TAnimation_Tick(object sender, EventArgs e)
         {
             if (this.Height > 5 && this.Width > 5)
             {

@@ -57,7 +57,7 @@ namespace BananaPredictor
             this.bSubmit.TabIndex = 0;
             this.bSubmit.Text = "Submit";
             this.bSubmit.UseVisualStyleBackColor = false;
-            this.bSubmit.Click += new System.EventHandler(this.bSubmit_Click);
+            this.bSubmit.Click += new System.EventHandler(this.BSubmit_Click);
             // 
             // bBrowse
             // 
@@ -73,7 +73,7 @@ namespace BananaPredictor
             this.bBrowse.TabIndex = 1;
             this.bBrowse.Text = "Browse";
             this.bBrowse.UseVisualStyleBackColor = false;
-            this.bBrowse.Click += new System.EventHandler(this.bBrowse_Click);
+            this.bBrowse.Click += new System.EventHandler(this.BBrowse_Click);
             // 
             // tbBeatmap
             // 
@@ -96,7 +96,7 @@ namespace BananaPredictor
             this.pTop.Name = "pTop";
             this.pTop.Size = new System.Drawing.Size(420, 36);
             this.pTop.TabIndex = 4;
-            this.pTop.MouseDown += new System.Windows.Forms.MouseEventHandler(this.tPanel_MouseDown);
+            this.pTop.MouseDown += new System.Windows.Forms.MouseEventHandler(this.TPanel_MouseDown);
             // 
             // wbMini
             // 
@@ -113,7 +113,7 @@ namespace BananaPredictor
             this.wbMini.TabIndex = 6;
             this.wbMini.Text = "-";
             this.wbMini.UseVisualStyleBackColor = false;
-            this.wbMini.Click += new System.EventHandler(this.wbMini_Click);
+            this.wbMini.Click += new System.EventHandler(this.WbMini_Click);
             // 
             // wbExit
             // 
@@ -130,11 +130,11 @@ namespace BananaPredictor
             this.wbExit.TabIndex = 5;
             this.wbExit.Text = "X";
             this.wbExit.UseVisualStyleBackColor = false;
-            this.wbExit.Click += new System.EventHandler(this.wbExit_Click);
+            this.wbExit.Click += new System.EventHandler(this.WbExit_Click);
             // 
             // tAnimation
             // 
-            this.tAnimation.Tick += new System.EventHandler(this.tAnimation_Tick);
+            this.tAnimation.Tick += new System.EventHandler(this.TAnimation_Tick);
             // 
             // bOpen
             // 
@@ -150,7 +150,7 @@ namespace BananaPredictor
             this.bOpen.TabIndex = 6;
             this.bOpen.Text = "Open Folder";
             this.bOpen.UseVisualStyleBackColor = false;
-            this.bOpen.Click += new System.EventHandler(this.bOpen_Click);
+            this.bOpen.Click += new System.EventHandler(this.BOpen_Click);
             // 
             // bOptions
             // 
@@ -166,7 +166,7 @@ namespace BananaPredictor
             this.bOptions.TabIndex = 9;
             this.bOptions.Text = "Options";
             this.bOptions.UseVisualStyleBackColor = false;
-            this.bOptions.Click += new System.EventHandler(this.bOptions_Click);
+            this.bOptions.Click += new System.EventHandler(this.BOptions_Click);
             // 
             // lStatus
             // 
