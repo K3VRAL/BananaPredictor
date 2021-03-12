@@ -53,13 +53,18 @@ namespace BananaPredictor
         // Main Window
         private void bSubmit_Click(object sender, EventArgs e)
         {
-            if (!File.Exists(tbBeatmap.Text) || !Path.GetExtension(fileDir.FileName).Equals(".osu"))
+            if (!File.Exists(tbBeatmap.Text)
+                || !Path.GetExtension(fileDir.FileName).Equals(".osu"))
             {
                 MessageBox.Show("There was an error trying to get the file. Make sure it either exists or has the \".osu\" extension");
                 return;
             }
 
-            if (bspr.spinnerSpecs[0][0] <= 0 && bspr.spinnerSpecs[0][1] <= 0 && bspr.spinnerSpecs[0][2] <= 0 && bspr.spinnerSpecs[0][3] <= 0)
+            // TODO: Fix this; error if pressed submit while having 0 inputs
+            if (bspr.spinnerSpecs[0][0] <= 0
+                && bspr.spinnerSpecs[0][1] <= 0
+                && bspr.spinnerSpecs[0][2] <= 0
+                && bspr.spinnerSpecs[0][3] <= 0)
             {
                 MessageBox.Show("Please go to options and input the neccessary values", "Error");
                 return;
