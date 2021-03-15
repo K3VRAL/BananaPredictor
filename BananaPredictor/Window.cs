@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -7,7 +8,6 @@ using System.Threading;
 using System.Windows.Forms;
 
 using BananaPredictor.Osu;
-using SixLabors.ImageSharp;
 
 namespace BananaPredictor
 {
@@ -72,71 +72,66 @@ namespace BananaPredictor
 
             cancel = !cancel;
 
+            // TODO: Fix cancel button
             if (cancel)
             {
                 Console.WriteLine("Cancel Clicked");
-
                 if (processingThread.IsAlive)
                 {
                     bspr.Stop();
                     processingThread.Join();
+
+                    Console.WriteLine("Program Ended");
+
+                    bSubmit.Text = "Submit";
+                    bSubmit.BackColor = Color.Transparent;
+                    bBrowse.Enabled = true;
+                    bBrowse.BackColor = Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
+                    bOptions.Enabled = true;
+                    bOptions.BackColor = Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
+                    tbBeatmap.ReadOnly = false;
+                    tbBeatmap.BackColor = SystemColors.Control;
                 }
+                cancel = true;
             } else
             {
                 Console.WriteLine("Submit Clicked");
-
                 processingThread = new(new ThreadStart(ThreadMethod));
                 processingThread.Start();
+
+                lStatus.Text = "Processing...";
+                bSubmit.Text = "Cancel";
+                bSubmit.BackColor = Color.Red;
+                bBrowse.Enabled = false;
+                bBrowse.BackColor = Color.DarkGray;
+                bOptions.Enabled = false;
+                bOptions.BackColor = Color.DarkGray;
+                tbBeatmap.ReadOnly = true;
+                tbBeatmap.BackColor = Color.DarkGray;
             }
         }
 
         private void ThreadMethod()
         {
-            Invoke(new Action(() =>
-            {
-                lStatus.Text = "Processing...";
-                bSubmit.Text = "Cancel";
-                bSubmit.BackColor = System.Drawing.Color.Red;
-                bBrowse.Enabled = false;
-                bBrowse.BackColor = System.Drawing.Color.DarkGray;
-                bOptions.Enabled = false;
-                bOptions.BackColor = System.Drawing.Color.DarkGray;
-                tbBeatmap.ReadOnly = true;
-                tbBeatmap.BackColor = System.Drawing.Color.DarkGray;
-            }));
-
+            // TODO: Invoke lStatus without crashing
             if (bspr.SpinnerPredictor(tbBeatmap.Text))
             {
-                Invoke(new Action(() => { lStatus.Text = "Success"; }));
+                lStatus.BeginInvoke((MethodInvoker)delegate() { lStatus.Text = "Success"; lStatus.ForeColor = Color.Green; });
                 Console.WriteLine("Program Success");
                 MessageBox.Show("Successfully made conversion! Press F5 in osu and it should be there", "Done");
             }
             else if (bspr.GetFlag())
             {
-                Invoke(new Action(() => { lStatus.Text = "Canceled"; }));
+                lStatus.BeginInvoke((MethodInvoker)delegate() { lStatus.Text = "Canceled"; lStatus.ForeColor = Color.Red; });
                 Console.WriteLine("Program Canceled");
                 MessageBox.Show("Canceled", "Error");
             }
             else
             {
-                Invoke(new Action(() => { lStatus.Text = "Failed"; }));
+                lStatus.BeginInvoke((MethodInvoker)delegate() { lStatus.Text = "Failed"; lStatus.ForeColor = Color.Red; });
                 Console.WriteLine("Program Failed");
                 MessageBox.Show("Failed", "Error");
             }
-
-            Invoke(new Action(() =>
-            {
-                Console.WriteLine("Program Ended");
-                bSubmit.Text = "Submit";
-                bSubmit.BackColor = System.Drawing.Color.Transparent;
-                bBrowse.Enabled = true;
-                bBrowse.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
-                bOptions.Enabled = true;
-                bOptions.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
-                tbBeatmap.ReadOnly = false;
-                tbBeatmap.BackColor = System.Drawing.SystemColors.Control;
-                cancel = !cancel;
-            }));
         }
 
         private void BBrowse_Click(object sender, EventArgs e)
@@ -157,6 +152,7 @@ namespace BananaPredictor
         private void BOpen_Click(object sender, EventArgs e)
         {
             Console.WriteLine("Directory Clicked");
+
             String dir = String.Join("\\", tbBeatmap.Text.Split('\\').Reverse().Skip(1).Reverse().ToArray());
             if (Directory.Exists(dir))
                 Process.Start("explorer.exe", String.Join("\\", tbBeatmap.Text.Split('\\').Reverse().Skip(1).Reverse().ToArray()));
@@ -167,15 +163,14 @@ namespace BananaPredictor
         private void BOptions_Click(object sender, EventArgs e)
         {
             Console.WriteLine("Options Clicked");
+
             if (Application.OpenForms.OfType<WinOptions>().Count() == 1)
                 Application.OpenForms.OfType<WinOptions>().First().Close();
             oWin = new(this);
             oWin.StartPosition = FormStartPosition.CenterScreen;
             oWin.Show();
-            // Open another winform and click on avaiable features
-            // Learn from https://www.youtube.com/watch?v=wgcrxUjXR-I and others
 
-            // IDEAS:
+            // TODO: OPTION IDEAS
             // + For each spinner, have it's own propertise
             // + Add in final hitobject for platter reset
             // + Scale from beginning to end on where the spinner will be
@@ -199,6 +194,7 @@ namespace BananaPredictor
         private void WbMini_Click(object sender, EventArgs e)
         {
             Console.WriteLine("Minimize Clicked");
+
             tAnimation.Interval = 15;
             tAnimation.Start();
         }
@@ -206,6 +202,7 @@ namespace BananaPredictor
         private void WbExit_Click(object sender, EventArgs e)
         {
             Console.WriteLine("Exit Clicked");
+
             Application.Exit();
         }
 

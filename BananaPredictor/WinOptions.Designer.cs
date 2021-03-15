@@ -36,10 +36,10 @@ namespace BananaPredictor
             this.tbEndTime = new System.Windows.Forms.TextBox();
             this.lStartSpin = new System.Windows.Forms.Label();
             this.lEndSpin = new System.Windows.Forms.Label();
-            this.lEndPos = new System.Windows.Forms.Label();
-            this.lStartPos = new System.Windows.Forms.Label();
-            this.tbEndPos = new System.Windows.Forms.TextBox();
-            this.tbStartPos = new System.Windows.Forms.TextBox();
+            this.lRightPos = new System.Windows.Forms.Label();
+            this.lLeftPos = new System.Windows.Forms.Label();
+            this.tbRightPos = new System.Windows.Forms.TextBox();
+            this.tbLeftPos = new System.Windows.Forms.TextBox();
             this.bConsole = new System.Windows.Forms.Button();
             this.ttDebug = new System.Windows.Forms.ToolTip(this.components);
             this.cbList = new System.Windows.Forms.ComboBox();
@@ -113,41 +113,41 @@ namespace BananaPredictor
             this.lEndSpin.TabIndex = 8;
             this.lEndSpin.Text = "End Time Offset";
             // 
-            // lEndPos
+            // lRightPos
             // 
-            this.lEndPos.AutoSize = true;
-            this.lEndPos.ForeColor = System.Drawing.SystemColors.Control;
-            this.lEndPos.Location = new System.Drawing.Point(144, 145);
-            this.lEndPos.Name = "lEndPos";
-            this.lEndPos.Size = new System.Drawing.Size(90, 20);
-            this.lEndPos.TabIndex = 12;
-            this.lEndPos.Text = "End Position";
+            this.lRightPos.AutoSize = true;
+            this.lRightPos.ForeColor = System.Drawing.SystemColors.Control;
+            this.lRightPos.Location = new System.Drawing.Point(144, 145);
+            this.lRightPos.Name = "lRightPos";
+            this.lRightPos.Size = new System.Drawing.Size(100, 20);
+            this.lRightPos.TabIndex = 12;
+            this.lRightPos.Text = "Right Position";
             // 
-            // lStartPos
+            // lLeftPos
             // 
-            this.lStartPos.AutoSize = true;
-            this.lStartPos.ForeColor = System.Drawing.SystemColors.Control;
-            this.lStartPos.Location = new System.Drawing.Point(144, 111);
-            this.lStartPos.Name = "lStartPos";
-            this.lStartPos.Size = new System.Drawing.Size(96, 20);
-            this.lStartPos.TabIndex = 11;
-            this.lStartPos.Text = "Start Position";
+            this.lLeftPos.AutoSize = true;
+            this.lLeftPos.ForeColor = System.Drawing.SystemColors.Control;
+            this.lLeftPos.Location = new System.Drawing.Point(144, 111);
+            this.lLeftPos.Name = "lLeftPos";
+            this.lLeftPos.Size = new System.Drawing.Size(90, 20);
+            this.lLeftPos.TabIndex = 11;
+            this.lLeftPos.Text = "Left Position";
             // 
-            // tbEndPos
+            // tbRightPos
             // 
-            this.tbEndPos.Location = new System.Drawing.Point(13, 142);
-            this.tbEndPos.Name = "tbEndPos";
-            this.tbEndPos.Size = new System.Drawing.Size(125, 27);
-            this.tbEndPos.TabIndex = 10;
-            this.tbEndPos.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TbEndPos_KeyPress);
+            this.tbRightPos.Location = new System.Drawing.Point(13, 142);
+            this.tbRightPos.Name = "tbRightPos";
+            this.tbRightPos.Size = new System.Drawing.Size(125, 27);
+            this.tbRightPos.TabIndex = 10;
+            this.tbRightPos.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TbEndPos_KeyPress);
             // 
-            // tbStartPos
+            // tbLeftPos
             // 
-            this.tbStartPos.Location = new System.Drawing.Point(13, 108);
-            this.tbStartPos.Name = "tbStartPos";
-            this.tbStartPos.Size = new System.Drawing.Size(125, 27);
-            this.tbStartPos.TabIndex = 9;
-            this.tbStartPos.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TbStartPos_KeyPress);
+            this.tbLeftPos.Location = new System.Drawing.Point(13, 108);
+            this.tbLeftPos.Name = "tbLeftPos";
+            this.tbLeftPos.Size = new System.Drawing.Size(125, 27);
+            this.tbLeftPos.TabIndex = 9;
+            this.tbLeftPos.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TbStartPos_KeyPress);
             // 
             // bConsole
             // 
@@ -224,10 +224,10 @@ namespace BananaPredictor
             this.Controls.Add(this.lList);
             this.Controls.Add(this.cbList);
             this.Controls.Add(this.bConsole);
-            this.Controls.Add(this.lEndPos);
-            this.Controls.Add(this.lStartPos);
-            this.Controls.Add(this.tbEndPos);
-            this.Controls.Add(this.tbStartPos);
+            this.Controls.Add(this.lRightPos);
+            this.Controls.Add(this.lLeftPos);
+            this.Controls.Add(this.tbRightPos);
+            this.Controls.Add(this.tbLeftPos);
             this.Controls.Add(this.lEndSpin);
             this.Controls.Add(this.lStartSpin);
             this.Controls.Add(this.tbEndTime);
@@ -250,10 +250,10 @@ namespace BananaPredictor
         private System.Windows.Forms.TextBox tbEndTime;
         private System.Windows.Forms.Label lStartSpin;
         private System.Windows.Forms.Label lEndSpin;
-        private System.Windows.Forms.Label lEndPos;
-        private System.Windows.Forms.Label lStartPos;
-        private System.Windows.Forms.TextBox tbEndPos;
-        private System.Windows.Forms.TextBox tbStartPos;
+        private System.Windows.Forms.Label lRightPos;
+        private System.Windows.Forms.Label lLeftPos;
+        private System.Windows.Forms.TextBox tbRightPos;
+        private System.Windows.Forms.TextBox tbLeftPos;
         private System.Windows.Forms.Button bConsole;
         private System.Windows.Forms.ToolTip ttDebug;
         private System.Windows.Forms.ComboBox cbList;
