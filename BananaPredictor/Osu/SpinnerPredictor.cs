@@ -28,7 +28,8 @@ namespace BananaPredictor.Osu
 
             // Map info lines (Used for the file name and such)
             GetMusicInfo MusicInfo = new();
-            int bmHitObjects = MusicInfo.GetItemLine("[HitObjects]", lines);
+            MusicInfo.Path = lines;
+            int bmHitObjects = MusicInfo.GetItemLine("[HitObjects]");
             bmHitObjects++;
 
             // If not found any
@@ -64,7 +65,7 @@ namespace BananaPredictor.Osu
                     {
                         Object = lines.Skip(i).First(),
                         OType = GetObjectInfo.Type.Slider,
-                        nestedSlider = new()
+                        NestedSlider = new()
                     });
                 }
                 else
@@ -99,7 +100,7 @@ namespace BananaPredictor.Osu
                     && AllHitObjects[i].BananaStart.Equals(spinnerSpecs[0][0])
                     && AllHitObjects[i].BananaEnd.Equals(spinnerSpecs[0][1]))
                 {
-                    for (int j = AllHitObjects[i].BananaStart; j < AllHitObjects[i].BananaEnd - 2; j += 60)
+                    for (int j = AllHitObjects[i].BananaStart; j < AllHitObjects[i].BananaEnd - 2; j += 19)
                     {
                         AllHitObjects.Add(new GetObjectInfo
                         {
@@ -164,7 +165,7 @@ namespace BananaPredictor.Osu
             FastRandom rng = new(CatchBeatmapProcessor.RNG_SEED); // Why is the seed 1337?
             //FastRandom temp = new(CatchBeatmapProcessor.RNG_SEED);
             int indx = 0;
-            bool restart = false;
+            bool restart;
             while (indx < AllHitObjects.Count)
             {
                 restart = false;
@@ -183,7 +184,7 @@ namespace BananaPredictor.Osu
                             {
                                 Object = "256,144," + AllHitObjects[indx].BananaStart + ",6,0,L|256:166,1,20",
                                 OType = GetObjectInfo.Type.Slider,
-                                nestedSlider = new()
+                                NestedSlider = new()
                             });
                             //rng = temp;
                             // TODO: IT WORKS. IT ACTUALLY WORKS. BUT ITS SO FUCKING INEFFICIENT. USE TEMPS INSTEAD OF RESETTING; HUGE MEMORY LEAKS
@@ -234,7 +235,7 @@ namespace BananaPredictor.Osu
             flag = true;
         }
 
-        public bool getFlag()
+        public bool GetFlag()
         {
             return flag;
         }

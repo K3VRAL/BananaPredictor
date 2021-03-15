@@ -10,11 +10,12 @@ namespace BananaPredictor.Osu
         public bool OsuToFile(IEnumerable<String> lines, String path, GetMusicInfo MusicInfo, List<GetObjectInfo> AllHitObjects, int bmHitObjects)
         {
             PutTogether pt = new();
+            pt.Path = lines;
             String filename = String.Join("\\", path.Split('\\').Reverse().Skip(1).Reverse().ToArray())
-                + "\\" + pt.PutLineTogether(MusicInfo.GetItemLine("Artist", lines), lines)
-                + " - " + pt.PutLineTogether(MusicInfo.GetItemLine("Title", lines), lines)
-                + " (" + pt.PutLineTogether(MusicInfo.GetItemLine("Creator", lines), lines)
-                + ") [" + pt.PutLineTogether(MusicInfo.GetItemLine("Version", lines), lines)
+                + "\\" + pt.PutLineTogether(MusicInfo.GetItemLine("Artist"))
+                + " - " + pt.PutLineTogether(MusicInfo.GetItemLine("Title"))
+                + " (" + pt.PutLineTogether(MusicInfo.GetItemLine("Creator"))
+                + ") [" + pt.PutLineTogether(MusicInfo.GetItemLine("Version"))
                 + " (BananaPredictor)].osu";
             File.Create(filename).Close();
             int num = 0;
@@ -22,9 +23,15 @@ namespace BananaPredictor.Osu
             {
                 foreach (var line in lines)
                 {
-                    if (num == MusicInfo.GetItemLine("Version", lines))
+                    if (num == MusicInfo.GetItemLine("Version"))
                     {
                         file.WriteLine(line + " (BananaPredictor)");
+                        num++;
+                        continue;
+                    }
+                    if (num == MusicInfo.GetItemLine("Tags"))
+                    {
+                        file.WriteLine(line + " BananaPredictor");
                         num++;
                         continue;
                     }

@@ -15,7 +15,7 @@ namespace BananaPredictor.Osu
         public String Object { get; set; }
         public Type OType { get; set; }
         // TODO: Slider nested
-        public List<double> nestedSlider { get; set; }
+        public List<double> NestedSlider { get; set; }
         // Spinner start to spinner end
         public int BananaStart { get; set; }
         public int BananaEnd { get; set; }

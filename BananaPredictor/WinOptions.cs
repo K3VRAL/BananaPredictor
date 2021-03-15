@@ -26,7 +26,7 @@ namespace BananaPredictor
             win = calling as K3BananaWindow;
         }
 
-        private void bConsole_Click(object sender, EventArgs e)
+        private void BConsole_Click(object sender, EventArgs e)
         {
             MessageBox.Show("If you close the console, you would have to restart the whole program", "Warning");
             WinConsole.Initialize();
@@ -35,7 +35,7 @@ namespace BananaPredictor
             Focus();
         }
 
-        private void bSave_Click(object sender, EventArgs e)
+        private void BSave_Click(object sender, EventArgs e)
         {
             if ((String.IsNullOrEmpty(tbStartTime.Text) || String.IsNullOrWhiteSpace(tbStartTime.Text))
                 && (String.IsNullOrEmpty(tbEndTime.Text) || String.IsNullOrWhiteSpace(tbEndTime.Text))
@@ -75,7 +75,7 @@ namespace BananaPredictor
 
         // Dynamic spinner list
         // TODO: Add in lists of spinners
-        private void bMinus_Click(object sender, EventArgs e)
+        private void BMinus_Click(object sender, EventArgs e)
         {
             /*
             spinnerAOR.Remove((int)cbList.SelectedItem);
@@ -83,7 +83,7 @@ namespace BananaPredictor
             */
         }
 
-        private void bPlus_Click(object sender, EventArgs e)
+        private void BPlus_Click(object sender, EventArgs e)
         {
             /*
             cbList.Items.Add((int)cbList.SelectedItem + 1);
@@ -116,7 +116,7 @@ namespace BananaPredictor
                 Console.WriteLine(String.Format("Key = {0}, [0] = {1},  [1] = {2},  [2] = {3},  [3] = {4}, ", kvp.Key, kvp.Value[0], kvp.Value[1], kvp.Value[2], kvp.Value[3]));
         }*/
 
-        private void cbList_SelectedValueChanged(object sender, EventArgs e)
+        private void CbList_SelectedValueChanged(object sender, EventArgs e)
         {
             /*
             tbStartTime.Text = spinnerAOR[(int)cbList.SelectedItem][0].ToString();
@@ -127,37 +127,37 @@ namespace BananaPredictor
         }
 
         // Inputting integers only
-        private void tbStartSpin_KeyPress(object sender, KeyPressEventArgs e)
+        private void TbStartSpin_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
                 e.Handled = true;
         }
 
-        private void tbEndSpin_KeyPress(object sender, KeyPressEventArgs e)
+        private void TbEndSpin_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
                 e.Handled = true;
         }
 
-        private void tbStartPos_KeyPress(object sender, KeyPressEventArgs e)
+        private void TbStartPos_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
                 e.Handled = true;
         }
 
-        private void tbEndPos_KeyPress(object sender, KeyPressEventArgs e)
+        private void TbEndPos_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
                 e.Handled = true;
         }
 
         // Debug checkbox
-        private void cbDebug_MouseHover(object sender, EventArgs e)
+        private void CbDebug_MouseHover(object sender, EventArgs e)
         {
             ttDebug.Show("Debug Mode is used to be able to place the bananas as beats and show where they will be placed", cbDebug);
         }
 
-        private void cbDebug_Click(object sender, EventArgs e)
+        private void CbDebug_Click(object sender, EventArgs e)
         {
             win.bspr.debug = cbDebug.Checked;
         }

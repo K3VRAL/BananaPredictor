@@ -61,7 +61,7 @@ namespace BananaPredictor
             this.bSave.TabIndex = 0;
             this.bSave.Text = "Save";
             this.bSave.UseVisualStyleBackColor = false;
-            this.bSave.Click += new System.EventHandler(this.bSave_Click);
+            this.bSave.Click += new System.EventHandler(this.BSave_Click);
             // 
             // cbDebug
             // 
@@ -74,8 +74,8 @@ namespace BananaPredictor
             this.cbDebug.TabIndex = 4;
             this.cbDebug.Text = "Debug Mode";
             this.cbDebug.UseVisualStyleBackColor = true;
-            this.cbDebug.Click += new System.EventHandler(this.cbDebug_Click);
-            this.cbDebug.MouseHover += new System.EventHandler(this.cbDebug_MouseHover);
+            this.cbDebug.Click += new System.EventHandler(this.CbDebug_Click);
+            this.cbDebug.MouseHover += new System.EventHandler(this.CbDebug_MouseHover);
             // 
             // tbStartTime
             // 
@@ -83,7 +83,7 @@ namespace BananaPredictor
             this.tbStartTime.Name = "tbStartTime";
             this.tbStartTime.Size = new System.Drawing.Size(125, 27);
             this.tbStartTime.TabIndex = 5;
-            this.tbStartTime.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.tbStartSpin_KeyPress);
+            this.tbStartTime.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TbStartSpin_KeyPress);
             // 
             // tbEndTime
             // 
@@ -91,7 +91,7 @@ namespace BananaPredictor
             this.tbEndTime.Name = "tbEndTime";
             this.tbEndTime.Size = new System.Drawing.Size(125, 27);
             this.tbEndTime.TabIndex = 6;
-            this.tbEndTime.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.tbEndSpin_KeyPress);
+            this.tbEndTime.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TbEndSpin_KeyPress);
             // 
             // lStartSpin
             // 
@@ -139,7 +139,7 @@ namespace BananaPredictor
             this.tbEndPos.Name = "tbEndPos";
             this.tbEndPos.Size = new System.Drawing.Size(125, 27);
             this.tbEndPos.TabIndex = 10;
-            this.tbEndPos.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.tbEndPos_KeyPress);
+            this.tbEndPos.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TbEndPos_KeyPress);
             // 
             // tbStartPos
             // 
@@ -147,7 +147,7 @@ namespace BananaPredictor
             this.tbStartPos.Name = "tbStartPos";
             this.tbStartPos.Size = new System.Drawing.Size(125, 27);
             this.tbStartPos.TabIndex = 9;
-            this.tbStartPos.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.tbStartPos_KeyPress);
+            this.tbStartPos.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TbStartPos_KeyPress);
             // 
             // bConsole
             // 
@@ -162,7 +162,7 @@ namespace BananaPredictor
             this.bConsole.TabIndex = 13;
             this.bConsole.Text = "Open Console";
             this.bConsole.UseVisualStyleBackColor = false;
-            this.bConsole.Click += new System.EventHandler(this.bConsole_Click);
+            this.bConsole.Click += new System.EventHandler(this.BConsole_Click);
             // 
             // cbList
             // 
@@ -171,7 +171,7 @@ namespace BananaPredictor
             this.cbList.Name = "cbList";
             this.cbList.Size = new System.Drawing.Size(127, 28);
             this.cbList.TabIndex = 14;
-            this.cbList.SelectedValueChanged += new System.EventHandler(this.cbList_SelectedValueChanged);
+            this.cbList.SelectedValueChanged += new System.EventHandler(this.CbList_SelectedValueChanged);
             // 
             // lList
             // 
@@ -196,7 +196,7 @@ namespace BananaPredictor
             this.bPlus.TabIndex = 16;
             this.bPlus.Text = "+";
             this.bPlus.UseVisualStyleBackColor = false;
-            this.bPlus.Click += new System.EventHandler(this.bPlus_Click);
+            this.bPlus.Click += new System.EventHandler(this.BPlus_Click);
             // 
             // bMinus
             // 
@@ -211,7 +211,7 @@ namespace BananaPredictor
             this.bMinus.TabIndex = 17;
             this.bMinus.Text = "-";
             this.bMinus.UseVisualStyleBackColor = false;
-            this.bMinus.Click += new System.EventHandler(this.bMinus_Click);
+            this.bMinus.Click += new System.EventHandler(this.BMinus_Click);
             // 
             // WinOptions
             // 
