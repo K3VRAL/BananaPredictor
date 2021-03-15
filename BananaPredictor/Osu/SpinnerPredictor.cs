@@ -84,14 +84,15 @@ namespace BananaPredictor.Osu
 
             // Make Spinner
             // TODO: Allow for the ability for add more spinners
-            AllHitObjects.Add(new GetObjectInfo
-            {
-                Object = "256,192," + spinnerSpecs[0][0] + ",12,0," + spinnerSpecs[0][1] + ",0:0:0:0:",
-                OType = GetObjectInfo.Type.Spinner,
-                BananaStart = spinnerSpecs[0][0],
-                BananaEnd = spinnerSpecs[0][1],
-                BananaShowerTime = new()
-            });
+            for (int i = 0; i < spinnerSpecs.Count; i++)
+                AllHitObjects.Add(new GetObjectInfo
+                {
+                    Object = "256,192," + spinnerSpecs[i][0] + ",12,0," + spinnerSpecs[i][1] + ",0:0:0:0:",
+                    OType = GetObjectInfo.Type.Spinner,
+                    BananaStart = spinnerSpecs[i][0],
+                    BananaEnd = spinnerSpecs[i][1],
+                    BananaShowerTime = new()
+                });
 
             int num = AllHitObjects.Count;
             for (int i = num - 1; i >= 0; i--)
@@ -172,33 +173,34 @@ namespace BananaPredictor.Osu
                 Console.WriteLine("Processing {0} in indx {1}", AllHitObjects[indx].Object, indx);
                 if (AllHitObjects[indx].OType.Equals(GetObjectInfo.Type.Spinner))
                 {
-                    for (int i = 0; i < AllHitObjects[indx].BananaShowerTime.Count; i++)
-                    {
-                        double xOffSetCheck = (float)(rng.NextDouble() * CatchPlayfield.WIDTH);
-                        Console.WriteLine("xOffset {0} | Adding new slider {1}", xOffSetCheck, !(xOffSetCheck < spinnerSpecs[0][2] || xOffSetCheck > spinnerSpecs[0][3]));
-                        if (AllHitObjects[indx].BananaStart > spinnerSpecs[0][0]
-                            && AllHitObjects[indx].BananaEnd < spinnerSpecs[0][1]
-                            && !(xOffSetCheck < spinnerSpecs[0][2] || xOffSetCheck > spinnerSpecs[0][3]))
+                    for (int i = 0; i < spinnerSpecs.Count; i++)
+                        for (int j = 0; j < AllHitObjects[indx].BananaShowerTime.Count; j++)
                         {
-                            AllHitObjects.Insert(indx, new GetObjectInfo
+                            double xOffSetCheck = (float)(rng.NextDouble() * CatchPlayfield.WIDTH);
+                            Console.WriteLine("xOffset {0} | Adding new slider {1}", xOffSetCheck, !(xOffSetCheck < spinnerSpecs[i][2] || xOffSetCheck > spinnerSpecs[i][3]));
+                            if (AllHitObjects[indx].BananaStart > spinnerSpecs[i][0]
+                                && AllHitObjects[indx].BananaEnd < spinnerSpecs[i][1]
+                                && !(xOffSetCheck < spinnerSpecs[i][2] || xOffSetCheck > spinnerSpecs[i][3]))
                             {
-                                Object = "256,144," + AllHitObjects[indx].BananaStart + ",6,0,L|256:166,1,20",
-                                OType = GetObjectInfo.Type.Slider,
-                                NestedSlider = new()
-                            });
-                            //rng = temp;
-                            // TODO: IT WORKS. IT ACTUALLY WORKS. BUT ITS SO FUCKING INEFFICIENT. USE TEMPS INSTEAD OF RESETTING; HUGE MEMORY LEAKS
-                            // If I try using temp, the whole thing breaks and I get different values.
-                            rng = new FastRandom(CatchBeatmapProcessor.RNG_SEED);
-                            indx = 0;
-                            AllHitObjects = ms.Merge(AllHitObjects);
-                            restart = true;
-                            break;
+                                AllHitObjects.Insert(indx, new GetObjectInfo
+                                {
+                                    Object = "256,144," + AllHitObjects[indx].BananaStart + ",6,0,L|256:166,1,20",
+                                    OType = GetObjectInfo.Type.Slider,
+                                    NestedSlider = new()
+                                });
+                                //rng = temp;
+                                // TODO: IT WORKS. IT ACTUALLY WORKS. BUT ITS SO FUCKING INEFFICIENT. USE TEMPS INSTEAD OF RESETTING; HUGE MEMORY LEAKS
+                                // If I try using temp, the whole thing breaks and I get different values.
+                                rng = new FastRandom(CatchBeatmapProcessor.RNG_SEED);
+                                indx = 0;
+                                AllHitObjects = ms.Merge(AllHitObjects);
+                                restart = true;
+                                break;
+                            }
+                            rng.Next();
+                            rng.Next();
+                            rng.Next();
                         }
-                        rng.Next();
-                        rng.Next();
-                        rng.Next();
-                    }
                     if (!restart)
                         indx++;
                 } else if (AllHitObjects[indx].OType.Equals(GetObjectInfo.Type.Slider))
