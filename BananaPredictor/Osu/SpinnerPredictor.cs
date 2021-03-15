@@ -83,7 +83,6 @@ namespace BananaPredictor.Osu
             }
 
             // Make Spinner
-            // TODO: Allow for the ability for add more spinners
             for (int i = 0; i < spinnerSpecs.Count; i++)
                 AllHitObjects.Add(new GetObjectInfo
                 {
