@@ -96,27 +96,28 @@ namespace BananaPredictor.Osu
             int num = AllHitObjects.Count;
             for (int i = num - 1; i >= 0; i--)
             {
-                if (AllHitObjects[i].OType.Equals(GetObjectInfo.Type.Spinner)
-                    && AllHitObjects[i].BananaStart.Equals(spinnerSpecs[0][0])
-                    && AllHitObjects[i].BananaEnd.Equals(spinnerSpecs[0][1]))
-                {
-                    for (int j = AllHitObjects[i].BananaStart; j < AllHitObjects[i].BananaEnd - 2; j += 19)
+                for (int j = 0; j < spinnerSpecs.Count; j++)
+                    if (AllHitObjects[i].OType.Equals(GetObjectInfo.Type.Spinner)
+                        && AllHitObjects[i].BananaStart.Equals(spinnerSpecs[j][0])
+                        && AllHitObjects[i].BananaEnd.Equals(spinnerSpecs[j][1]))
                     {
-                        AllHitObjects.Add(new GetObjectInfo
+                        for (int k = AllHitObjects[i].BananaStart; k < AllHitObjects[i].BananaEnd - 2; k += 14)
                         {
-                            Object = "256,192," + j + ",12,0," + (j + 1) + ",0:0:0:0:",
-                            OType = GetObjectInfo.Type.Spinner,
-                            BananaStart = j,
-                            BananaEnd = j + 1,
-                            BananaShowerTime = new()
-                        });
+                            AllHitObjects.Add(new GetObjectInfo
+                            {
+                                Object = "256,192," + k + ",12,0," + (k + 1) + ",0:0:0:0:",
+                                OType = GetObjectInfo.Type.Spinner,
+                                BananaStart = k,
+                                BananaEnd = k + 1,
+                                BananaShowerTime = new()
+                            });
 
-                        if (flag)
-                            return false;
+                            if (flag)
+                                return false;
+                        }
+
+                        AllHitObjects.RemoveAt(i);
                     }
-
-                    AllHitObjects.RemoveAt(i);
-                }
 
                 if (flag)
                     return false;
@@ -157,7 +158,7 @@ namespace BananaPredictor.Osu
             MergeSort ms = new();
             AllHitObjects = ms.Merge(AllHitObjects);
 
-            if (AllHitObjects.Equals(null))
+            if (AllHitObjects == null)
                 return false;
 
             // How each banana is processed - The logic the banana xoffset according to the catch rulesets; all rights go to peppy and his mathematics, just using the important code
@@ -188,6 +189,7 @@ namespace BananaPredictor.Osu
                                     NestedSlider = new()
                                 });
                                 //rng = temp;
+                                // TODO: Something broke, fix it
                                 // TODO: IT WORKS. IT ACTUALLY WORKS. BUT ITS SO FUCKING INEFFICIENT. USE TEMPS INSTEAD OF RESETTING; HUGE MEMORY LEAKS
                                 // If I try using temp, the whole thing breaks and I get different values.
                                 rng = new FastRandom(CatchBeatmapProcessor.RNG_SEED);
@@ -202,7 +204,8 @@ namespace BananaPredictor.Osu
                         }
                     if (!restart)
                         indx++;
-                } else if (AllHitObjects[indx].OType.Equals(GetObjectInfo.Type.Slider))
+                }
+                else if (AllHitObjects[indx].OType.Equals(GetObjectInfo.Type.Slider))
                 {
                     // TODO: For sliders
                     //foreach(var drop in AllHitObjects[indx].nestedSlider)
@@ -216,7 +219,8 @@ namespace BananaPredictor.Osu
                     //}
                     rng.Next();
                     indx++;
-                } else
+                }
+                else
                     indx++;
 
                 if (flag)
@@ -238,7 +242,8 @@ namespace BananaPredictor.Osu
 
         public bool GetFlag()
         {
-            return flag;
+            flag = !flag;
+            return !flag;
         }
     }
 }
