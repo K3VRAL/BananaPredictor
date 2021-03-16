@@ -60,11 +60,7 @@ namespace BananaPredictor
                 return;
             }
 
-            // TODO: Fix this; error if pressed submit while having 0 inputs
-            if (bspr.spinnerSpecs[0][0] <= 0
-                && bspr.spinnerSpecs[0][1] <= 0
-                && bspr.spinnerSpecs[0][2] <= 0
-                && bspr.spinnerSpecs[0][3] <= 0)
+            if (bspr.spinnerSpecs.Count <= 0)
             {
                 MessageBox.Show("Please go to options and input the neccessary values", "Error");
                 return;
@@ -72,7 +68,6 @@ namespace BananaPredictor
 
             cancel = !cancel;
 
-            // TODO: Fix cancel button
             if (cancel)
             {
                 Console.WriteLine("Cancel Clicked");
@@ -80,17 +75,6 @@ namespace BananaPredictor
                 {
                     bspr.Stop();
                     processingThread.Join();
-
-                    Console.WriteLine("Program Ended");
-
-                    bSubmit.Text = "Submit";
-                    bSubmit.BackColor = Color.Transparent;
-                    bBrowse.Enabled = true;
-                    bBrowse.BackColor = Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
-                    bOptions.Enabled = true;
-                    bOptions.BackColor = Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
-                    tbBeatmap.ReadOnly = false;
-                    tbBeatmap.BackColor = SystemColors.Control;
                 }
                 cancel = true;
             } else
@@ -113,25 +97,39 @@ namespace BananaPredictor
 
         private void ThreadMethod()
         {
-            // TODO: Invoke lStatus without crashing
             if (bspr.SpinnerPredictor(tbBeatmap.Text))
             {
-                lStatus.BeginInvoke((MethodInvoker)delegate() { lStatus.Text = "Success"; lStatus.ForeColor = Color.Green; });
+                this.BeginInvoke((MethodInvoker)delegate () { lStatus.Text = "Success"; lStatus.ForeColor = Color.Green; });
                 Console.WriteLine("Program Success");
                 MessageBox.Show("Successfully made conversion! Press F5 in osu and it should be there", "Done");
             }
             else if (bspr.GetFlag())
             {
-                lStatus.BeginInvoke((MethodInvoker)delegate() { lStatus.Text = "Canceled"; lStatus.ForeColor = Color.Red; });
+                this.BeginInvoke((MethodInvoker)delegate () { lStatus.Text = "Canceled"; lStatus.ForeColor = Color.Red; });
                 Console.WriteLine("Program Canceled");
                 MessageBox.Show("Canceled", "Error");
             }
             else
             {
-                lStatus.BeginInvoke((MethodInvoker)delegate() { lStatus.Text = "Failed"; lStatus.ForeColor = Color.Red; });
+                this.BeginInvoke((MethodInvoker)delegate () { lStatus.Text = "Failed"; lStatus.ForeColor = Color.Red; });
                 Console.WriteLine("Program Failed");
                 MessageBox.Show("Failed", "Error");
             }
+
+            this.BeginInvoke((MethodInvoker)delegate ()
+            {
+                Console.WriteLine("Program Ended");
+
+                bSubmit.Text = "Submit";
+                bSubmit.BackColor = Color.Transparent;
+                bBrowse.Enabled = true;
+                bBrowse.BackColor = Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
+                bOptions.Enabled = true;
+                bOptions.BackColor = Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
+                tbBeatmap.ReadOnly = false;
+                tbBeatmap.BackColor = SystemColors.Control;
+                cancel = true;
+            });
         }
 
         private void BBrowse_Click(object sender, EventArgs e)
@@ -179,6 +177,7 @@ namespace BananaPredictor
             // + Debug mode
             // + Invert bananas
             // + Allow to add more spinners
+            // + Bookmakers as setters
         }
 
         // Window Panel/Top Bar
