@@ -10,12 +10,13 @@ namespace BananaPredictor
 
         // TODO: Remove this and replace this with an actual counting system
         private int adding = 0;
+        private int prev = 0;
 
         public WinOptions()
         {
             InitializeComponent();
 
-            AddZero(adding);
+            AddMore(adding);
         }
 
         private K3BananaWindow win = null;
@@ -24,7 +25,7 @@ namespace BananaPredictor
             win = calling as K3BananaWindow;
         }
 
-        public void AddZero(int num)
+        public void AddMore(int num)
         {
             cbList.Items.Add(num);
             spinnerAOR.Add(num, new int[] { 0, 0, 0, 0 });
@@ -34,6 +35,40 @@ namespace BananaPredictor
             tbLeftPos.Text = spinnerAOR[num][2].ToString();
             tbRightPos.Text = spinnerAOR[num][3].ToString();
             adding += 1;
+        }
+
+        public void SavingData(int num)
+        {
+            try
+            {
+                Console.WriteLine("Saving...");
+                spinnerAOR[num][0] = Int32.Parse(tbStartTime.Text);
+                spinnerAOR[num][1] = Int32.Parse(tbEndTime.Text);
+                spinnerAOR[num][2] = Int32.Parse(tbLeftPos.Text);
+                spinnerAOR[num][3] = Int32.Parse(tbRightPos.Text);
+            } catch (FormatException)
+            {
+                ExceptionMade();
+                return;
+            }
+
+            ConsoleSave();
+        }
+
+        public void ConsoleSave()
+        {
+            foreach (KeyValuePair<int, int[]> kvp in spinnerAOR)
+                Console.WriteLine("Index: {0}, StartTime: {1},  EndTime: {2},  StartPos: {3},  EndPos: {4}",
+                    kvp.Key, kvp.Value[0], kvp.Value[1], kvp.Value[2], kvp.Value[3]);
+        }
+
+        public void ExceptionMade()
+        {
+            MessageBox.Show("Please only input integers", "Error");
+            tbStartTime.Text = "0";
+            tbEndTime.Text = "0";
+            tbLeftPos.Text = "0";
+            tbRightPos.Text = "0";
         }
 
         private void BConsole_Click(object sender, EventArgs e)
@@ -56,23 +91,23 @@ namespace BananaPredictor
                 MessageBox.Show("Input integers into the textboxes", "Error");
                 return;
             }
-            if ((Int32.Parse(tbStartTime.Text) >= Int32.Parse(tbEndTime.Text)) 
-                || (Int32.Parse(tbLeftPos.Text) >= Int32.Parse(tbRightPos.Text)))
+
+            try
             {
-                Console.WriteLine("Start Time or Pos is bigger than End Time or Pos");
-                MessageBox.Show("Start Time or Pos must be bigger than End Time or Poss", "Error");
+                if ((Int32.Parse(tbStartTime.Text) >= Int32.Parse(tbEndTime.Text))
+                    || (Int32.Parse(tbLeftPos.Text) >= Int32.Parse(tbRightPos.Text)))
+                {
+                    Console.WriteLine("Start Time or Pos is bigger than End Time or Pos");
+                    MessageBox.Show("Start Time or Pos must be bigger than End Time or Poss", "Error");
+                    return;
+                }
+            } catch (FormatException)
+            {
+                ExceptionMade();
                 return;
             }
 
-            Console.WriteLine("Saving...");
-            spinnerAOR[(int)cbList.SelectedItem][0] = Int32.Parse(tbStartTime.Text);
-            spinnerAOR[(int)cbList.SelectedItem][1] = Int32.Parse(tbEndTime.Text);
-            spinnerAOR[(int)cbList.SelectedItem][2] = Int32.Parse(tbLeftPos.Text);
-            spinnerAOR[(int)cbList.SelectedItem][3] = Int32.Parse(tbRightPos.Text);
-            
-            foreach (KeyValuePair<int, int[]> kvp in spinnerAOR)
-                Console.WriteLine("Index: {0}, StartTime: {1},  EndTime: {2},  StartPos: {3},  EndPos: {4}",
-                    kvp.Key, kvp.Value[0], kvp.Value[1], kvp.Value[2], kvp.Value[3]);
+            SavingData(prev);
 
             win.bspr.spinnerSpecs = spinnerAOR;
             win.lStatus.Text = "Values saved";
@@ -84,12 +119,13 @@ namespace BananaPredictor
         }
 
         // Dynamic spinner list
-        // TODO: Add in lists of spinners
+        // TODO: Replace this where it compliments the combobox
         private void BPlus_Click(object sender, EventArgs e)
         {
-            AddZero(adding);
+            AddMore(adding);
         }
 
+        // TODO: Remove a list of spinners
         private void BMinus_Click(object sender, EventArgs e)
         {
             /*
@@ -100,12 +136,15 @@ namespace BananaPredictor
 
         private void CbList_SelectedValueChanged(object sender, EventArgs e)
         {
-            /*
+            if (adding > 0)
+                SavingData(prev);
+
             tbStartTime.Text = spinnerAOR[(int)cbList.SelectedItem][0].ToString();
             tbEndTime.Text = spinnerAOR[(int)cbList.SelectedItem][1].ToString();
             tbLeftPos.Text = spinnerAOR[(int)cbList.SelectedItem][2].ToString();
             tbRightPos.Text = spinnerAOR[(int)cbList.SelectedItem][3].ToString();
-            */
+
+            prev = (int)cbList.SelectedItem;
         }
 
         // Inputting integers only

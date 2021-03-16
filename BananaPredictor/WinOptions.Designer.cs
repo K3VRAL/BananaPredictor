@@ -190,7 +190,7 @@ namespace BananaPredictor
             this.bPlus.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.Control;
             this.bPlus.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.bPlus.ForeColor = System.Drawing.SystemColors.Control;
-            this.bPlus.Location = new System.Drawing.Point(271, 9);
+            this.bPlus.Location = new System.Drawing.Point(231, 8);
             this.bPlus.Name = "bPlus";
             this.bPlus.Size = new System.Drawing.Size(28, 29);
             this.bPlus.TabIndex = 16;
@@ -205,7 +205,7 @@ namespace BananaPredictor
             this.bMinus.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.Control;
             this.bMinus.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.bMinus.ForeColor = System.Drawing.SystemColors.Control;
-            this.bMinus.Location = new System.Drawing.Point(235, 9);
+            this.bMinus.Location = new System.Drawing.Point(265, 8);
             this.bMinus.Name = "bMinus";
             this.bMinus.Size = new System.Drawing.Size(29, 29);
             this.bMinus.TabIndex = 17;
