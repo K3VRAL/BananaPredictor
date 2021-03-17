@@ -25,52 +25,6 @@ namespace BananaPredictor
             win = calling as K3BananaWindow;
         }
 
-        public void AddMore(int num)
-        {
-            cbList.Items.Add(num);
-            spinnerAOR.Add(num, new int[] { 0, 0, 0, 0 });
-            cbList.SelectedItem = num;
-            tbStartTime.Text = spinnerAOR[num][0].ToString();
-            tbEndTime.Text = spinnerAOR[num][1].ToString();
-            tbLeftPos.Text = spinnerAOR[num][2].ToString();
-            tbRightPos.Text = spinnerAOR[num][3].ToString();
-            adding += 1;
-        }
-
-        public void SavingData(int num)
-        {
-            try
-            {
-                Console.WriteLine("Saving...");
-                spinnerAOR[num][0] = Int32.Parse(tbStartTime.Text);
-                spinnerAOR[num][1] = Int32.Parse(tbEndTime.Text);
-                spinnerAOR[num][2] = Int32.Parse(tbLeftPos.Text);
-                spinnerAOR[num][3] = Int32.Parse(tbRightPos.Text);
-            } catch (FormatException)
-            {
-                ExceptionMade();
-                return;
-            }
-
-            ConsoleSave();
-        }
-
-        public void ConsoleSave()
-        {
-            foreach (KeyValuePair<int, int[]> kvp in spinnerAOR)
-                Console.WriteLine("Index: {0}, StartTime: {1},  EndTime: {2},  StartPos: {3},  EndPos: {4}",
-                    kvp.Key, kvp.Value[0], kvp.Value[1], kvp.Value[2], kvp.Value[3]);
-        }
-
-        public void ExceptionMade()
-        {
-            MessageBox.Show("Please only input integers", "Error");
-            tbStartTime.Text = "0";
-            tbEndTime.Text = "0";
-            tbLeftPos.Text = "0";
-            tbRightPos.Text = "0";
-        }
-
         private void BConsole_Click(object sender, EventArgs e)
         {
             MessageBox.Show("If you close the console, you would have to restart the whole program", "Warning");
@@ -128,10 +82,18 @@ namespace BananaPredictor
         // TODO: Remove a list of spinners
         private void BMinus_Click(object sender, EventArgs e)
         {
-            /*
-            spinnerAOR.Remove((int)cbList.SelectedItem);
-            cbList.Items.Remove(cbList.SelectedItem);
-            */
+            int saving = (int)cbList.SelectedItem;
+            if (cbList.Items.Count > 1)
+            {
+                if ((int)cbList.SelectedIndex == 0)
+                    cbList.SelectedIndex++;
+                else
+                    cbList.SelectedIndex--;
+                spinnerAOR.Remove(saving);
+                cbList.Items.Remove(saving);
+            }
+            else
+                MessageBox.Show("You can only have a minimum amount of 1 spinner", "Error");
         }
 
         private void CbList_SelectedValueChanged(object sender, EventArgs e)
@@ -145,6 +107,60 @@ namespace BananaPredictor
             tbRightPos.Text = spinnerAOR[(int)cbList.SelectedItem][3].ToString();
 
             prev = (int)cbList.SelectedItem;
+        }
+
+        // Functions to get things done easier
+        public void AddMore(int num)
+        {
+            cbList.Items.Add(num);
+            spinnerAOR.Add(num, new int[] { 0, 0, 0, 0 });
+            cbList.SelectedItem = num;
+            tbStartTime.Text = spinnerAOR[num][0].ToString();
+            tbEndTime.Text = spinnerAOR[num][1].ToString();
+            tbLeftPos.Text = spinnerAOR[num][2].ToString();
+            tbRightPos.Text = spinnerAOR[num][3].ToString();
+            adding += 1;
+        }
+
+        public void SavingData(int num)
+        {
+            try
+            {
+                Console.WriteLine("Saving...");
+                spinnerAOR[num][0] = Int32.Parse(tbStartTime.Text);
+                spinnerAOR[num][1] = Int32.Parse(tbEndTime.Text);
+                spinnerAOR[num][2] = Int32.Parse(tbLeftPos.Text);
+                spinnerAOR[num][3] = Int32.Parse(tbRightPos.Text);
+            }
+            catch (FormatException)
+            {
+                ExceptionMade();
+                return;
+            }
+
+            ConsoleSave();
+        }
+
+        public void ConsoleSave()
+        {
+            foreach (KeyValuePair<int, int[]> kvp in spinnerAOR)
+                Console.WriteLine("Index: {0}, StartTime: {1},  EndTime: {2},  StartPos: {3},  EndPos: {4}",
+                    kvp.Key, kvp.Value[0], kvp.Value[1], kvp.Value[2], kvp.Value[3]);
+        }
+
+        public void ExceptionMade()
+        {
+            MessageBox.Show("Please only input integers", "Error");
+            tbStartTime.Text = "0";
+            tbEndTime.Text = "0";
+            tbLeftPos.Text = "0";
+            tbRightPos.Text = "0";
+        }
+
+        public void NormalCounting(int index)
+        {
+            foreach (KeyValuePair<int, int[]> key in spinnerAOR)
+                if (key.Key)
         }
 
         // Inputting integers only
