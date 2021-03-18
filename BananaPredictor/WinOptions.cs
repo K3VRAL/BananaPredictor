@@ -157,12 +157,6 @@ namespace BananaPredictor
             tbRightPos.Text = "0";
         }
 
-        public void NormalCounting(int index)
-        {
-            foreach (KeyValuePair<int, int[]> key in spinnerAOR)
-                if (key.Key)
-        }
-
         // Inputting integers only
         private void TbStartSpin_KeyPress(object sender, KeyPressEventArgs e)
         {
@@ -186,17 +180,6 @@ namespace BananaPredictor
         {
             if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
                 e.Handled = true;
-        }
-
-        // Debug checkbox
-        private void CbDebug_MouseHover(object sender, EventArgs e)
-        {
-            ttDebug.Show("Debug Mode is used to be able to place the bananas as beats and show where they will be placed", cbDebug);
-        }
-
-        private void CbDebug_Click(object sender, EventArgs e)
-        {
-            win.bspr.debug = cbDebug.Checked;
         }
 
         // Focus on window, not console

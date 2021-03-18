@@ -31,7 +31,6 @@ namespace BananaPredictor
         {
             this.components = new System.ComponentModel.Container();
             this.bSave = new System.Windows.Forms.Button();
-            this.cbDebug = new System.Windows.Forms.CheckBox();
             this.tbStartTime = new System.Windows.Forms.TextBox();
             this.tbEndTime = new System.Windows.Forms.TextBox();
             this.lStartSpin = new System.Windows.Forms.Label();
@@ -62,20 +61,6 @@ namespace BananaPredictor
             this.bSave.Text = "Save";
             this.bSave.UseVisualStyleBackColor = false;
             this.bSave.Click += new System.EventHandler(this.BSave_Click);
-            // 
-            // cbDebug
-            // 
-            this.cbDebug.AutoSize = true;
-            this.cbDebug.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.cbDebug.Location = new System.Drawing.Point(236, 175);
-            this.cbDebug.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.cbDebug.Name = "cbDebug";
-            this.cbDebug.Size = new System.Drawing.Size(119, 24);
-            this.cbDebug.TabIndex = 4;
-            this.cbDebug.Text = "Debug Mode";
-            this.cbDebug.UseVisualStyleBackColor = true;
-            this.cbDebug.Click += new System.EventHandler(this.CbDebug_Click);
-            this.cbDebug.MouseHover += new System.EventHandler(this.CbDebug_MouseHover);
             // 
             // tbStartTime
             // 
@@ -218,7 +203,7 @@ namespace BananaPredictor
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.ClientSize = new System.Drawing.Size(361, 214);
+            this.ClientSize = new System.Drawing.Size(306, 214);
             this.Controls.Add(this.bMinus);
             this.Controls.Add(this.bPlus);
             this.Controls.Add(this.lList);
@@ -232,8 +217,10 @@ namespace BananaPredictor
             this.Controls.Add(this.lStartSpin);
             this.Controls.Add(this.tbEndTime);
             this.Controls.Add(this.tbStartTime);
-            this.Controls.Add(this.cbDebug);
             this.Controls.Add(this.bSave);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "WinOptions";
             this.Text = "Options";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.WinOptions_FormClosing);
@@ -245,7 +232,6 @@ namespace BananaPredictor
         #endregion
 
         private System.Windows.Forms.Button bSave;
-        private System.Windows.Forms.CheckBox cbDebug;
         private System.Windows.Forms.TextBox tbStartTime;
         private System.Windows.Forms.TextBox tbEndTime;
         private System.Windows.Forms.Label lStartSpin;
