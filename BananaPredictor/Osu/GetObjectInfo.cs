@@ -16,12 +16,12 @@ namespace BananaPredictor.Osu
         public Type OType { get; set; }
         // TODO: Slider nested
         public List<double> NestedSlider { get; set; }
+
         // Spinner start to spinner end
         public int BananaStart { get; set; }
         public int BananaEnd { get; set; }
+
         // Getting the specific time of the spinner
         public List<double> BananaShowerTime { get; set; }
-        // TODO: For debugging
-        //public List<double> BananaShowerXOffset { get; set; }
     }
 }
