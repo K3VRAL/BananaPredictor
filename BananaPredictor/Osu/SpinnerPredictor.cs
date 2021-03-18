@@ -14,8 +14,6 @@ namespace BananaPredictor.Osu
     // Used for debugging if program/initial logic works
     public class BananaSpinPredictor
     {
-        public bool debug = false;
-
         // [0] = startTime, [1] = endTime, [2] = startPos, [3] = endPos
         public Dictionary<int, int[]> spinnerSpecs = new();
 
@@ -77,13 +75,15 @@ namespace BananaPredictor.Osu
                         OType = GetObjectInfo.Type.Normal
                     });
                 }
+                Console.WriteLine("Found object {0}", AllHitObjects[i].Object);
 
                 if (flag)
                     return false;
             }
 
-            // Make Spinner
+            // Making requested spinner(s)
             for (int i = 0; i < spinnerSpecs.Count; i++)
+            {
                 AllHitObjects.Add(new GetObjectInfo
                 {
                     Object = "256,192," + spinnerSpecs[i][0] + ",12,0," + spinnerSpecs[i][1] + ",0:0:0:0:",
@@ -92,7 +92,10 @@ namespace BananaPredictor.Osu
                     BananaEnd = spinnerSpecs[i][1],
                     BananaShowerTime = new()
                 });
+                Console.WriteLine("Making spinner {0} - {1}", AllHitObjects[i].BananaStart, AllHitObjects[i].BananaEnd);
+            }
 
+            // Splitting up spinners in a length of 1
             int num = AllHitObjects.Count;
             for (int i = num - 1; i >= 0; i--)
             {
@@ -129,6 +132,7 @@ namespace BananaPredictor.Osu
             {
                 if (obj.OType.Equals(GetObjectInfo.Type.Spinner))
                 {
+                    Console.WriteLine("Processing Spinner {0}", obj.Object);
                     String[] getitem = obj.Object.Split(",");
                     double time = Int32.Parse(getitem[2]);
                     double endtime = Int32.Parse(getitem[5]);
@@ -142,6 +146,7 @@ namespace BananaPredictor.Osu
 
                     while (time <= endtime)
                     {
+                        Console.WriteLine("Added BananaShowerTime {0}", obj.BananaShowerTime.Count);
                         obj.BananaShowerTime.Add(time);
                         time += spacing;
 
@@ -170,10 +175,11 @@ namespace BananaPredictor.Osu
             while (indx < AllHitObjects.Count)
             {
                 restart = false;
-                Console.WriteLine("Processing {0} in indx {1}", AllHitObjects[indx].Object, indx);
+                Console.WriteLine("Logically Calculating {0} in indx {1}", AllHitObjects[indx].Object, indx);
                 if (AllHitObjects[indx].OType.Equals(GetObjectInfo.Type.Spinner))
                 {
                     for (int i = 0; i < spinnerSpecs.Count; i++)
+                    {
                         for (int j = 0; j < AllHitObjects[indx].BananaShowerTime.Count; j++)
                         {
                             double xOffSetCheck = (float)(rng.NextDouble() * CatchPlayfield.WIDTH);
@@ -202,8 +208,11 @@ namespace BananaPredictor.Osu
                             rng.Next();
                             rng.Next();
                         }
-                    if (!restart)
-                        indx++;
+                        if (!restart)
+                            indx++;
+                        else
+                            break;
+                    }
                 }
                 else if (AllHitObjects[indx].OType.Equals(GetObjectInfo.Type.Slider))
                 {
