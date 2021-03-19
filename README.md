@@ -1,5 +1,7 @@
 # BananaPredictor
 
+UPDATE: Currently a dead project until I have the motivation to figure out how sliders works, as well as fixing the other many issues I need to develop
+
 Using [.Net Core SDK 5](https://dotnet.microsoft.com/download/dotnet/5.0) and [osu Catch Rulesets](https://www.nuget.org/packages/ppy.osu.Game.Rulesets.Catch/) from lazer
 
 This program will be able to predict where the next banana xoffset will be placed and either remove or leave it be depending on the area you want the banana to be placed in.
