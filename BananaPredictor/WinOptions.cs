@@ -9,14 +9,13 @@ namespace BananaPredictor
         private Dictionary<int, int[]> spinnerAOR = new();
 
         // TODO: Remove this and replace this with an actual counting system
-        private int adding = 0;
         private int prev = 0;
 
         public WinOptions()
         {
             InitializeComponent();
 
-            AddMore(adding);
+            AddMore();
         }
 
         private K3BananaWindow win = null;
@@ -76,7 +75,7 @@ namespace BananaPredictor
         // TODO: Replace this where it compliments the combobox
         private void BPlus_Click(object sender, EventArgs e)
         {
-            AddMore(adding);
+            AddMore();
         }
 
         // TODO: Remove a list of spinners
@@ -89,8 +88,18 @@ namespace BananaPredictor
                     cbList.SelectedIndex++;
                 else
                     cbList.SelectedIndex--;
+
                 spinnerAOR.Remove(saving);
                 cbList.Items.Remove(saving);
+
+                // TODO: Change this so that if the index doesn't match up the index of cbList, then reduce it by 1
+                for (int i = 0; i < cbList.Items.Count; i++)
+                {
+                    if (!cbList.Items[i].Equals(i))
+                    {
+                        //cbList.Items[i]. -= 1;
+                    }
+                }
             }
             else
                 MessageBox.Show("You can only have a minimum amount of 1 spinner", "Error");
@@ -98,7 +107,7 @@ namespace BananaPredictor
 
         private void CbList_SelectedValueChanged(object sender, EventArgs e)
         {
-            if (adding > 0)
+            if (spinnerAOR.Count > 0)
                 SavingData(prev);
 
             tbStartTime.Text = spinnerAOR[(int)cbList.SelectedItem][0].ToString();
@@ -110,8 +119,10 @@ namespace BananaPredictor
         }
 
         // Functions to get things done easier
-        public void AddMore(int num)
+        public void AddMore()
         {
+            int num = spinnerAOR.Count == 0 ? 0 : spinnerAOR.Count;
+
             cbList.Items.Add(num);
             spinnerAOR.Add(num, new int[] { 0, 0, 0, 0 });
             cbList.SelectedItem = num;
@@ -119,7 +130,6 @@ namespace BananaPredictor
             tbEndTime.Text = spinnerAOR[num][1].ToString();
             tbLeftPos.Text = spinnerAOR[num][2].ToString();
             tbRightPos.Text = spinnerAOR[num][3].ToString();
-            adding += 1;
         }
 
         public void SavingData(int num)
