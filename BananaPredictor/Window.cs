@@ -43,9 +43,9 @@ namespace BananaPredictor
 
             bspr = new();
 
-            OriginalWidth = this.Width;
-            OriginalHeight = this.Height;
-            this.CenterToScreen();
+            OriginalWidth = Width;
+            OriginalHeight = Height;
+            CenterToScreen();
 
             Console.WriteLine("Application Started Up");
         }
@@ -207,17 +207,17 @@ namespace BananaPredictor
 
         private void TAnimation_Tick(object sender, EventArgs e)
         {
-            if (this.Height > 5 && this.Width > 5)
+            if (Height > 5 && Width > 5)
             {
-                this.Height -= OriginalHeight / 10;
-                this.Width -= OriginalHeight / 10;
+                Height -= OriginalHeight / 10;
+                Width -= OriginalHeight / 10;
             }
             else
             {
                 tAnimation.Stop();
-                this.Height = OriginalHeight;
-                this.Width = OriginalWidth;
-                this.WindowState = FormWindowState.Minimized;
+                Height = OriginalHeight;
+                Width = OriginalWidth;
+                WindowState = FormWindowState.Minimized;
             }
         }
     }

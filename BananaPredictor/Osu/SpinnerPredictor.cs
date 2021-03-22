@@ -14,20 +14,33 @@ namespace BananaPredictor.Osu
     // Used for debugging if program/initial logic works
     public class BananaSpinPredictor
     {
-        // [0] = startTime, [1] = endTime, [2] = startPos, [3] = endPos
-        public Dictionary<int, int[]> spinnerSpecs = new();
+        // File of .osu
+        IEnumerable<String> lines;
+
+        // Start line from file of hitobjects
+        int bmHitObjects;
+
+        // All hitobjects
+        List<GetObjectInfo> AllHitObjects = new();
+
+        // Inputted Slider Info
+        // State1   |   [0] = startTime, [1] = endTime, [2] = distanceSpinner, [3] = invertSpinner, [4] = startPos, [5] = endPos
+        // State2   |   [0] = startTime, [1] = endTime, [2] = distanceSpinner, [3] = invertSpinner, [4] = startLeftPos, [5] = startRightPos, [6] = endLeftPos, [7] = endRightPos
+        public Dictionary<int, List<int>> spinnerSpecs;
+        // StoryingInfoDict will work by allowing [0-3] (or more) to be stored for general uses of the spinner whereas [4+] is more a direct change to the spinner. This is because I constantly have to rewrite the whole tope thing over and over again
+        //public StoringInfoDict spinnerSpecs;
 
         private bool flag = false;
 
         public bool SpinnerPredictor(string path)
         {
             // Read file
-            IEnumerable<String> lines = File.ReadLines(path);
+            lines = File.ReadLines(path);
 
             // Map info lines (Used for the file name and such)
             GetMusicInfo MusicInfo = new();
             MusicInfo.Path = lines;
-            int bmHitObjects = MusicInfo.GetItemLine("[HitObjects]");
+            bmHitObjects = MusicInfo.GetItemLine("[HitObjects]");
             bmHitObjects++;
 
             // If not found any
@@ -35,7 +48,44 @@ namespace BananaPredictor.Osu
                 return false;
 
             // Storing all spinners and objects found into list
-            List<GetObjectInfo> AllHitObjects = new();
+            CheckingObjects();
+            if (flag)
+                return false;
+
+            // TODO: Attempting to process slider
+            //for (int i = 0; i < AllHitObjects.Count; i++)
+            //    if (AllHitObjects[i].OType.Equals(GetObjectInfo.Type.Slider))
+
+            // Making requested spinners
+            AddingSpinners();
+            if (flag)
+                return false;
+
+            // Splitting up spinners in a length of 1
+            SplittingSpinners();
+            if (flag)
+                return false;
+
+            // Processing each spinner - The logic for generating the time interval for each banana according to the catch rulesets; all rights go to peppy and his mathematics, just using the important code
+            // Used according to https://github.com/ppy/osu/blob/master/osu.Game.Rulesets.Catch/Objects/BananaShower.cs
+            ProcessingSpinners();
+            if (flag)
+                return false;
+
+            // How each banana is processed - The logic the banana xoffset according to the catch rulesets; all rights go to peppy and his mathematics, just using the important code
+            // Used according to https://github.com/ppy/osu/blob/master/osu.Game.Rulesets.Catch/Beatmaps/CatchBeatmapProcessor.cs
+            //if (spinnerSpecs.Count <= 6) XOffsetProcessingDynamic(); else
+            XOffsetProcessing();
+            if (flag)
+                return false;
+
+            // Put all contents as well as processed hitobjects into osu file
+            ToFileMaker toFile = new();
+            return toFile.OsuToFile(lines, path, MusicInfo, AllHitObjects, bmHitObjects);
+        }
+
+        private void CheckingObjects()
+        {
             for (int i = bmHitObjects; i < lines.Count(); i++)
             {
                 // Making sure that these are spinners; spinners always have x: 256 and y: 192 according to https://osu.ppy.sh/wiki/en/osu%21_File_Formats/Osu_%28file_format%29#spinners
@@ -77,20 +127,12 @@ namespace BananaPredictor.Osu
                 }
 
                 if (flag)
-                    return false;
+                    return;
             }
+        }
 
-            // TODO: Attempting to process slider
-            /*for (int i = 0; i < AllHitObjects.Count; i++)
-            {
-                if (AllHitObjects[i].OType.Equals(GetObjectInfo.Type.Slider))
-                {
-
-                }
-                Console.WriteLine("Processing slider's nested objects {0}", AllHitObjects[i].NestedSlider.Count);
-            }*/
-
-            // Making requested spinner(s)
+        private void AddingSpinners()
+        {
             for (int i = 0; i < spinnerSpecs.Count; i++)
             {
                 AllHitObjects.Add(new GetObjectInfo
@@ -102,9 +144,14 @@ namespace BananaPredictor.Osu
                     BananaShowerTime = new()
                 });
                 Console.WriteLine("Making spinner {0} - {1}", AllHitObjects[i].BananaStart, AllHitObjects[i].BananaEnd);
-            }
 
-            // Splitting up spinners in a length of 1
+                if (flag)
+                    return;
+            }
+        }
+
+        private void SplittingSpinners()
+        {
             int num = AllHitObjects.Count;
             for (int i = num - 1; i >= 0; i--)
             {
@@ -113,7 +160,7 @@ namespace BananaPredictor.Osu
                         && AllHitObjects[i].BananaStart.Equals(spinnerSpecs[j][0])
                         && AllHitObjects[i].BananaEnd.Equals(spinnerSpecs[j][1]))
                     {
-                        for (int k = AllHitObjects[i].BananaStart; k < AllHitObjects[i].BananaEnd - 2; k += 14)
+                        for (int k = AllHitObjects[i].BananaStart; k < AllHitObjects[i].BananaEnd - 2; k += spinnerSpecs[j][2])
                         {
                             AllHitObjects.Add(new GetObjectInfo
                             {
@@ -123,20 +170,21 @@ namespace BananaPredictor.Osu
                                 BananaEnd = k + 1,
                                 BananaShowerTime = new()
                             });
-
-                            if (flag)
-                                return false;
                         }
 
                         AllHitObjects.RemoveAt(i);
+
+                        if (flag)
+                            return;
                     }
 
                 if (flag)
-                    return false;
+                    return;
             }
+        }
 
-            // Processing each spinner - The logic for generating the time interval for each banana according to the catch rulesets; all rights go to peppy and his mathematics, just using the important code
-            // Used according to https://github.com/ppy/osu/blob/master/osu.Game.Rulesets.Catch/Objects/BananaShower.cs
+        private void ProcessingSpinners()
+        {
             foreach (var obj in AllHitObjects)
             {
                 if (obj.OType.Equals(GetObjectInfo.Type.Spinner))
@@ -160,30 +208,29 @@ namespace BananaPredictor.Osu
                         time += spacing;
 
                         if (flag)
-                            return false;
+                            return;
                     }
                 }
 
                 if (flag)
-                    return false;
+                    return;
             }
+        }
 
+        private void XOffsetProcessing()
+        {
             // Mergesort
             MergeSort ms = new();
-            AllHitObjects = ms.Merge(AllHitObjects);
-
-            if (AllHitObjects == null)
-                return false;
-
-            // How each banana is processed - The logic the banana xoffset according to the catch rulesets; all rights go to peppy and his mathematics, just using the important code
-            // Used according to https://github.com/ppy/osu/blob/master/osu.Game.Rulesets.Catch/Beatmaps/CatchBeatmapProcessor.cs
+            
+            // Seeded RNG
             FastRandom rng = new(CatchBeatmapProcessor.RNG_SEED); // Why is the seed 1337?
             //FastRandom temp = new(CatchBeatmapProcessor.RNG_SEED);
+            
+            // TODO: Make it so that it will be going through each inputted spinner; currently only does 1
             int indx = 0;
             bool restart;
             while (indx < AllHitObjects.Count)
             {
-                // TODO: Make it so that when going through each inputted spinner, it will process and place the correct objects into the correct places
                 int i = 0;
                 restart = false;
                 Console.WriteLine("Identifying {0} in indx {1}", AllHitObjects[indx].Object, indx);
@@ -192,10 +239,10 @@ namespace BananaPredictor.Osu
                     for (int j = 0; j < AllHitObjects[indx].BananaShowerTime.Count; j++)
                     {
                         double xOffSetCheck = (float)(rng.NextDouble() * CatchPlayfield.WIDTH);
-                        Console.WriteLine("xOffset {0} | Adding new slider {1}", xOffSetCheck, !(xOffSetCheck < spinnerSpecs[i][2] || xOffSetCheck > spinnerSpecs[i][3]));
+                        Console.WriteLine("xOffset {0} | Adding new slider {1}", xOffSetCheck, !(xOffSetCheck < spinnerSpecs[i][4] || xOffSetCheck > spinnerSpecs[i][5]));
                         if (AllHitObjects[indx].BananaStart > spinnerSpecs[i][0]
                         && AllHitObjects[indx].BananaEnd < spinnerSpecs[i][1]
-                        && !(xOffSetCheck < spinnerSpecs[i][2] || xOffSetCheck > spinnerSpecs[i][3]))
+                        && Invert(spinnerSpecs[i][3], xOffSetCheck, i))
                         {
                             AllHitObjects.Insert(indx, new GetObjectInfo
                             {
@@ -204,9 +251,8 @@ namespace BananaPredictor.Osu
                                 NestedSlider = new()
                             });
                             //rng = temp;
-                            // TODO: Something broke, fix it
                             // TODO: IT WORKS. IT ACTUALLY WORKS. BUT ITS SO FUCKING INEFFICIENT. USE TEMPS INSTEAD OF RESETTING; HUGE MEMORY LEAKS
-                            // If I try using temp, the whole thing breaks and I get different values.
+                            // NOTE: If I try using temp, the whole thing breaks and I get different values.
                             rng = new FastRandom(CatchBeatmapProcessor.RNG_SEED);
                             indx = 0;
                             AllHitObjects = ms.Merge(AllHitObjects);
@@ -233,21 +279,30 @@ namespace BananaPredictor.Osu
                     //else
                     //return false;
                     //}
-                    rng.Next();
+                    rng.Next(-20, 20);
                     indx++;
                 }
                 else
                     indx++;
 
                 if (flag)
-                    return false;
+                    return;
 
                 //temp = rng;
             }
+        }
 
-            // Put all contents as well as processed hitobjects into osu file
-            ToFileMaker toFile = new();
-            return toFile.OsuToFile(lines, path, MusicInfo, AllHitObjects, bmHitObjects);
+        private void XOffsetProcessingDynamic()
+        {
+            // TODO: Work on this
+        }
+
+        private bool Invert(int isRequested, double offset, int index)
+        {
+            if (Convert.ToBoolean(isRequested))
+                return (offset < spinnerSpecs[index][4] || offset > spinnerSpecs[index][5]);
+            else
+                return !(offset < spinnerSpecs[index][4] || offset > spinnerSpecs[index][5]);
         }
 
         public void Stop()

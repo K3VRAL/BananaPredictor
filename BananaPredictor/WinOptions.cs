@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using System.Drawing;
 
 namespace BananaPredictor
 {
     public partial class WinOptions : Form
     {
-        private Dictionary<int, int[]> spinnerAOR = new();
+        // TODO: Don't use this, use the SpinnerPredictor's list instead
+        private Dictionary<int, List<int>> spinnerAOR = new();
 
         // TODO: Remove this and replace this with an actual counting system
         private int prev = 0;
@@ -14,6 +16,20 @@ namespace BananaPredictor
         public WinOptions()
         {
             InitializeComponent();
+
+            // Using this since CheckedState doesn't do anything if you just call it as false (since it already is)
+            tbLeftStart.Enabled = cbMoveTo.Checked;
+            tbRightStart.Enabled = cbMoveTo.Checked;
+            tbLeftEnd.Enabled = cbMoveTo.Checked;
+            tbRightEnd.Enabled = cbMoveTo.Checked;
+            tbLeftPos.Enabled = !cbMoveTo.Checked;
+            tbRightPos.Enabled = !cbMoveTo.Checked;
+            tbLeftStart.BackColor = Color.DarkGray;
+            tbRightStart.BackColor = Color.DarkGray;
+            tbLeftEnd.BackColor = Color.DarkGray;
+            tbRightEnd.BackColor = Color.DarkGray;
+            tbLeftPos.BackColor = SystemColors.Control;
+            tbRightPos.BackColor = SystemColors.Control;
 
             AddMore();
         }
@@ -37,6 +53,7 @@ namespace BananaPredictor
         {
             if ((String.IsNullOrEmpty(tbStartTime.Text) || String.IsNullOrWhiteSpace(tbStartTime.Text))
                 && (String.IsNullOrEmpty(tbEndTime.Text) || String.IsNullOrWhiteSpace(tbEndTime.Text))
+                && (String.IsNullOrEmpty(tbDistance.Text) || String.IsNullOrWhiteSpace(tbDistance.Text))
                 && (String.IsNullOrEmpty(tbLeftPos.Text) || String.IsNullOrWhiteSpace(tbLeftPos.Text))
                 && (String.IsNullOrEmpty(tbRightPos.Text) || String.IsNullOrWhiteSpace(tbRightPos.Text)))
             {
@@ -112,10 +129,49 @@ namespace BananaPredictor
 
             tbStartTime.Text = spinnerAOR[(int)cbList.SelectedItem][0].ToString();
             tbEndTime.Text = spinnerAOR[(int)cbList.SelectedItem][1].ToString();
-            tbLeftPos.Text = spinnerAOR[(int)cbList.SelectedItem][2].ToString();
-            tbRightPos.Text = spinnerAOR[(int)cbList.SelectedItem][3].ToString();
+
+            tbDistance.Text = spinnerAOR[(int)cbList.SelectedIndex][2].ToString();
+            cbInvert.Checked = Convert.ToBoolean(spinnerAOR[(int)cbList.SelectedIndex][3]);
+
+            tbLeftPos.Text = spinnerAOR[(int)cbList.SelectedItem][4].ToString();
+            tbRightPos.Text = spinnerAOR[(int)cbList.SelectedItem][5].ToString();
 
             prev = (int)cbList.SelectedItem;
+        }
+
+        // Dynamic Spinner
+        private void CbMoveTo_CheckedChanged(object sender, EventArgs e)
+        {
+            // TODO: Fix then remove this
+            if (cbMoveTo.Checked)
+                MessageBox.Show("They are in a broken state right now; under development", "Warning");
+            cbMoveTo.Checked = false;
+
+            /*if (!cbMoveTo.Checked)
+            {
+                tbLeftStart.BackColor = Color.DarkGray;
+                tbRightStart.BackColor = Color.DarkGray;
+                tbLeftEnd.BackColor = Color.DarkGray;
+                tbRightEnd.BackColor = Color.DarkGray;
+                tbLeftPos.BackColor = SystemColors.Control;
+                tbRightPos.BackColor = SystemColors.Control;
+            }
+            else
+            {
+                tbLeftStart.BackColor = SystemColors.Control;
+                tbRightStart.BackColor = SystemColors.Control;
+                tbLeftEnd.BackColor = SystemColors.Control;
+                tbRightEnd.BackColor = SystemColors.Control;
+                tbLeftPos.BackColor = Color.DarkGray;
+                tbRightPos.BackColor = Color.DarkGray;
+            }
+
+            tbLeftStart.Enabled = cbMoveTo.Checked;
+            tbRightStart.Enabled = cbMoveTo.Checked;
+            tbLeftEnd.Enabled = cbMoveTo.Checked;
+            tbRightEnd.Enabled = cbMoveTo.Checked;
+            tbLeftPos.Enabled = !cbMoveTo.Checked;
+            tbRightPos.Enabled = !cbMoveTo.Checked;*/
         }
 
         // Functions to get things done easier
@@ -124,12 +180,27 @@ namespace BananaPredictor
             int num = spinnerAOR.Count == 0 ? 0 : spinnerAOR.Count;
 
             cbList.Items.Add(num);
-            spinnerAOR.Add(num, new int[] { 0, 0, 0, 0 });
+            // Instead of using int[], use List<int>() to allow for more dynamic things
+            //spinnerAOR.Add(num, new int[] { 0, 0, 0, 0 });
+            // TODO: This looks weird, fix it
+            List<int> list = new();
+            list.Add(0);
+            list.Add(0);
+            list.Add(1);
+            list.Add(0);
+            list.Add(0);
+            list.Add(0);
+            spinnerAOR.Add(num, list);
+
             cbList.SelectedItem = num;
             tbStartTime.Text = spinnerAOR[num][0].ToString();
             tbEndTime.Text = spinnerAOR[num][1].ToString();
-            tbLeftPos.Text = spinnerAOR[num][2].ToString();
-            tbRightPos.Text = spinnerAOR[num][3].ToString();
+
+            tbDistance.Text = spinnerAOR[num][2].ToString();
+            cbInvert.Checked = Convert.ToBoolean(spinnerAOR[num][3]);
+
+            tbLeftPos.Text = spinnerAOR[num][4].ToString();
+            tbRightPos.Text = spinnerAOR[num][5].ToString();
         }
 
         public void SavingData(int num)
@@ -137,25 +208,44 @@ namespace BananaPredictor
             try
             {
                 Console.WriteLine("Saving...");
+                /*if (cbMoveTo.Checked)
+                {
+                    spinnerAOR[num][0] = Int32.Parse(tbStartTime.Text);
+                    spinnerAOR[num][1] = Int32.Parse(tbEndTime.Text);
+                
+                    spinnerAOR[num][2] = Int32.Parse(tbEndTime.Text);
+                    spinnerAOR[num][3] = Convert.ToInt32(cbInvert.Checked);
+
+                    spinnerAOR[num][4] = Int32.Parse(tbLeftStart.Text);
+                    spinnerAOR[num][5] = Int32.Parse(tbRightStart.Text);
+                    spinnerAOR[num][6] = Int32.Parse(tbLeftEnd.Text);
+                    spinnerAOR[num][7] = Int32.Parse(tbRightEnd.Text);
+                }
+                else
+                {*/
                 spinnerAOR[num][0] = Int32.Parse(tbStartTime.Text);
                 spinnerAOR[num][1] = Int32.Parse(tbEndTime.Text);
-                spinnerAOR[num][2] = Int32.Parse(tbLeftPos.Text);
-                spinnerAOR[num][3] = Int32.Parse(tbRightPos.Text);
+
+                spinnerAOR[num][2] = Int32.Parse(tbDistance.Text);
+                spinnerAOR[num][3] = Convert.ToInt32(cbInvert.Checked);
+
+                spinnerAOR[num][4] = Int32.Parse(tbLeftPos.Text);
+                spinnerAOR[num][5] = Int32.Parse(tbRightPos.Text);
+
+                ConsoleSave();
             }
             catch (FormatException)
             {
                 ExceptionMade();
                 return;
             }
-
-            ConsoleSave();
         }
 
         public void ConsoleSave()
         {
-            foreach (KeyValuePair<int, int[]> kvp in spinnerAOR)
-                Console.WriteLine("Index: {0}, StartTime: {1},  EndTime: {2},  StartPos: {3},  EndPos: {4}",
-                    kvp.Key, kvp.Value[0], kvp.Value[1], kvp.Value[2], kvp.Value[3]);
+            foreach (KeyValuePair<int, List<int>> kvp in spinnerAOR)
+                Console.WriteLine("Index: {0}, StartTime: {1},  EndTime: {2}, Distance: {3}, Invert: {4},  StartPos: {5},  EndPos: {6}",
+                    kvp.Key, kvp.Value[0], kvp.Value[1], kvp.Value[2], kvp.Value[3], kvp.Value[4], kvp.Value[5]);
         }
 
         public void ExceptionMade()
@@ -163,11 +253,15 @@ namespace BananaPredictor
             MessageBox.Show("Please only input integers", "Error");
             tbStartTime.Text = "0";
             tbEndTime.Text = "0";
+
+            tbDistance.Text = "1";
+            cbInvert.Checked = false;
+
             tbLeftPos.Text = "0";
             tbRightPos.Text = "0";
         }
 
-        // Inputting integers only
+        // Inputting integers only in TextBox
         private void TbStartSpin_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
@@ -187,6 +281,36 @@ namespace BananaPredictor
         }
 
         private void TbEndPos_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+                e.Handled = true;
+        }
+
+        private void TbLeftStart_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+                e.Handled = true;
+        }
+
+        private void TbRightStart_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+                e.Handled = true;
+        }
+
+        private void TbLeftEnd_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+                e.Handled = true;
+        }
+
+        private void TbRightEnd_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+                e.Handled = true;
+        }
+
+        private void TbSpawnRate_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
                 e.Handled = true;
