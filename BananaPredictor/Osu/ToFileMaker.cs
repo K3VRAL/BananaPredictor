@@ -7,7 +7,7 @@ namespace BananaPredictor.Osu
 {
     public class ToFileMaker
     {
-        public bool OsuToFile(IEnumerable<String> lines, String path, GetMusicInfo MusicInfo, List<GetObjectInfo> AllHitObjects, int bmHitObjects)
+        public bool OsuToFile(IEnumerable<String> lines, String path, GetMusicInfo MusicInfo, List<GetObjectInfo> AllHitObjects, List<GetMapInfo> AllTimingPoints, int bmHitObjects, int bmTimingPoints)
         {
             PutTogether pt = new();
             pt.Path = lines;
@@ -35,7 +35,7 @@ namespace BananaPredictor.Osu
                         num++;
                         continue;
                     }
-                    if (num.Equals(bmHitObjects))
+                    if (num == bmHitObjects)
                     {
                         break;
                     }
