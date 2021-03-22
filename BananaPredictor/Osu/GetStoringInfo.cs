@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace BananaPredictor.Osu
 {
-    // TODO: Use this for a better storage system
-
     // Thanks stackoverflow https://stackoverflow.com/questions/569903/multi-value-dictionary
     public struct StoringInfo
     {
