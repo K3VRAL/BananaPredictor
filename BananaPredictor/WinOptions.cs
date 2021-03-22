@@ -2,18 +2,19 @@
 using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Drawing;
+using BananaPredictor.Osu;
 
 namespace BananaPredictor
 {
     public partial class WinOptions : Form
     {
         // TODO: Don't use this, use the SpinnerPredictor's list instead
-        private Dictionary<int, List<int>> spinnerAOR = new();
+        private StoringInfoDict spinnerAOR = new();
 
         // TODO: Remove this and replace this with an actual counting system
         private int prev = 0;
 
-        public WinOptions()
+        private WinOptions()
         {
             InitializeComponent();
 
@@ -71,6 +72,12 @@ namespace BananaPredictor
                     MessageBox.Show("Start Time or Pos must be bigger than End Time or Poss", "Error");
                     return;
                 }
+                else if (Int32.Parse(tbDistance.Text) <= 0)
+                {
+                    Console.WriteLine("Distance Snap must be bigger than 0");
+                    MessageBox.Show("Distance Snap must be bigger than 0", "Error");
+                    return;
+                }
             } catch (FormatException)
             {
                 ExceptionMade();
@@ -112,7 +119,7 @@ namespace BananaPredictor
                 // TODO: Change this so that if the index doesn't match up the index of cbList, then reduce it by 1
                 for (int i = 0; i < cbList.Items.Count; i++)
                 {
-                    if (!cbList.Items[i].Equals(i))
+                    if (!((int)cbList.Items[i] == i))
                     {
                         //cbList.Items[i]. -= 1;
                     }
@@ -127,14 +134,7 @@ namespace BananaPredictor
             if (spinnerAOR.Count > 0)
                 SavingData(prev);
 
-            tbStartTime.Text = spinnerAOR[(int)cbList.SelectedItem][0].ToString();
-            tbEndTime.Text = spinnerAOR[(int)cbList.SelectedItem][1].ToString();
-
-            tbDistance.Text = spinnerAOR[(int)cbList.SelectedIndex][2].ToString();
-            cbInvert.Checked = Convert.ToBoolean(spinnerAOR[(int)cbList.SelectedIndex][3]);
-
-            tbLeftPos.Text = spinnerAOR[(int)cbList.SelectedItem][4].ToString();
-            tbRightPos.Text = spinnerAOR[(int)cbList.SelectedItem][5].ToString();
+            ToTextBox((int)cbList.SelectedItem);
 
             prev = (int)cbList.SelectedItem;
         }
@@ -175,35 +175,29 @@ namespace BananaPredictor
         }
 
         // Functions to get things done easier
-        public void AddMore()
+        private void AddMore()
         {
             int num = spinnerAOR.Count == 0 ? 0 : spinnerAOR.Count;
 
             cbList.Items.Add(num);
-            // Instead of using int[], use List<int>() to allow for more dynamic things
-            //spinnerAOR.Add(num, new int[] { 0, 0, 0, 0 });
+            // Instead of using int[], use List<int> to allow for more dynamic things
             // TODO: This looks weird, fix it
-            List<int> list = new();
-            list.Add(0);
-            list.Add(0);
-            list.Add(1);
-            list.Add(0);
-            list.Add(0);
-            list.Add(0);
-            spinnerAOR.Add(num, list);
+            List<int> listMap = new();
+            List<int> listSpin = new();
+            listMap.Add(0);
+            listMap.Add(0);
+            listMap.Add(1);
+            listMap.Add(0);
+            listMap.Add(0);
+            listSpin.Add(0);
+            listSpin.Add(0);
+            spinnerAOR.Add(num, listMap, listSpin);
 
             cbList.SelectedItem = num;
-            tbStartTime.Text = spinnerAOR[num][0].ToString();
-            tbEndTime.Text = spinnerAOR[num][1].ToString();
-
-            tbDistance.Text = spinnerAOR[num][2].ToString();
-            cbInvert.Checked = Convert.ToBoolean(spinnerAOR[num][3]);
-
-            tbLeftPos.Text = spinnerAOR[num][4].ToString();
-            tbRightPos.Text = spinnerAOR[num][5].ToString();
+            ToTextBox(num);
         }
 
-        public void SavingData(int num)
+        private void SavingData(int num)
         {
             try
             {
@@ -223,14 +217,14 @@ namespace BananaPredictor
                 }
                 else
                 {*/
-                spinnerAOR[num][0] = Int32.Parse(tbStartTime.Text);
-                spinnerAOR[num][1] = Int32.Parse(tbEndTime.Text);
+                spinnerAOR[num].MapRelated[0] = Int32.Parse(tbStartTime.Text);
+                spinnerAOR[num].MapRelated[1] = Int32.Parse(tbEndTime.Text);
+                spinnerAOR[num].MapRelated[2] = Int32.Parse(tbDistance.Text);
+                spinnerAOR[num].MapRelated[3] = Convert.ToInt32(cbInvert.Checked);
+                spinnerAOR[num].MapRelated[4] = Convert.ToInt32(cbOnlySpin.Checked);
 
-                spinnerAOR[num][2] = Int32.Parse(tbDistance.Text);
-                spinnerAOR[num][3] = Convert.ToInt32(cbInvert.Checked);
-
-                spinnerAOR[num][4] = Int32.Parse(tbLeftPos.Text);
-                spinnerAOR[num][5] = Int32.Parse(tbRightPos.Text);
+                spinnerAOR[num].SpinnerRelated[0] = Int32.Parse(tbLeftPos.Text);
+                spinnerAOR[num].SpinnerRelated[1] = Int32.Parse(tbRightPos.Text);
 
                 ConsoleSave();
             }
@@ -241,21 +235,37 @@ namespace BananaPredictor
             }
         }
 
-        public void ConsoleSave()
+        private void ToTextBox(int number)
         {
-            foreach (KeyValuePair<int, List<int>> kvp in spinnerAOR)
-                Console.WriteLine("Index: {0}, StartTime: {1},  EndTime: {2}, Distance: {3}, Invert: {4},  StartPos: {5},  EndPos: {6}",
-                    kvp.Key, kvp.Value[0], kvp.Value[1], kvp.Value[2], kvp.Value[3], kvp.Value[4], kvp.Value[5]);
+            tbStartTime.Text = spinnerAOR[number].MapRelated[0].ToString();
+            tbEndTime.Text = spinnerAOR[number].MapRelated[1].ToString();
+            tbDistance.Text = spinnerAOR[number].MapRelated[2].ToString();
+            cbInvert.Checked = Convert.ToBoolean(spinnerAOR[number].MapRelated[3]);
+            cbOnlySpin.Checked = Convert.ToBoolean(spinnerAOR[number].MapRelated[4]);
+
+            tbLeftPos.Text = spinnerAOR[number].SpinnerRelated[0].ToString();
+            tbRightPos.Text = spinnerAOR[number].SpinnerRelated[1].ToString();
         }
 
-        public void ExceptionMade()
+        private void ConsoleSave()
+        {
+            foreach (KeyValuePair<int, StoringInfo> kvp in spinnerAOR)
+                Console.WriteLine("Index: {0}"
+                    + "\nStartTime: {1},  EndTime: {2}, Distance: {3}, Invert: {4}, SpinnerOnly: {5},"
+                    + "\nStartPos: {6},  EndPos: {7}",
+                    kvp.Key,
+                    kvp.Value.MapRelated[0], kvp.Value.MapRelated[1], kvp.Value.MapRelated[2], kvp.Value.MapRelated[3], kvp.Value.MapRelated[4],
+                    kvp.Value.SpinnerRelated[0], kvp.Value.SpinnerRelated[1]);
+        }
+
+        private void ExceptionMade()
         {
             MessageBox.Show("Please only input integers", "Error");
             tbStartTime.Text = "0";
             tbEndTime.Text = "0";
-
             tbDistance.Text = "1";
             cbInvert.Checked = false;
+            cbOnlySpin.Checked = false;
 
             tbLeftPos.Text = "0";
             tbRightPos.Text = "0";
