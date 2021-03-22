@@ -8,7 +8,6 @@ namespace BananaPredictor
 {
     public partial class WinOptions : Form
     {
-        // TODO: Don't use this, use the SpinnerPredictor's list instead
         private StoringInfoDict spinnerAOR = new();
 
         // TODO: Remove this and replace this with an actual counting system
@@ -52,7 +51,9 @@ namespace BananaPredictor
 
         private void BSave_Click(object sender, EventArgs e)
         {
-            if ((String.IsNullOrEmpty(tbStartTime.Text) || String.IsNullOrWhiteSpace(tbStartTime.Text))
+            // TODO: Use this is SavingData() foreach item
+            if (!cbOnlySpin.Checked
+                && (String.IsNullOrEmpty(tbStartTime.Text) || String.IsNullOrWhiteSpace(tbStartTime.Text))
                 && (String.IsNullOrEmpty(tbEndTime.Text) || String.IsNullOrWhiteSpace(tbEndTime.Text))
                 && (String.IsNullOrEmpty(tbDistance.Text) || String.IsNullOrWhiteSpace(tbDistance.Text))
                 && (String.IsNullOrEmpty(tbLeftPos.Text) || String.IsNullOrWhiteSpace(tbLeftPos.Text))
@@ -174,6 +175,31 @@ namespace BananaPredictor
             tbRightPos.Enabled = !cbMoveTo.Checked;*/
         }
 
+        private void CbOnlySpin_CheckedChanged(object sender, EventArgs e)
+        {
+            if (cbOnlySpin.Checked)
+            {
+                tbLeftPos.BackColor = Color.DarkGray;
+                tbRightPos.BackColor = Color.DarkGray;
+
+                tbLeftPos.Text = "0";
+                tbRightPos.Text = "1";
+            }
+            else
+            {
+                tbLeftPos.BackColor = SystemColors.Control;
+                tbRightPos.BackColor = SystemColors.Control;
+            }
+
+            cbInvert.Visible = !cbOnlySpin.Checked;
+            cbInvert.Enabled = !cbOnlySpin.Checked;
+            cbMoveTo.Visible = !cbOnlySpin.Checked;
+            cbMoveTo.Enabled = !cbOnlySpin.Checked;
+
+            tbLeftPos.Enabled = !cbOnlySpin.Checked;
+            tbRightPos.Enabled = !cbOnlySpin.Checked;
+        }
+
         // Functions to get things done easier
         private void AddMore()
         {
@@ -254,7 +280,7 @@ namespace BananaPredictor
                     + "\nStartTime: {1},  EndTime: {2}, Distance: {3}, Invert: {4}, SpinnerOnly: {5},"
                     + "\nStartPos: {6},  EndPos: {7}",
                     kvp.Key,
-                    kvp.Value.MapRelated[0], kvp.Value.MapRelated[1], kvp.Value.MapRelated[2], kvp.Value.MapRelated[3], kvp.Value.MapRelated[4],
+                    kvp.Value.MapRelated[0], kvp.Value.MapRelated[1], kvp.Value.MapRelated[2], Convert.ToBoolean(kvp.Value.MapRelated[3]), Convert.ToBoolean(kvp.Value.MapRelated[4]),
                     kvp.Value.SpinnerRelated[0], kvp.Value.SpinnerRelated[1]);
         }
 

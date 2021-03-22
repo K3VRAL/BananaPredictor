@@ -72,9 +72,10 @@ namespace BananaPredictor
             this.bSave.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.Control;
             this.bSave.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.bSave.ForeColor = System.Drawing.SystemColors.Control;
-            this.bSave.Location = new System.Drawing.Point(12, 172);
+            this.bSave.Location = new System.Drawing.Point(9, 112);
+            this.bSave.Margin = new System.Windows.Forms.Padding(2);
             this.bSave.Name = "bSave";
-            this.bSave.Size = new System.Drawing.Size(93, 29);
+            this.bSave.Size = new System.Drawing.Size(70, 19);
             this.bSave.TabIndex = 0;
             this.bSave.Text = "Save";
             this.bSave.UseVisualStyleBackColor = false;
@@ -83,18 +84,20 @@ namespace BananaPredictor
             // tbStartTime
             // 
             this.tbStartTime.BackColor = System.Drawing.SystemColors.Control;
-            this.tbStartTime.Location = new System.Drawing.Point(13, 42);
+            this.tbStartTime.Location = new System.Drawing.Point(10, 27);
+            this.tbStartTime.Margin = new System.Windows.Forms.Padding(2);
             this.tbStartTime.Name = "tbStartTime";
-            this.tbStartTime.Size = new System.Drawing.Size(125, 27);
+            this.tbStartTime.Size = new System.Drawing.Size(95, 21);
             this.tbStartTime.TabIndex = 5;
             this.tbStartTime.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TbStartSpin_KeyPress);
             // 
             // tbEndTime
             // 
             this.tbEndTime.BackColor = System.Drawing.SystemColors.Control;
-            this.tbEndTime.Location = new System.Drawing.Point(13, 75);
+            this.tbEndTime.Location = new System.Drawing.Point(10, 49);
+            this.tbEndTime.Margin = new System.Windows.Forms.Padding(2);
             this.tbEndTime.Name = "tbEndTime";
-            this.tbEndTime.Size = new System.Drawing.Size(125, 27);
+            this.tbEndTime.Size = new System.Drawing.Size(95, 21);
             this.tbEndTime.TabIndex = 6;
             this.tbEndTime.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TbEndSpin_KeyPress);
             // 
@@ -102,9 +105,10 @@ namespace BananaPredictor
             // 
             this.lStartSpin.AutoSize = true;
             this.lStartSpin.ForeColor = System.Drawing.SystemColors.Control;
-            this.lStartSpin.Location = new System.Drawing.Point(144, 45);
+            this.lStartSpin.Location = new System.Drawing.Point(108, 29);
+            this.lStartSpin.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lStartSpin.Name = "lStartSpin";
-            this.lStartSpin.Size = new System.Drawing.Size(121, 20);
+            this.lStartSpin.Size = new System.Drawing.Size(90, 13);
             this.lStartSpin.TabIndex = 7;
             this.lStartSpin.Text = "Start Time Offset";
             // 
@@ -112,9 +116,10 @@ namespace BananaPredictor
             // 
             this.lEndSpin.AutoSize = true;
             this.lEndSpin.ForeColor = System.Drawing.SystemColors.Control;
-            this.lEndSpin.Location = new System.Drawing.Point(144, 78);
+            this.lEndSpin.Location = new System.Drawing.Point(108, 51);
+            this.lEndSpin.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lEndSpin.Name = "lEndSpin";
-            this.lEndSpin.Size = new System.Drawing.Size(115, 20);
+            this.lEndSpin.Size = new System.Drawing.Size(84, 13);
             this.lEndSpin.TabIndex = 8;
             this.lEndSpin.Text = "End Time Offset";
             // 
@@ -122,9 +127,10 @@ namespace BananaPredictor
             // 
             this.lRightPos.AutoSize = true;
             this.lRightPos.ForeColor = System.Drawing.SystemColors.Control;
-            this.lRightPos.Location = new System.Drawing.Point(144, 145);
+            this.lRightPos.Location = new System.Drawing.Point(108, 94);
+            this.lRightPos.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lRightPos.Name = "lRightPos";
-            this.lRightPos.Size = new System.Drawing.Size(190, 20);
+            this.lRightPos.Size = new System.Drawing.Size(137, 13);
             this.lRightPos.TabIndex = 12;
             this.lRightPos.Text = "Right Empty Space Position";
             // 
@@ -132,27 +138,30 @@ namespace BananaPredictor
             // 
             this.lLeftPos.AutoSize = true;
             this.lLeftPos.ForeColor = System.Drawing.SystemColors.Control;
-            this.lLeftPos.Location = new System.Drawing.Point(144, 111);
+            this.lLeftPos.Location = new System.Drawing.Point(108, 72);
+            this.lLeftPos.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lLeftPos.Name = "lLeftPos";
-            this.lLeftPos.Size = new System.Drawing.Size(180, 20);
+            this.lLeftPos.Size = new System.Drawing.Size(131, 13);
             this.lLeftPos.TabIndex = 11;
             this.lLeftPos.Text = "Left Empty Space Position";
             // 
             // tbRightPos
             // 
             this.tbRightPos.BackColor = System.Drawing.SystemColors.Control;
-            this.tbRightPos.Location = new System.Drawing.Point(13, 142);
+            this.tbRightPos.Location = new System.Drawing.Point(10, 92);
+            this.tbRightPos.Margin = new System.Windows.Forms.Padding(2);
             this.tbRightPos.Name = "tbRightPos";
-            this.tbRightPos.Size = new System.Drawing.Size(125, 27);
+            this.tbRightPos.Size = new System.Drawing.Size(95, 21);
             this.tbRightPos.TabIndex = 10;
             this.tbRightPos.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TbEndPos_KeyPress);
             // 
             // tbLeftPos
             // 
             this.tbLeftPos.BackColor = System.Drawing.SystemColors.Control;
-            this.tbLeftPos.Location = new System.Drawing.Point(13, 108);
+            this.tbLeftPos.Location = new System.Drawing.Point(10, 70);
+            this.tbLeftPos.Margin = new System.Windows.Forms.Padding(2);
             this.tbLeftPos.Name = "tbLeftPos";
-            this.tbLeftPos.Size = new System.Drawing.Size(125, 27);
+            this.tbLeftPos.Size = new System.Drawing.Size(95, 21);
             this.tbLeftPos.TabIndex = 9;
             this.tbLeftPos.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TbStartPos_KeyPress);
             // 
@@ -163,9 +172,10 @@ namespace BananaPredictor
             this.bConsole.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.Control;
             this.bConsole.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.bConsole.ForeColor = System.Drawing.SystemColors.Control;
-            this.bConsole.Location = new System.Drawing.Point(112, 172);
+            this.bConsole.Location = new System.Drawing.Point(84, 112);
+            this.bConsole.Margin = new System.Windows.Forms.Padding(2);
             this.bConsole.Name = "bConsole";
-            this.bConsole.Size = new System.Drawing.Size(117, 29);
+            this.bConsole.Size = new System.Drawing.Size(88, 19);
             this.bConsole.TabIndex = 13;
             this.bConsole.Text = "Open Console";
             this.bConsole.UseVisualStyleBackColor = false;
@@ -174,10 +184,12 @@ namespace BananaPredictor
             // cbList
             // 
             this.cbList.BackColor = System.Drawing.SystemColors.Control;
+            this.cbList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbList.FormattingEnabled = true;
-            this.cbList.Location = new System.Drawing.Point(12, 9);
+            this.cbList.Location = new System.Drawing.Point(9, 6);
+            this.cbList.Margin = new System.Windows.Forms.Padding(2);
             this.cbList.Name = "cbList";
-            this.cbList.Size = new System.Drawing.Size(127, 28);
+            this.cbList.Size = new System.Drawing.Size(96, 21);
             this.cbList.TabIndex = 14;
             this.cbList.SelectedValueChanged += new System.EventHandler(this.CbList_SelectedValueChanged);
             // 
@@ -185,9 +197,10 @@ namespace BananaPredictor
             // 
             this.lList.AutoSize = true;
             this.lList.ForeColor = System.Drawing.SystemColors.Control;
-            this.lList.Location = new System.Drawing.Point(144, 12);
+            this.lList.Location = new System.Drawing.Point(108, 8);
+            this.lList.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lList.Name = "lList";
-            this.lList.Size = new System.Drawing.Size(85, 20);
+            this.lList.Size = new System.Drawing.Size(62, 13);
             this.lList.TabIndex = 15;
             this.lList.Text = "Spinner List";
             // 
@@ -198,9 +211,10 @@ namespace BananaPredictor
             this.bPlus.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.Control;
             this.bPlus.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.bPlus.ForeColor = System.Drawing.SystemColors.Control;
-            this.bPlus.Location = new System.Drawing.Point(231, 8);
+            this.bPlus.Location = new System.Drawing.Point(173, 5);
+            this.bPlus.Margin = new System.Windows.Forms.Padding(2);
             this.bPlus.Name = "bPlus";
-            this.bPlus.Size = new System.Drawing.Size(28, 29);
+            this.bPlus.Size = new System.Drawing.Size(21, 19);
             this.bPlus.TabIndex = 16;
             this.bPlus.Text = "+";
             this.bPlus.UseVisualStyleBackColor = false;
@@ -213,9 +227,10 @@ namespace BananaPredictor
             this.bMinus.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.Control;
             this.bMinus.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.bMinus.ForeColor = System.Drawing.SystemColors.Control;
-            this.bMinus.Location = new System.Drawing.Point(265, 8);
+            this.bMinus.Location = new System.Drawing.Point(199, 5);
+            this.bMinus.Margin = new System.Windows.Forms.Padding(2);
             this.bMinus.Name = "bMinus";
-            this.bMinus.Size = new System.Drawing.Size(29, 29);
+            this.bMinus.Size = new System.Drawing.Size(22, 19);
             this.bMinus.TabIndex = 17;
             this.bMinus.Text = "-";
             this.bMinus.UseVisualStyleBackColor = false;
@@ -225,10 +240,9 @@ namespace BananaPredictor
             // 
             this.lPosInX.AutoSize = true;
             this.lPosInX.ForeColor = System.Drawing.SystemColors.Control;
-            this.lPosInX.Location = new System.Drawing.Point(236, 177);
-            this.lPosInX.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lPosInX.Location = new System.Drawing.Point(177, 115);
             this.lPosInX.Name = "lPosInX";
-            this.lPosInX.Size = new System.Drawing.Size(88, 20);
+            this.lPosInX.Size = new System.Drawing.Size(64, 13);
             this.lPosInX.TabIndex = 18;
             this.lPosInX.Text = "Position in x";
             // 
@@ -236,10 +250,9 @@ namespace BananaPredictor
             // 
             this.cbMoveTo.AutoSize = true;
             this.cbMoveTo.ForeColor = System.Drawing.SystemColors.Control;
-            this.cbMoveTo.Location = new System.Drawing.Point(336, 12);
-            this.cbMoveTo.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.cbMoveTo.Location = new System.Drawing.Point(252, 8);
             this.cbMoveTo.Name = "cbMoveTo";
-            this.cbMoveTo.Size = new System.Drawing.Size(148, 24);
+            this.cbMoveTo.Size = new System.Drawing.Size(113, 17);
             this.cbMoveTo.TabIndex = 19;
             this.cbMoveTo.Text = "Start from, End to";
             this.cbMoveTo.UseVisualStyleBackColor = true;
@@ -248,36 +261,40 @@ namespace BananaPredictor
             // tbRightEnd
             // 
             this.tbRightEnd.BackColor = System.Drawing.SystemColors.Control;
-            this.tbRightEnd.Location = new System.Drawing.Point(336, 142);
+            this.tbRightEnd.Location = new System.Drawing.Point(252, 92);
+            this.tbRightEnd.Margin = new System.Windows.Forms.Padding(2);
             this.tbRightEnd.Name = "tbRightEnd";
-            this.tbRightEnd.Size = new System.Drawing.Size(125, 27);
+            this.tbRightEnd.Size = new System.Drawing.Size(95, 21);
             this.tbRightEnd.TabIndex = 23;
             this.tbRightEnd.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TbRightEnd_KeyPress);
             // 
             // tbLeftEnd
             // 
             this.tbLeftEnd.BackColor = System.Drawing.SystemColors.Control;
-            this.tbLeftEnd.Location = new System.Drawing.Point(336, 108);
+            this.tbLeftEnd.Location = new System.Drawing.Point(252, 70);
+            this.tbLeftEnd.Margin = new System.Windows.Forms.Padding(2);
             this.tbLeftEnd.Name = "tbLeftEnd";
-            this.tbLeftEnd.Size = new System.Drawing.Size(125, 27);
+            this.tbLeftEnd.Size = new System.Drawing.Size(95, 21);
             this.tbLeftEnd.TabIndex = 22;
             this.tbLeftEnd.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TbLeftEnd_KeyPress);
             // 
             // tbRightStart
             // 
             this.tbRightStart.BackColor = System.Drawing.SystemColors.Control;
-            this.tbRightStart.Location = new System.Drawing.Point(336, 75);
+            this.tbRightStart.Location = new System.Drawing.Point(252, 49);
+            this.tbRightStart.Margin = new System.Windows.Forms.Padding(2);
             this.tbRightStart.Name = "tbRightStart";
-            this.tbRightStart.Size = new System.Drawing.Size(125, 27);
+            this.tbRightStart.Size = new System.Drawing.Size(95, 21);
             this.tbRightStart.TabIndex = 21;
             this.tbRightStart.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TbRightStart_KeyPress);
             // 
             // tbLeftStart
             // 
             this.tbLeftStart.BackColor = System.Drawing.SystemColors.Control;
-            this.tbLeftStart.Location = new System.Drawing.Point(336, 42);
+            this.tbLeftStart.Location = new System.Drawing.Point(252, 27);
+            this.tbLeftStart.Margin = new System.Windows.Forms.Padding(2);
             this.tbLeftStart.Name = "tbLeftStart";
-            this.tbLeftStart.Size = new System.Drawing.Size(125, 27);
+            this.tbLeftStart.Size = new System.Drawing.Size(95, 21);
             this.tbLeftStart.TabIndex = 20;
             this.tbLeftStart.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TbLeftStart_KeyPress);
             // 
@@ -285,9 +302,10 @@ namespace BananaPredictor
             // 
             this.lLeftStart.AutoSize = true;
             this.lLeftStart.ForeColor = System.Drawing.SystemColors.Control;
-            this.lLeftStart.Location = new System.Drawing.Point(468, 46);
+            this.lLeftStart.Location = new System.Drawing.Point(351, 30);
+            this.lLeftStart.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lLeftStart.Name = "lLeftStart";
-            this.lLeftStart.Size = new System.Drawing.Size(69, 20);
+            this.lLeftStart.Size = new System.Drawing.Size(53, 13);
             this.lLeftStart.TabIndex = 24;
             this.lLeftStart.Text = "Left Start";
             // 
@@ -295,9 +313,10 @@ namespace BananaPredictor
             // 
             this.lRightStart.AutoSize = true;
             this.lRightStart.ForeColor = System.Drawing.SystemColors.Control;
-            this.lRightStart.Location = new System.Drawing.Point(468, 78);
+            this.lRightStart.Location = new System.Drawing.Point(351, 51);
+            this.lRightStart.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lRightStart.Name = "lRightStart";
-            this.lRightStart.Size = new System.Drawing.Size(79, 20);
+            this.lRightStart.Size = new System.Drawing.Size(59, 13);
             this.lRightStart.TabIndex = 25;
             this.lRightStart.Text = "Right Start";
             // 
@@ -305,9 +324,10 @@ namespace BananaPredictor
             // 
             this.lLeftEnd.AutoSize = true;
             this.lLeftEnd.ForeColor = System.Drawing.SystemColors.Control;
-            this.lLeftEnd.Location = new System.Drawing.Point(468, 112);
+            this.lLeftEnd.Location = new System.Drawing.Point(351, 73);
+            this.lLeftEnd.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lLeftEnd.Name = "lLeftEnd";
-            this.lLeftEnd.Size = new System.Drawing.Size(63, 20);
+            this.lLeftEnd.Size = new System.Drawing.Size(47, 13);
             this.lLeftEnd.TabIndex = 26;
             this.lLeftEnd.Text = "Left End";
             // 
@@ -315,9 +335,10 @@ namespace BananaPredictor
             // 
             this.lRightEnd.AutoSize = true;
             this.lRightEnd.ForeColor = System.Drawing.SystemColors.Control;
-            this.lRightEnd.Location = new System.Drawing.Point(468, 146);
+            this.lRightEnd.Location = new System.Drawing.Point(351, 95);
+            this.lRightEnd.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lRightEnd.Name = "lRightEnd";
-            this.lRightEnd.Size = new System.Drawing.Size(73, 20);
+            this.lRightEnd.Size = new System.Drawing.Size(53, 13);
             this.lRightEnd.TabIndex = 27;
             this.lRightEnd.Text = "Right End";
             // 
@@ -325,10 +346,9 @@ namespace BananaPredictor
             // 
             this.lRemoveLater.AutoSize = true;
             this.lRemoveLater.ForeColor = System.Drawing.SystemColors.Control;
-            this.lRemoveLater.Location = new System.Drawing.Point(336, 177);
-            this.lRemoveLater.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lRemoveLater.Location = new System.Drawing.Point(252, 115);
             this.lRemoveLater.Name = "lRemoveLater";
-            this.lRemoveLater.Size = new System.Drawing.Size(169, 20);
+            this.lRemoveLater.Size = new System.Drawing.Size(125, 13);
             this.lRemoveLater.TabIndex = 28;
             this.lRemoveLater.Text = "Don\'t use above; broken";
             // 
@@ -336,18 +356,20 @@ namespace BananaPredictor
             // 
             this.lDistance.AutoSize = true;
             this.lDistance.ForeColor = System.Drawing.SystemColors.Control;
-            this.lDistance.Location = new System.Drawing.Point(684, 49);
+            this.lDistance.Location = new System.Drawing.Point(513, 32);
+            this.lDistance.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lDistance.Name = "lDistance";
-            this.lDistance.Size = new System.Drawing.Size(103, 20);
+            this.lDistance.Size = new System.Drawing.Size(75, 13);
             this.lDistance.TabIndex = 30;
             this.lDistance.Text = "Distance Snap";
             // 
             // tbDistance
             // 
             this.tbDistance.BackColor = System.Drawing.SystemColors.Control;
-            this.tbDistance.Location = new System.Drawing.Point(552, 43);
+            this.tbDistance.Location = new System.Drawing.Point(414, 28);
+            this.tbDistance.Margin = new System.Windows.Forms.Padding(2);
             this.tbDistance.Name = "tbDistance";
-            this.tbDistance.Size = new System.Drawing.Size(125, 27);
+            this.tbDistance.Size = new System.Drawing.Size(95, 21);
             this.tbDistance.TabIndex = 29;
             this.tbDistance.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TbSpawnRate_KeyPress);
             // 
@@ -355,19 +377,19 @@ namespace BananaPredictor
             // 
             this.lInvert.AutoSize = true;
             this.lInvert.ForeColor = System.Drawing.SystemColors.Control;
-            this.lInvert.Location = new System.Drawing.Point(684, 15);
+            this.lInvert.Location = new System.Drawing.Point(513, 10);
+            this.lInvert.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lInvert.Name = "lInvert";
-            this.lInvert.Size = new System.Drawing.Size(100, 20);
+            this.lInvert.Size = new System.Drawing.Size(76, 13);
             this.lInvert.TabIndex = 32;
             this.lInvert.Text = "Invert Spinner";
             // 
             // cbInvert
             // 
             this.cbInvert.AutoSize = true;
-            this.cbInvert.Location = new System.Drawing.Point(606, 15);
-            this.cbInvert.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.cbInvert.Location = new System.Drawing.Point(454, 10);
             this.cbInvert.Name = "cbInvert";
-            this.cbInvert.Size = new System.Drawing.Size(18, 17);
+            this.cbInvert.Size = new System.Drawing.Size(15, 14);
             this.cbInvert.TabIndex = 33;
             this.cbInvert.UseVisualStyleBackColor = true;
             // 
@@ -376,9 +398,10 @@ namespace BananaPredictor
             this.lWarning.AutoSize = true;
             this.lWarning.Font = new System.Drawing.Font("Segoe UI", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.lWarning.ForeColor = System.Drawing.SystemColors.Control;
-            this.lWarning.Location = new System.Drawing.Point(552, 82);
+            this.lWarning.Location = new System.Drawing.Point(414, 53);
+            this.lWarning.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lWarning.Name = "lWarning";
-            this.lWarning.Size = new System.Drawing.Size(228, 45);
+            this.lWarning.Size = new System.Drawing.Size(190, 36);
             this.lWarning.TabIndex = 34;
             this.lWarning.Text = "Warning: The lower the number,\r\nthe higher the amount, the bigger the lag.\r\nUse t" +
     "he bpm\'s distance snap";
@@ -386,29 +409,30 @@ namespace BananaPredictor
             // cbOnlySpin
             // 
             this.cbOnlySpin.AutoSize = true;
-            this.cbOnlySpin.Location = new System.Drawing.Point(606, 145);
-            this.cbOnlySpin.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.cbOnlySpin.Location = new System.Drawing.Point(454, 94);
             this.cbOnlySpin.Name = "cbOnlySpin";
-            this.cbOnlySpin.Size = new System.Drawing.Size(18, 17);
+            this.cbOnlySpin.Size = new System.Drawing.Size(15, 14);
             this.cbOnlySpin.TabIndex = 36;
             this.cbOnlySpin.UseVisualStyleBackColor = true;
+            this.cbOnlySpin.CheckedChanged += new System.EventHandler(this.CbOnlySpin_CheckedChanged);
             // 
             // lOnlySpin
             // 
             this.lOnlySpin.AutoSize = true;
             this.lOnlySpin.ForeColor = System.Drawing.SystemColors.Control;
-            this.lOnlySpin.Location = new System.Drawing.Point(684, 145);
+            this.lOnlySpin.Location = new System.Drawing.Point(513, 94);
+            this.lOnlySpin.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lOnlySpin.Name = "lOnlySpin";
-            this.lOnlySpin.Size = new System.Drawing.Size(93, 20);
+            this.lOnlySpin.Size = new System.Drawing.Size(68, 13);
             this.lOnlySpin.TabIndex = 35;
             this.lOnlySpin.Text = "Only Spinner";
             // 
             // WinOptions
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.ClientSize = new System.Drawing.Size(784, 214);
+            this.ClientSize = new System.Drawing.Size(588, 139);
             this.Controls.Add(this.cbOnlySpin);
             this.Controls.Add(this.lOnlySpin);
             this.Controls.Add(this.lWarning);
@@ -442,6 +466,7 @@ namespace BananaPredictor
             this.Controls.Add(this.tbStartTime);
             this.Controls.Add(this.bSave);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "WinOptions";
