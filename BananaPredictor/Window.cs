@@ -168,7 +168,7 @@ namespace BananaPredictor
             oWin.StartPosition = FormStartPosition.CenterScreen;
             oWin.Show();
 
-            // TODO: OPTION IDEAS
+            // OPTION IDEAS
             // + For each spinner, have it's own propertise
             // + Add in final hitobject for platter reset
             // + Scale from beginning to end on where the spinner will be
