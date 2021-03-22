@@ -19,16 +19,17 @@ namespace BananaPredictor.Osu
 
         // Start line from file of hitobjects
         int bmHitObjects;
+        int bmTimingPoints;
 
         // All hitobjects
         List<GetObjectInfo> AllHitObjects = new();
+        List<GetMapInfo> AllTimingPoints = new();
 
         // Inputted Slider Info
-        // State1   |   [0] = startTime, [1] = endTime, [2] = distanceSpinner, [3] = invertSpinner, [4] = startPos, [5] = endPos
-        // State2   |   [0] = startTime, [1] = endTime, [2] = distanceSpinner, [3] = invertSpinner, [4] = startLeftPos, [5] = startRightPos, [6] = endLeftPos, [7] = endRightPos
-        public Dictionary<int, List<int>> spinnerSpecs;
-        // StoryingInfoDict will work by allowing [0-3] (or more) to be stored for general uses of the spinner whereas [4+] is more a direct change to the spinner. This is because I constantly have to rewrite the whole tope thing over and over again
-        //public StoringInfoDict spinnerSpecs;
+        // Key              -
+        // MapRelated       -       [0] = startTime, [1] = endTime, [2] = distanceSpinner, [3] = invertSpinner, [4] = onlySpinner
+        // SpinnerRelated   -       [0] = startPos, [1] = endPos    |       (will include [0] = startLeftPos, [1] = startRightPos, [2] = endLeftPos, [3] = endRightPos maybe using enum instead)
+        public StoringInfoDict spinnerSpecs;
 
         private bool flag = false;
 
@@ -42,6 +43,8 @@ namespace BananaPredictor.Osu
             MusicInfo.Path = lines;
             bmHitObjects = MusicInfo.GetItemLine("[HitObjects]");
             bmHitObjects++;
+            bmTimingPoints = MusicInfo.GetItemLine("[TimingPoints]");
+            bmTimingPoints++;
 
             // If not found any
             if (bmHitObjects < 0)
@@ -52,48 +55,80 @@ namespace BananaPredictor.Osu
             if (flag)
                 return false;
 
-            // TODO: Attempting to process slider
-            //for (int i = 0; i < AllHitObjects.Count; i++)
-            //    if (AllHitObjects[i].OType.Equals(GetObjectInfo.Type.Slider))
+            // TODO: Attempt to process slider
+            //private void ProcessingSlider() { for (int i = 0; i < AllHitObjects.Count; i++) { if (AllHitObjects[i].OType.Equals(GetObjectInfo.Type.Slider)) {}}}
 
             // Making requested spinners
             AddingSpinners();
             if (flag)
                 return false;
 
-            // Splitting up spinners in a length of 1
-            SplittingSpinners();
-            if (flag)
-                return false;
+            for (int i = 0; i < spinnerSpecs.Count; i++)
+            {
+                if (Convert.ToBoolean(spinnerSpecs[i].MapRelated[4]))
+                {
+                    // Adding Timing Points
+                    AddingTiming(i);
+                    if (flag)
+                        return false;
 
-            // Processing each spinner - The logic for generating the time interval for each banana according to the catch rulesets; all rights go to peppy and his mathematics, just using the important code
-            // Used according to https://github.com/ppy/osu/blob/master/osu.Game.Rulesets.Catch/Objects/BananaShower.cs
-            ProcessingSpinners();
-            if (flag)
-                return false;
+                    // Splitting up spinners in a length of 1
+                    SplittingSpinners(i);
+                    if (flag)
+                        return false;
 
-            // How each banana is processed - The logic the banana xoffset according to the catch rulesets; all rights go to peppy and his mathematics, just using the important code
-            // Used according to https://github.com/ppy/osu/blob/master/osu.Game.Rulesets.Catch/Beatmaps/CatchBeatmapProcessor.cs
-            //if (spinnerSpecs.Count <= 6) XOffsetProcessingDynamic(); else
-            XOffsetProcessing();
-            if (flag)
-                return false;
+                    // Processing each spinner - The logic for generating the time interval for each banana according to the catch rulesets; all rights go to peppy and his mathematics, just using the important code
+                    // Used according to https://github.com/ppy/osu/blob/master/osu.Game.Rulesets.Catch/Objects/BananaShower.cs
+                    ProcessingSpinners();
+                    if (flag)
+                        return false;
+
+                    // How each banana is processed - The logic the banana xoffset according to the catch rulesets; all rights go to peppy and his mathematics, just using the important code
+                    // Used according to https://github.com/ppy/osu/blob/master/osu.Game.Rulesets.Catch/Beatmaps/CatchBeatmapProcessor.cs
+                    //if (spinnerSpecs.Count <= 6) XOffsetProcessingDynamic(); else
+                    XOffsetProcessing(i);
+                    if (flag)
+                        return false;
+                }
+            }
 
             // Put all contents as well as processed hitobjects into osu file
             ToFileMaker toFile = new();
-            return toFile.OsuToFile(lines, path, MusicInfo, AllHitObjects, bmHitObjects);
+            return toFile.OsuToFile(lines, path, MusicInfo, AllHitObjects, AllTimingPoints, bmHitObjects, bmTimingPoints);
         }
 
         private void CheckingObjects()
         {
+            for (int i = bmTimingPoints; i < bmHitObjects; i++)
+            {
+                // Making sure that these are timing points; timing points have 8 different propertise so we make sure that they have it according to https://osu.ppy.sh/wiki/en/osu%21_File_Formats/Osu_%28file_format%29#timing-points
+                String[] amount = lines.Skip(i).First().Split(",");
+                if (amount.Length == 8)
+                    if (Int32.Parse(amount[6]) == 1)
+                        // Added Timing Point
+                        AllTimingPoints.Add(new GetMapInfo
+                        {
+                            Timing = lines.Skip(i).First(),
+                            TType = GetMapInfo.Type.Timing,
+                            TimeStart = Int32.Parse(amount[0]),
+                            BeatLength = Double.Parse(amount[1])
+                        });
+                    else if (Int32.Parse(amount[6]) == 0)
+                        // Added Inherit Point
+                        AllTimingPoints.Add(new GetMapInfo
+                        {
+                            Timing = lines.Skip(i).First(),
+                            TType = GetMapInfo.Type.Inherit,
+                            TimeStart = Int32.Parse(amount[0]),
+                            BeatLength = Double.Parse(amount[1])
+                        });
+            }
+            
             for (int i = bmHitObjects; i < lines.Count(); i++)
             {
                 // Making sure that these are spinners; spinners always have x: 256 and y: 192 according to https://osu.ppy.sh/wiki/en/osu%21_File_Formats/Osu_%28file_format%29#spinners
                 String[] amount = lines.Skip(i).First().Split(",");
-                if (amount.Length.Equals(7)
-                    && Int32.Parse(amount[0]).Equals(256)
-                    && Int32.Parse(amount[1]).Equals(192))
-                {
+                if (amount.Length == 7 && Int32.Parse(amount[0]) == 256 && Int32.Parse(amount[1]) == 192)
                     // Spinner added
                     AllHitObjects.Add(new GetObjectInfo
                     {
@@ -103,9 +138,7 @@ namespace BananaPredictor.Osu
                         BananaEnd = Int32.Parse(amount[5]),
                         BananaShowerTime = new()
                     });
-                }
                 else if (amount.Length > 7)
-                {
                     // Slider added
                     // Checks for sliders; they use the rng class as well like spinners
                     // According to https://osu.ppy.sh/wiki/en/osu%21_File_Formats/Osu_%28file_format%29#sliders; they are pretty dynamic whereas hitobjects and spinners are static, so I hope this line of code doesn't break anything with other beatmaps
@@ -115,20 +148,40 @@ namespace BananaPredictor.Osu
                         OType = GetObjectInfo.Type.Slider,
                         NestedSlider = new()
                     });
-                }
                 else
-                {
                     // Circle added
                     AllHitObjects.Add(new GetObjectInfo
                     {
                         Object = lines.Skip(i).First(),
                         OType = GetObjectInfo.Type.Normal
                     });
-                }
 
                 if (flag)
                     return;
             }
+        }
+
+        private void AddingTiming(int i)
+        {
+            AllTimingPoints.Add(new GetMapInfo
+            {
+                Timing = "",
+                TType = GetMapInfo.Type.Timing,
+                TimeStart = spinnerSpecs[i].MapRelated[0],
+                // TODO: Change this to match with the map's original BPM
+                BeatLength = 58.59375
+            });
+            AllTimingPoints.Add(new GetMapInfo
+            {
+                Timing = spinnerSpecs[i].MapRelated[0] + ",-100,4,2,1,20,0,0",
+                TType = GetMapInfo.Type.Inherit,
+                TimeStart = spinnerSpecs[i].MapRelated[0],
+                BeatLength = -100
+            });
+            Console.WriteLine("Making spinner {0} - {1}", AllHitObjects[i].BananaStart, AllHitObjects[i].BananaEnd);
+
+            if (flag)
+                return;
         }
 
         private void AddingSpinners()
@@ -137,10 +190,10 @@ namespace BananaPredictor.Osu
             {
                 AllHitObjects.Add(new GetObjectInfo
                 {
-                    Object = "256,192," + spinnerSpecs[i][0] + ",12,0," + spinnerSpecs[i][1] + ",0:0:0:0:",
+                    Object = "256,192," + spinnerSpecs[i].MapRelated[0] + ",12,0," + spinnerSpecs[i].MapRelated[1] + ",0:0:0:0:",
                     OType = GetObjectInfo.Type.Spinner,
-                    BananaStart = spinnerSpecs[i][0],
-                    BananaEnd = spinnerSpecs[i][1],
+                    BananaStart = spinnerSpecs[i].MapRelated[0],
+                    BananaEnd = spinnerSpecs[i].MapRelated[1],
                     BananaShowerTime = new()
                 });
                 Console.WriteLine("Making spinner {0} - {1}", AllHitObjects[i].BananaStart, AllHitObjects[i].BananaEnd);
@@ -150,33 +203,30 @@ namespace BananaPredictor.Osu
             }
         }
 
-        private void SplittingSpinners()
+        private void SplittingSpinners(int j)
         {
             int num = AllHitObjects.Count;
             for (int i = num - 1; i >= 0; i--)
             {
-                for (int j = 0; j < spinnerSpecs.Count; j++)
-                    if (AllHitObjects[i].OType.Equals(GetObjectInfo.Type.Spinner)
-                        && AllHitObjects[i].BananaStart.Equals(spinnerSpecs[j][0])
-                        && AllHitObjects[i].BananaEnd.Equals(spinnerSpecs[j][1]))
-                    {
-                        for (int k = AllHitObjects[i].BananaStart; k < AllHitObjects[i].BananaEnd - 2; k += spinnerSpecs[j][2])
+                if (AllHitObjects[i].OType.Equals(GetObjectInfo.Type.Spinner)
+                    && AllHitObjects[i].BananaStart == spinnerSpecs[j].MapRelated[0]
+                    && AllHitObjects[i].BananaEnd == spinnerSpecs[j].MapRelated[1])
+                {
+                    for (int k = AllHitObjects[i].BananaStart; k < AllHitObjects[i].BananaEnd - 2; k += spinnerSpecs[j].MapRelated[2])
+                        AllHitObjects.Add(new GetObjectInfo
                         {
-                            AllHitObjects.Add(new GetObjectInfo
-                            {
-                                Object = "256,192," + k + ",12,0," + (k + 1) + ",0:0:0:0:",
-                                OType = GetObjectInfo.Type.Spinner,
-                                BananaStart = k,
-                                BananaEnd = k + 1,
-                                BananaShowerTime = new()
-                            });
-                        }
+                            Object = "256,192," + k + ",12,0," + (k + 1) + ",0:0:0:0:",
+                            OType = GetObjectInfo.Type.Spinner,
+                            BananaStart = k,
+                            BananaEnd = k + 1,
+                            BananaShowerTime = new()
+                        });
 
-                        AllHitObjects.RemoveAt(i);
+                    AllHitObjects.RemoveAt(i);
 
-                        if (flag)
-                            return;
-                    }
+                    if (flag)
+                        return;
+                }
 
                 if (flag)
                     return;
@@ -217,7 +267,7 @@ namespace BananaPredictor.Osu
             }
         }
 
-        private void XOffsetProcessing()
+        private void XOffsetProcessing(int i)
         {
             // Mergesort
             MergeSort ms = new();
@@ -226,12 +276,10 @@ namespace BananaPredictor.Osu
             FastRandom rng = new(CatchBeatmapProcessor.RNG_SEED); // Why is the seed 1337?
             //FastRandom temp = new(CatchBeatmapProcessor.RNG_SEED);
             
-            // TODO: Make it so that it will be going through each inputted spinner; currently only does 1
             int indx = 0;
             bool restart;
             while (indx < AllHitObjects.Count)
             {
-                int i = 0;
                 restart = false;
                 Console.WriteLine("Identifying {0} in indx {1}", AllHitObjects[indx].Object, indx);
                 if (AllHitObjects[indx].OType.Equals(GetObjectInfo.Type.Spinner))
@@ -239,10 +287,10 @@ namespace BananaPredictor.Osu
                     for (int j = 0; j < AllHitObjects[indx].BananaShowerTime.Count; j++)
                     {
                         double xOffSetCheck = (float)(rng.NextDouble() * CatchPlayfield.WIDTH);
-                        Console.WriteLine("xOffset {0} | Adding new slider {1}", xOffSetCheck, !(xOffSetCheck < spinnerSpecs[i][4] || xOffSetCheck > spinnerSpecs[i][5]));
-                        if (AllHitObjects[indx].BananaStart > spinnerSpecs[i][0]
-                        && AllHitObjects[indx].BananaEnd < spinnerSpecs[i][1]
-                        && Invert(spinnerSpecs[i][3], xOffSetCheck, i))
+                        Console.WriteLine("xOffset {0} | Adding new slider {1}", xOffSetCheck, !(xOffSetCheck < spinnerSpecs[i].SpinnerRelated[0] || xOffSetCheck > spinnerSpecs[i].SpinnerRelated[1]));
+                        if (AllHitObjects[indx].BananaStart > spinnerSpecs[i].MapRelated[0]
+                        && AllHitObjects[indx].BananaEnd < spinnerSpecs[i].MapRelated[1]
+                        && Invert(spinnerSpecs[i].MapRelated[3], xOffSetCheck, i))
                         {
                             AllHitObjects.Insert(indx, new GetObjectInfo
                             {
@@ -269,7 +317,9 @@ namespace BananaPredictor.Osu
                 }
                 else if (AllHitObjects[indx].OType.Equals(GetObjectInfo.Type.Slider))
                 {
-                    // TODO: For sliders
+                    // I am so stupid, it's insane. Went through the source code for https://github.com/ppy/osu/blob/70342897637e9dd630d778daab062e7a7022d240/osu.Game.Rulesets.Catch/MathUtils/FastRandom.cs#L47
+                    // but what I failed to realize is that TinyDroplet and Droplet will always just normally use the same function to change the rng. I thought this wasn't the case and now I feel stupid
+                    // TODO: Use slider nested only to see if the rng should change if slider is long enough to generate a drop/droplet as well as repeated sliders
                     //foreach(var drop in AllHitObjects[indx].nestedSlider)
                     //{
                     //if (drop.TinyDroplet)
@@ -279,7 +329,7 @@ namespace BananaPredictor.Osu
                     //else
                     //return false;
                     //}
-                    rng.Next(-20, 20);
+                    rng.Next();
                     indx++;
                 }
                 else
@@ -300,9 +350,9 @@ namespace BananaPredictor.Osu
         private bool Invert(int isRequested, double offset, int index)
         {
             if (Convert.ToBoolean(isRequested))
-                return (offset < spinnerSpecs[index][4] || offset > spinnerSpecs[index][5]);
+                return (offset < spinnerSpecs[index].SpinnerRelated[0] || offset > spinnerSpecs[index].SpinnerRelated[1]);
             else
-                return !(offset < spinnerSpecs[index][4] || offset > spinnerSpecs[index][5]);
+                return !(offset < spinnerSpecs[index].SpinnerRelated[0] || offset > spinnerSpecs[index].SpinnerRelated[1]);
         }
 
         public void Stop()
