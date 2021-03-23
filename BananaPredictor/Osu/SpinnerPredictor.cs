@@ -11,6 +11,7 @@ namespace BananaPredictor.Osu
 {
     // TODO: Need to get inherit and uninherit lines to see how they affect the slider
     // TODO: Need to process how sliders will be placed
+    // TODO: Error when program is going to do a second+ round of processing; I'm guessing because the same values are still stored so will need to remove them somehow (since I keep getting nullexception error)
     // Used for debugging if program/initial logic works
     public class BananaSpinPredictor
     {
@@ -57,6 +58,8 @@ namespace BananaPredictor.Osu
 
             for (int i = 0; i < spinnerSpecs.Count; i++)
             {
+                Console.WriteLine("Now on spinner {0}", i);
+
                 // Making requested spinners
                 AddingSpinners(i);
                 if (flag)
@@ -86,7 +89,13 @@ namespace BananaPredictor.Osu
                     // How each banana is processed - The logic the banana xoffset according to the catch rulesets; all rights go to peppy and his mathematics, just using the important code
                     // Used according to https://github.com/ppy/osu/blob/master/osu.Game.Rulesets.Catch/Beatmaps/CatchBeatmapProcessor.cs
                     //if (spinnerSpecs.Count <= 6) XOffsetProcessingDynamic(); else
-                    XOffsetProcessing(i);
+                    Console.WriteLine("Count of current SpinnerRelated Items {0}", spinnerSpecs[i].SpinnerRelated.Count);
+                    if (spinnerSpecs[i].SpinnerRelated.Count == 4)
+                        XOffsetProcessingDynamic(i);
+                    else if (spinnerSpecs[i].SpinnerRelated.Count == 2)
+                        XOffsetProcessing(i);
+                    else
+                        return false;
                     if (flag)
                         return false;
                 }
@@ -266,13 +275,17 @@ namespace BananaPredictor.Osu
 
         private void XOffsetProcessing(int i)
         {
+            // TODO: This broke again; it breaks when it goes to the second+ spinner since it constantly restarts
+            // Possible reasons as to why it might have broken could be because of mergesort?
+            // If I want to reverse this, just don't use the for loop in the main function, instead, put it in this function as that is what kinda worked before
+
             // Mergesort
             MergeSort ms = new();
             
             // Seeded RNG
             FastRandom rng = new(CatchBeatmapProcessor.RNG_SEED); // Why is the seed 1337?
             //FastRandom temp = new(CatchBeatmapProcessor.RNG_SEED);
-            
+
             int indx = 0;
             bool restart;
             while (indx < AllHitObjects.Count)
@@ -284,7 +297,7 @@ namespace BananaPredictor.Osu
                     for (int j = 0; j < AllHitObjects[indx].BananaShowerTime.Count; j++)
                     {
                         double xOffSetCheck = (float)(rng.NextDouble() * CatchPlayfield.WIDTH);
-                        Console.WriteLine("xOffset {0} | Adding new slider {1}", xOffSetCheck, !(xOffSetCheck < spinnerSpecs[i].SpinnerRelated[0] || xOffSetCheck > spinnerSpecs[i].SpinnerRelated[1]));
+                        Console.WriteLine("xOffset {0} | Adding new slider {1}", xOffSetCheck, Invert(spinnerSpecs[i].MapRelated[3], xOffSetCheck, i));
                         if (AllHitObjects[indx].BananaStart > spinnerSpecs[i].MapRelated[0]
                         && AllHitObjects[indx].BananaEnd < spinnerSpecs[i].MapRelated[1]
                         && Invert(spinnerSpecs[i].MapRelated[3], xOffSetCheck, i))
@@ -296,7 +309,7 @@ namespace BananaPredictor.Osu
                                 NestedSlider = new()
                             });
                             //rng = temp;
-                            // TODO: IT WORKS. IT ACTUALLY WORKS. BUT ITS SO FUCKING INEFFICIENT. USE TEMPS INSTEAD OF RESETTING; HUGE MEMORY LEAKS
+                            // TODO: Figuring out how to use temp will make this program so much more efficient, however, it seems very inconsistent the way how I am tryint to make it do
                             // NOTE: If I try using temp, the whole thing breaks and I get different values.
                             rng = new FastRandom(CatchBeatmapProcessor.RNG_SEED);
                             indx = 0;
@@ -339,9 +352,71 @@ namespace BananaPredictor.Osu
             }
         }
 
-        private void XOffsetProcessingDynamic()
+        private void XOffsetProcessingDynamic(int i)
         {
-            // TODO: Work on this
+            // TODO: Work on this; close
+
+            // Mergesort
+            MergeSort ms = new();
+
+            // Seeded RNG
+            FastRandom rng = new(CatchBeatmapProcessor.RNG_SEED);
+
+            int indx = 0, n = 0;
+            bool restart;
+            while (indx < AllHitObjects.Count)
+            {
+                restart = false;
+                Console.WriteLine("Identifying {0} in indx {1}", AllHitObjects[indx].Object, indx);
+                if (AllHitObjects[indx].OType.Equals(GetObjectInfo.Type.Spinner))
+                {
+                    for (int j = 0; j < AllHitObjects[indx].BananaShowerTime.Count; j++)
+                    {
+                        double xOffSetCheck = (float)(rng.NextDouble() * CatchPlayfield.WIDTH);
+                        Console.WriteLine("xOffset {0} | Adding new slider {1}", xOffSetCheck, Invert(spinnerSpecs[i].MapRelated[3], xOffSetCheck, i));
+                        if (AllHitObjects[indx].BananaStart > spinnerSpecs[i].MapRelated[0] + spinnerSpecs[i].MapRelated[2] * n
+                        && AllHitObjects[indx].BananaEnd < spinnerSpecs[i].MapRelated[1] + spinnerSpecs[i].MapRelated[2] * n
+                        && Invert(spinnerSpecs[i].MapRelated[3], xOffSetCheck, i))
+                        {
+                            AllHitObjects.Insert(indx, new GetObjectInfo
+                            {
+                                Object = "256,144," + AllHitObjects[indx].BananaStart + ",6,0,L|256:166,1,20",
+                                OType = GetObjectInfo.Type.Slider,
+                                NestedSlider = new()
+                            });
+                            rng = new FastRandom(CatchBeatmapProcessor.RNG_SEED);
+                            indx = 0;
+                            n = 0;
+                            AllHitObjects = ms.Merge(AllHitObjects);
+                            restart = true;
+                            break;
+                        }
+                        rng.Next();
+                        rng.Next();
+                        rng.Next();
+                    }
+
+                    if (!restart)
+                    {
+                        indx++;
+                        n++;
+                    }
+                }
+                else if (AllHitObjects[indx].OType.Equals(GetObjectInfo.Type.Slider))
+                {
+                    rng.Next();
+                    indx++;
+                    n++;
+                }
+                else
+                {
+                    indx++;
+                    n++;
+                }
+
+                if (flag)
+                    return;
+            }
         }
 
         private bool Invert(int isRequested, double offset, int index)
