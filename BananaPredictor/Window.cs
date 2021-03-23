@@ -84,6 +84,7 @@ namespace BananaPredictor
                 processingThread.Start();
 
                 lStatus.Text = "Processing...";
+                lStatus.ForeColor = SystemColors.Control;
                 bSubmit.Text = "Cancel";
                 bSubmit.BackColor = Color.Red;
                 bBrowse.Enabled = false;
@@ -116,6 +117,8 @@ namespace BananaPredictor
                 MessageBox.Show("Failed", "Error");
             }
 
+            MessageBox.Show("It is highly recommended that you restart this program since there is a bug that prevents you from properally processing more items after another", "Warning");
+
             this.BeginInvoke((MethodInvoker)delegate ()
             {
                 Console.WriteLine("Program Ended");
@@ -128,6 +131,7 @@ namespace BananaPredictor
                 bOptions.BackColor = Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
                 tbBeatmap.ReadOnly = false;
                 tbBeatmap.BackColor = SystemColors.Control;
+                
                 cancel = true;
             });
         }
