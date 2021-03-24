@@ -297,10 +297,10 @@ namespace BananaPredictor.Osu
                     for (int j = 0; j < AllHitObjects[indx].BananaShowerTime.Count; j++)
                     {
                         double xOffSetCheck = (float)(rng.NextDouble() * CatchPlayfield.WIDTH);
-                        Console.WriteLine("xOffset {0} | Adding new slider {1}", xOffSetCheck, Invert(spinnerSpecs[i].MapRelated[3], xOffSetCheck, i));
+                        Console.WriteLine("xOffset {0} | Adding new slider {1}", xOffSetCheck, Invert(xOffSetCheck, i));
                         if (AllHitObjects[indx].BananaStart > spinnerSpecs[i].MapRelated[0]
                         && AllHitObjects[indx].BananaEnd < spinnerSpecs[i].MapRelated[1]
-                        && Invert(spinnerSpecs[i].MapRelated[3], xOffSetCheck, i))
+                        && Invert(xOffSetCheck, i))
                         {
                             AllHitObjects.Insert(indx, new GetObjectInfo
                             {
@@ -354,7 +354,7 @@ namespace BananaPredictor.Osu
 
         private void XOffsetProcessingDynamic(int i)
         {
-            // TODO: Work on this; close
+            // TODO: Work on this
 
             // Mergesort
             MergeSort ms = new();
@@ -373,10 +373,10 @@ namespace BananaPredictor.Osu
                     for (int j = 0; j < AllHitObjects[indx].BananaShowerTime.Count; j++)
                     {
                         double xOffSetCheck = (float)(rng.NextDouble() * CatchPlayfield.WIDTH);
-                        Console.WriteLine("xOffset {0} | Adding new slider {1}", xOffSetCheck, Invert(spinnerSpecs[i].MapRelated[3], xOffSetCheck, i));
-                        if (AllHitObjects[indx].BananaStart > spinnerSpecs[i].MapRelated[0] + spinnerSpecs[i].MapRelated[2] * n
-                        && AllHitObjects[indx].BananaEnd < spinnerSpecs[i].MapRelated[1] + spinnerSpecs[i].MapRelated[2] * n
-                        && Invert(spinnerSpecs[i].MapRelated[3], xOffSetCheck, i))
+                        Console.WriteLine("xOffset {0} | Adding new slider {1}", xOffSetCheck, InvertDynamic(xOffSetCheck, i, n));
+                        if (AllHitObjects[indx].BananaStart > spinnerSpecs[i].MapRelated[0]
+                        && AllHitObjects[indx].BananaEnd < spinnerSpecs[i].MapRelated[1]
+                        && InvertDynamic(xOffSetCheck, i, n))
                         {
                             AllHitObjects.Insert(indx, new GetObjectInfo
                             {
@@ -419,12 +419,27 @@ namespace BananaPredictor.Osu
             }
         }
 
-        private bool Invert(int isRequested, double offset, int index)
+        private bool Invert(double offset, int index)
         {
-            if (Convert.ToBoolean(isRequested))
+            if (Convert.ToBoolean(spinnerSpecs[index].MapRelated[3]))
                 return (offset < spinnerSpecs[index].SpinnerRelated[0] || offset > spinnerSpecs[index].SpinnerRelated[1]);
             else
                 return !(offset < spinnerSpecs[index].SpinnerRelated[0] || offset > spinnerSpecs[index].SpinnerRelated[1]);
+        }
+
+        private bool InvertDynamic(double offset, int index, int n)
+        {
+            // TODO: Fix this
+            if (Convert.ToBoolean(spinnerSpecs[index].MapRelated[3]))
+                return (offset > spinnerSpecs[index].SpinnerRelated[0]
+                    && offset < spinnerSpecs[index].SpinnerRelated[2]
+                    && offset > spinnerSpecs[index].SpinnerRelated[1]
+                    && offset < spinnerSpecs[index].SpinnerRelated[3]);
+            else
+                return !(offset > spinnerSpecs[index].SpinnerRelated[0]
+                    && offset < spinnerSpecs[index].SpinnerRelated[2]
+                    && offset > spinnerSpecs[index].SpinnerRelated[1]
+                    && offset < spinnerSpecs[index].SpinnerRelated[3]);
         }
 
         public void Stop()
