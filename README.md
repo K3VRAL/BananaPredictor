@@ -15,7 +15,10 @@ Look at releases or click here;
 
 **CLI Commands**
 
+THIS IS CURRENTLY UNDOCUMENTED; THIS WILL BE FIXED IN THE FUTURE
+
 Normal Commands:
+
     tpath   [ path:string ]     -       The target osu file to manipulate
     edit                        -       The bananapredictor editor to manipulate the positioning and timing of the bananashower
     run                         -       Run the application to manipulate the bananapredictor
