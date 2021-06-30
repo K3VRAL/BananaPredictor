@@ -27,5 +27,6 @@ Normal Commands:
     exit                        -       Exits the application
 
 Edit Commands:
+
     add                         -   Adds a new bananapredictor point
         [ time:int ] [ invert:bool ] [ left:int ] [ right:int ]
