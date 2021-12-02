@@ -18,7 +18,7 @@ Linux32: cleano
 %.o: %.c %.h | $(BINFLR)
 	$(CC) $(CFLAGS) -o $(BINFLR)$(notdir $@) -c $<
 
-$(TARGET): main.o src/test.o
+$(TARGET): main.o src/run.o src/lib/files.o src/lib/print.o
 	$(CC) $(CFLAGS) -o $(BINFLR)$@ $(addprefix $(BINFLR), $(notdir $^)) $(LFLAGS)
 
 $(BINFLR):
