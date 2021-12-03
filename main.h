@@ -5,7 +5,10 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <ctype.h>
+#include <limits.h>
 
+#include "src/run.h"
 #include "src/lib/files.h"
+#include "src/lib/print.h"
 
 #endif

@@ -1,8 +1,10 @@
 #ifndef PRINT_H
 #define PRINT_H
 
+#include <stddef.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <string.h>
 #include <ctype.h>
 
 #include "files.h"
@@ -30,13 +32,12 @@ typedef struct {
 } listSpin;
 
 typedef struct {
+    size_t id;
     listMap listM;
     listSpin listS;
 } listAll;
 
-listAll addAsk();
-
-extern listMap lMap;
-extern listSpin lSpin;
+listAll *addAsk();
+listAll *editAsk(listAll *all);
 
 #endif
