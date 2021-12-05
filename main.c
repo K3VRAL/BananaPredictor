@@ -1,7 +1,8 @@
 #include "main.h"
+#include <stdio.h>
 
 int main(int argc, char **argv) {
-	printf("+BananaPredictor+\n");
+	fprintf(stdout, "+BananaPredictor+\n");
 
 	bool quit = false;
 	char command;
@@ -12,28 +13,32 @@ int main(int argc, char **argv) {
 	size_t numAll = 0;
 
 	while (!quit) {
-		printf("Command: ");
+		fprintf(stdout, "Command: ");
 		scanf("%c", &command);
 		command = tolower(command);
 		char getting;
 		if ((getting = getchar()) != '\n') {
-			printf("Please only input a character, not an entire string.\n");
+			fprintf(stdout, "Please only input a character, not an entire string.\n");
 			while ((getting = getchar()) != '\n');
 			continue;
 		}
 
 		switch (command) {
 			case 't':
-				printf("\tInput the target map: ");
+				fprintf(stdout, "\tInput the target map: ");
 				char ttemp[256];
 				fgets(ttemp, 256, stdin);
 				ttemp[strcspn(ttemp, "\n")] = '\0';
+				if (access(ttemp, F_OK) != 0) {
+					fprintf(stdout, "\tError: Target file (%s) not found\n", ttemp);
+					break;
+				}
 				target = xrealloc(target, strlen(ttemp) * sizeof (char) + 1);
 				strcpy(target, ttemp);
 				break;
 			
 			case 'o':
-				printf("\tInput the output path: ");
+				fprintf(stdout, "\tInput the output path: ");
 				char otemp[256];
 				fgets(otemp, 256, stdin);
 				otemp[strcspn(otemp, "\n")] = '\0';
@@ -63,9 +68,11 @@ int main(int argc, char **argv) {
 				}
 				(all + numAll++)->id = r;
 				break;
+			case 's': // TODO more dynamic/quadratics/mathematical
+				break;
 			
 			case 'e':
-				printf("\tInput id of spinner to edit: ");
+				fprintf(stdout, "\tInput id of spinner to edit: ");
 				char etemp[256];
 				fgets(etemp, 256, stdin);
 				etemp[strcspn(etemp, "\n")] = '\0';
@@ -84,7 +91,7 @@ int main(int argc, char **argv) {
 					}
 				}
 				if (!found) {
-					printf("\tInputted id (%zu) does not exist\n", input);
+					fprintf(stdout, "\tInputted id (%zu) does not exist\n", input);
 				}
 				break;
 			
@@ -92,22 +99,22 @@ int main(int argc, char **argv) {
 				break;
 			
 			case 'x':
-				if (strlen(target) != 0 && strlen(output) != 0) executeBanana(all);
-				else printf("Target path or Output path is empty, please to them.");
+				if (strlen(target) != 0 && strlen(output) != 0) executeBanana(target, output, all);
+				else fprintf(stdout, "Target path or Output path is empty, please to them.");
 				break;
 			
 			case 'i':
-				printf("\tTarget Path: %s\n", target);
-				printf("\tOutput Path: %s\n", output);
+				fprintf(stdout, "\tTarget Path: %s\n", target);
+				fprintf(stdout, "\tOutput Path: %s\n", output);
 				for (size_t i = 0; i < numAll; i++) {
-					printf("\tnum: %zu\tid: %zu\n", i, (all + i)->id);
-					printf("\t\tlMap:\tStart-Time=%zu\tEnd-Time=%zu\tDistance=%zu\tOnly-Spin=%s\tInverted=%s\n", (all + i)->listM.startTime, (all + i)->listM.endTime, (all + i)->listM.distance, (all + i)->listM.onlySpin ? "true" : "false", (all + i)->listM.inverted ? "true" : "false");
-					printf("\t\tlSpin:\tStartLeftPos=%zu\tEndLeftPos=%zu\tStartRightPos=%zu\tEndRightPos=%zu\n", (all + i)->listS.startLPos, (all + i)->listS.endLPos, (all + i)->listS.startRPos, (all + i)->listS.endRPos);
+					fprintf(stdout, "\tnum: %zu\tid: %zu\n", i, (all + i)->id);
+					fprintf(stdout, "\t\tlMap:\tStart-Time=%zu\tEnd-Time=%zu\tDistance=%zu\tOnly-Spin=%s\tInverted=%s\n", (all + i)->listM.startTime, (all + i)->listM.endTime, (all + i)->listM.distance, (all + i)->listM.onlySpin ? "true" : "false", (all + i)->listM.inverted ? "true" : "false");
+					fprintf(stdout, "\t\tlSpin:\tStartLeftPos=%zu\tEndLeftPos=%zu\tStartRightPos=%zu\tEndRightPos=%zu\n", (all + i)->listS.startLPos, (all + i)->listS.endLPos, (all + i)->listS.startRPos, (all + i)->listS.endRPos);
 				}
 				break;
 			
 			case 'h':
-				printf(
+				fprintf(stdout,
 					"t\t\tTargets the file to process data and output\n"
 					"o\t\tAfter execution, outputs all processed data to file\n"
 					"a\t\tAdds in new spinner\n"
@@ -121,7 +128,7 @@ int main(int argc, char **argv) {
 				break;
 
 			case 'q':
-				printf("\tQuitting...\n");
+				fprintf(stdout, "\tQuitting...\n");
 				quit = true;
 				break;
 		}

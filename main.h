@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include <ctype.h>
 #include <limits.h>
+#include <unistd.h>
 
 #include "src/run.h"
 #include "src/lib/files.h"

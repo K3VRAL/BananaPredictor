@@ -1,50 +1,50 @@
 #include "print.h"
 
 void addStartTime() {
-    printf("Start Time: ");
+    fprintf(stdout, "Start Time: ");
 }
 void addEndTime() {
-    printf("End Time: ");
+    fprintf(stdout, "End Time: ");
 }
 void addDistance() {
-    printf("Distance: ");
+    fprintf(stdout, "Distance: ");
 }
 void addOnlySpin() {
-    printf("Only Spinner (y/n): ");
+    fprintf(stdout, "Only Spinner (y/n): ");
 }
 void addInverted() {
-    printf("Inverted (y/n): ");
+    fprintf(stdout, "Inverted (y/n): ");
 }
 
 void addStartLPos() {
-    printf("Start Left Pos: ");
+    fprintf(stdout, "Start Left Pos: ");
 }
 void addEndLPos() {
-    printf("End Left Pos: ");
+    fprintf(stdout, "End Left Pos: ");
 }
 void addStartRPos() {
-    printf("Start Right Pos: ");
+    fprintf(stdout, "Start Right Pos: ");
 }
 void addEndRPos() {
-    printf("End Right Pos: ");
+    fprintf(stdout, "End Right Pos: ");
 }
 
 bool checkingErorrs(FunCallback *function) {
     bool isthis = false;
     if (*(function + 0)->set > *(function + 1)->set) {
-        printf("\tStart Time is greater than End Time.\n");
+        fprintf(stdout, "\tStart Time is greater than End Time.\n");
         isthis = true;
     }
     if (*(function + 2)->set <= 0) {
-        printf("\tDistance is smaller or equal to 0.\n");
+        fprintf(stdout, "\tDistance is smaller or equal to 0.\n");
         isthis = true;
     }
     if (*(function + 5)->set > *(function + 7)->set) {
-        printf("\tStartLeftPos is greater than StartRightPos.\n");
+        fprintf(stdout, "\tStartLeftPos is greater than StartRightPos.\n");
         isthis = true;
     }
     if (*(function + 6)->set > *(function + 8)->set) {
-        printf("\tEndLeftPos is greater than EndRightPos.\n");
+        fprintf(stdout, "\tEndLeftPos is greater than EndRightPos.\n");
         isthis = true;
     }
     return isthis;
@@ -57,7 +57,7 @@ FunCallback *setData(FunCallback *function, size_t size) {
         while (true) {
             char temp[256];
             isthis = false;
-            printf("\t");
+            fprintf(stdout, "\t");
             (function + i)->function();
             fgets(temp, 256, stdin);
             temp[strcspn(temp, "\n")] = '\0';
@@ -137,7 +137,7 @@ listAll *addAsk() {
     function = setData(function, size);
 
     if (checkingErorrs(function)) {
-        printf("\tNothing has changed.\n");
+        fprintf(stdout, "\tNothing has changed.\n");
         free(function);
         return NULL;
     }
@@ -187,7 +187,7 @@ listAll *editAsk(listAll *all) {
     function = setData(function, size);
 
     if (checkingErorrs(function)) {
-        printf("\tNothing has changed.\n");
+        fprintf(stdout, "\tNothing has changed.\n");
         free(function);
         return NULL;
     }
