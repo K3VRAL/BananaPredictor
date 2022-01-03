@@ -1,5 +1,4 @@
 #include "main.h"
-#include <stdio.h>
 
 int main(int argc, char **argv) {
 	fprintf(stdout, "+BananaPredictor+\n");
@@ -9,8 +8,8 @@ int main(int argc, char **argv) {
 
 	char *target = xrealloc(NULL, sizeof (char));
 	char *output = xrealloc(NULL, sizeof (char));
-	listAll *all = xrealloc(NULL, sizeof (listAll));
-	size_t numAll = 0;
+	listInput input = { NULL, 0 };
+	input.listA = xrealloc(NULL, (input.numAll + 1) * sizeof (listAll));
 
 	while (!quit) {
 		fprintf(stdout, "Command: ");
@@ -47,27 +46,28 @@ int main(int argc, char **argv) {
 				break;
 			
 			case 'a':
-				all = xrealloc(all, (numAll + 1) * sizeof (listAll));
+				input.listA = xrealloc(input.listA, (input.numAll + 1) * sizeof (listAll));
 				listAll *temp = addAsk();
 				if (temp == NULL) {
 					break;
 				}
-				*(all + numAll) = *temp;
+				*(input.listA + input.numAll) = *temp;
 				free(temp);
 				size_t r;
 				bool exists = true;
 				while (exists) {
 					exists = false;
 					r = rand() % USHRT_MAX;
-					for (int i = 0; i < numAll; i++) {
-						if ((all + i)->id == r) {
+					for (int i = 0; i < input.numAll; i++) {
+						if ((input.listA + i)->id == r) {
 							exists = true;
 							break;
 						}
 					}
 				}
-				(all + numAll++)->id = r;
+				(input.listA + input.numAll++)->id = r;
 				break;
+				
 			case 's': // TODO more dynamic/quadratics/mathematical
 				break;
 			
@@ -76,22 +76,22 @@ int main(int argc, char **argv) {
 				char etemp[256];
 				fgets(etemp, 256, stdin);
 				etemp[strcspn(etemp, "\n")] = '\0';
-				size_t input = atoi(etemp);
+				int inp = atoi(etemp);
 				bool found = false;
-				for (int i = 0; i < numAll; i++) {
-					if (input == (all + i)->id) {
-						listAll *temp = editAsk((all + i));
+				for (int i = 0; i < input.numAll; i++) {
+					if (inp == (input.listA + i)->id) {
+						listAll *temp = editAsk((input.listA + i));
 						if (temp == NULL) {
 							break;
 						}
-						*(all + numAll) = *temp;
+						*(input.listA + input.numAll) = *temp;
 						free(temp);
 						found = true;
 						break;
 					}
 				}
 				if (!found) {
-					fprintf(stdout, "\tInputted id (%zu) does not exist\n", input);
+					fprintf(stdout, "\tInputted id (%d) does not exist\n", inp);
 				}
 				break;
 			
@@ -99,17 +99,17 @@ int main(int argc, char **argv) {
 				break;
 			
 			case 'x':
-				if (strlen(target) != 0 && strlen(output) != 0) executeBanana(target, output, all);
+				if (target && output && strlen(target) != 0 && strlen(output) != 0) executeBanana(target, output, input);
 				else fprintf(stdout, "Target path or Output path is empty, please to them.");
 				break;
 			
 			case 'i':
 				fprintf(stdout, "\tTarget Path: %s\n", target);
 				fprintf(stdout, "\tOutput Path: %s\n", output);
-				for (size_t i = 0; i < numAll; i++) {
-					fprintf(stdout, "\tnum: %zu\tid: %zu\n", i, (all + i)->id);
-					fprintf(stdout, "\t\tlMap:\tStart-Time=%zu\tEnd-Time=%zu\tDistance=%zu\tOnly-Spin=%s\tInverted=%s\n", (all + i)->listM.startTime, (all + i)->listM.endTime, (all + i)->listM.distance, (all + i)->listM.onlySpin ? "true" : "false", (all + i)->listM.inverted ? "true" : "false");
-					fprintf(stdout, "\t\tlSpin:\tStartLeftPos=%zu\tEndLeftPos=%zu\tStartRightPos=%zu\tEndRightPos=%zu\n", (all + i)->listS.startLPos, (all + i)->listS.endLPos, (all + i)->listS.startRPos, (all + i)->listS.endRPos);
+				for (int i = 0; i < input.numAll; i++) {
+					fprintf(stdout, "\tnum: %d\tid: %zu\n", i, (input.listA + i)->id);
+					fprintf(stdout, "\t\tlMap:\tStart-Time=%zu\tEnd-Time=%zu\tDistance=%zu\tOnly-Spin=%s\tInverted=%s\n", (input.listA + i)->listM.startTime, (input.listA + i)->listM.endTime, (input.listA + i)->listM.distance, (input.listA + i)->listM.onlySpin ? "true" : "false", (input.listA + i)->listM.inverted ? "true" : "false");
+					fprintf(stdout, "\t\tlSpin:\tStartLeftPos=%zu\tEndLeftPos=%zu\tStartRightPos=%zu\tEndRightPos=%zu\n", (input.listA + i)->listS.startLPos, (input.listA + i)->listS.endLPos, (input.listA + i)->listS.startRPos, (input.listA + i)->listS.endRPos);
 				}
 				break;
 			
@@ -136,7 +136,7 @@ int main(int argc, char **argv) {
 
 	free(target);
 	free(output);
-	free(all);
+	free(input.listA);
 
 	return EXIT_SUCCESS;
 }

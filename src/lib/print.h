@@ -37,6 +37,11 @@ typedef struct {
     listSpin listS;
 } listAll;
 
+typedef struct {
+    listAll *listA;
+    int numAll;
+} listInput;
+
 listAll *addAsk();
 listAll *editAsk(listAll *all);
 

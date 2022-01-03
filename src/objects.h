@@ -14,10 +14,19 @@ typedef struct {
     char *line;
     size_t fileline;
 
+    int time, meter, sset, sindex, volume, effects;
+    float beatLength;
+    bool uninherited;
+} allTP;
+
+typedef struct {
+    char *line;
+    size_t fileline;
+
     // Hit Object/Cirlce
-    size_t tlen;
+    int tlen;
     types type;
-    size_t x, y, time, hsound, *hsample;
+    int x, y, time, hsound, *hsample;
     bool ncombo;
 
     // Slider
@@ -32,6 +41,9 @@ typedef struct {
 typedef struct {
     char *tFile;
     char *oFile;
+    float smultiplier, stickrate;
+    allTP *atp;
+    size_t numAtp;
     allHO *aho;
     size_t numAho;
 } objects;
