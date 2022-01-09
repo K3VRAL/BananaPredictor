@@ -2,52 +2,71 @@
 #define OBJECTS_H
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 
-typedef enum {
-    circle = 0,
-    slider = 1,
-    spinner = 2
-} types;
+typedef enum Types {
+    circle,
+    slider,
+    spinner
+} Types;
 
-typedef struct {
-    char *line;
-    size_t fileline;
+char *getType(Types type);
 
+typedef struct allTP {
     int time, meter, sset, sindex, volume, effects;
-    float beatLength;
+    float beatlength;
     bool uninherited;
 } allTP;
 
-typedef struct {
-    char *line;
-    size_t fileline;
-
-    // Hit Object/Cirlce
-    int tlen;
-    types type;
-    int x, y, time, hsound, *hsample;
-    bool ncombo;
-
-    // Slider
+typedef struct HOCircle {} HOCircle;
+typedef struct HOSlider {
     // TODO curveType|curvePoints, edgeSounds, edgeSets
     int slides;
     double length;
-    
-    // Spinner
+} HOSlider;
+typedef struct HOSpinner {
     int endtime;
+} HOSpinner;
+typedef union HO {
+    HOCircle circle;
+    HOSlider slider;
+    HOSpinner spinner;
+} HO;
+typedef struct allHO {
+    int x, y, time, hsound, *hsample;
+    bool ncombo;
+    Types type;
+    HO hobject;
 } allHO;
+typedef union Tag {
+    allHO aho;
+    allTP atp;
+} Tag;
 
-typedef struct {
-    char *tFile;
-    char *oFile;
-    float smultiplier, stickrate;
-    allTP *atp;
-    size_t numAtp;
-    allHO *aho;
-    size_t numAho;
-} objects;
+typedef enum TagID {
+    atp,
+    aho
+} TagID;
+typedef struct Node {
+    struct Node *next;
+    TagID tagid;
+    Tag tag;
+} Node;
 
-char *etsType(types typ);
+int ll_length(Node *head);
+Node *ll_add(Node *head, TagID tagid, Tag tag);
+Node *ll_remove(Node *head, int key);
+Node *ll_get(Node *head, int key);
+Node *ll_sort(Node *head, char *delim);
+Node *ll_free(Node *head);
+
+typedef struct Objects {
+    char *tFile, *oFile;
+    int lineTimingPoints, lineHitObjects;
+    Node *llTP, *llHO;
+    float sliderMultiplier, sliderTickrate;
+} Objects;
 
 #endif

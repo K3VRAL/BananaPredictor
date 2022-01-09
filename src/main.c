@@ -6,16 +6,17 @@ int main(int argc, char **argv) {
 	bool quit = false;
 	char command;
 
-	char *target = xrealloc(NULL, sizeof (char));
-	char *output = xrealloc(NULL, sizeof (char));
+	char *target = malloc(sizeof (char));
+	char *output = malloc(sizeof (char));
 	listInput input = { NULL, 0 };
-	input.listA = xrealloc(NULL, (input.numAll + 1) * sizeof (listAll));
+	input.listA = malloc((input.numAll + 1) * sizeof (listAll));
 
+	char getting;
+	char temp[4096];
 	while (!quit) {
 		fprintf(stdout, "Command: ");
 		scanf("%c", &command);
 		command = tolower(command);
-		char getting;
 		if ((getting = getchar()) != '\n') {
 			fprintf(stdout, "Please only input a character, not an entire string.\n");
 			while ((getting = getchar()) != '\n');
@@ -25,34 +26,32 @@ int main(int argc, char **argv) {
 		switch (command) {
 			case 't':
 				fprintf(stdout, "\tInput the target map: ");
-				char ttemp[256];
-				fgets(ttemp, 256, stdin);
-				ttemp[strcspn(ttemp, "\n")] = '\0';
-				if (access(ttemp, F_OK) != 0) {
-					fprintf(stdout, "\tError: Target file (%s) not found\n", ttemp);
+				memset(temp, 0, strlen(temp));
+				fgets(temp, sizeof (temp), stdin);
+				temp[strcspn(temp, "\n")] = '\0';
+				if (access(temp, F_OK) != 0) {
+					fprintf(stdout, "\tError: Target file (%s) not found\n", temp);
 					break;
 				}
-				target = xrealloc(target, strlen(ttemp) * sizeof (char) + 1);
-				strcpy(target, ttemp);
+				target = strdup(temp);
 				break;
 			
 			case 'o':
 				fprintf(stdout, "\tInput the output path: ");
-				char otemp[256];
-				fgets(otemp, 256, stdin);
-				otemp[strcspn(otemp, "\n")] = '\0';
-				output = xrealloc(output, strlen(otemp) * sizeof (char) + 1);
-				strcpy(output, otemp);
+				memset(temp, 0, strlen(temp));
+				fgets(temp, sizeof (temp), stdin);
+				temp[strcspn(temp, "\n")] = '\0';
+				output = strdup(temp);
 				break;
 			
 			case 'a':
-				input.listA = xrealloc(input.listA, (input.numAll + 1) * sizeof (listAll));
-				listAll *temp = addAsk();
-				if (temp == NULL) {
+				input.listA = realloc(input.listA, (input.numAll + 1) * sizeof (listAll));
+				listAll *asktemp = addAsk();
+				if (asktemp == NULL) {
 					break;
 				}
-				*(input.listA + input.numAll) = *temp;
-				free(temp);
+				*(input.listA + input.numAll) = *asktemp;
+				free(asktemp);
 				size_t r;
 				bool exists = true;
 				while (exists) {
@@ -73,10 +72,10 @@ int main(int argc, char **argv) {
 			
 			case 'e':
 				fprintf(stdout, "\tInput id of spinner to edit: ");
-				char etemp[256];
-				fgets(etemp, 256, stdin);
-				etemp[strcspn(etemp, "\n")] = '\0';
-				int inp = atoi(etemp);
+				memset(temp, 0, strlen(temp));
+				fgets(temp, sizeof (temp), stdin);
+				temp[strcspn(temp, "\n")] = '\0';
+				int inp = atoi(temp);
 				bool found = false;
 				for (int i = 0; i < input.numAll; i++) {
 					if (inp == (input.listA + i)->id) {
@@ -99,8 +98,11 @@ int main(int argc, char **argv) {
 				break;
 			
 			case 'x':
-				if (target && output && strlen(target) != 0 && strlen(output) != 0) executeBanana(target, output, input);
-				else fprintf(stdout, "Target path or Output path is empty, please to them.");
+				if (target && output && strlen(target) != 0 && strlen(output) != 0) {
+					executeBanana(target, output, input);
+				} else {
+					fprintf(stdout, "Target path or Output path is empty, please to them.");
+				}
 				break;
 			
 			case 'i':
@@ -117,7 +119,7 @@ int main(int argc, char **argv) {
 				fprintf(stdout,
 					"t\t\tTargets the file to process data and output\n"
 					"o\t\tAfter execution, outputs all processed data to file\n"
-					"a\t\tAdds in new spinner\n"
+					"a\t\tAdds new spinner\n"
 					"e\t\tEdits specific spinner\n"
 					"r\t\tRemoves specific spinner\n"
 					"x\t\tExecutes data based on the input\n"

@@ -55,7 +55,7 @@ FunCallback *setData(FunCallback *function, size_t size) {
     size_t numtemp;
     for (int i = 0; i < size; i++) {
         while (true) {
-            char temp[256];
+            char temp[4096];
             isthis = false;
             fprintf(stdout, "\t");
             (function + i)->function();
@@ -103,7 +103,7 @@ listAll *addAsk() {
     listSpin lSpin = { 0, 0, 0, 0 };
 
     int size = 9;
-    FunCallback *function = xrealloc(NULL, size * sizeof (FunCallback));
+    FunCallback *function = malloc(size * sizeof (FunCallback));
     
     (function + 0)->function = addStartTime;
     (function + 0)->set = &lMap.startTime;
@@ -144,7 +144,7 @@ listAll *addAsk() {
 
     free(function);
 
-    listAll *lAll = xrealloc(NULL, sizeof (listAll));
+    listAll *lAll = malloc(sizeof (listAll));
     lAll->id = 0;
     lAll->listM = lMap;
     lAll->listS = lSpin;
@@ -153,7 +153,7 @@ listAll *addAsk() {
 
 listAll *editAsk(listAll *all) {
     int size = 9;
-    FunCallback *function = xrealloc(NULL, size * sizeof (FunCallback));
+    FunCallback *function = malloc(size * sizeof (FunCallback));
 
     (function + 0)->function = addStartTime;
     (function + 0)->set = &all->listM.startTime;

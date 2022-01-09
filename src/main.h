@@ -8,8 +8,7 @@
 #include <limits.h>
 #include <unistd.h>
 
-#include "src/run.h"
-#include "src/lib/files.h"
-#include "src/lib/print.h"
+#include "run.h"
+#include "print.h"
 
 #endif
