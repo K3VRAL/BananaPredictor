@@ -5,9 +5,9 @@
 #include <string.h>
 
 #include "objects.h"
-#include "fastrandom.h"
 #include "print.h"
+#include "process.h"
 
-void executeBanana(char *target, char *output, listInput all);
+void executeBanana(char *, char *, Node *);
 
 #endif

@@ -6,13 +6,7 @@
 #include <stdbool.h>
 #include <string.h>
 
-typedef enum Types {
-    circle,
-    slider,
-    spinner
-} Types;
-
-char *getType(Types type);
+#include "print.h"
 
 typedef struct allTP {
     int time, meter, sset, sindex, volume, effects;
@@ -20,7 +14,6 @@ typedef struct allTP {
     bool uninherited;
 } allTP;
 
-typedef struct HOCircle {} HOCircle;
 typedef struct HOSlider {
     // TODO curveType|curvePoints, edgeSounds, edgeSets
     int slides;
@@ -29,44 +22,53 @@ typedef struct HOSlider {
 typedef struct HOSpinner {
     int endtime;
 } HOSpinner;
+
 typedef union HO {
-    HOCircle circle;
     HOSlider slider;
     HOSpinner spinner;
 } HO;
+typedef enum Types {
+    circle,
+    slider,
+    spinner
+} Types;
+
 typedef struct allHO {
     int x, y, time, hsound, *hsample;
     bool ncombo;
     Types type;
     HO hobject;
 } allHO;
+
 typedef union Tag {
+    listAll inp;
     allHO aho;
     allTP atp;
 } Tag;
-
 typedef enum TagID {
+    inp,
     atp,
     aho
 } TagID;
+
 typedef struct Node {
     struct Node *next;
     TagID tagid;
     Tag tag;
 } Node;
 
-int ll_length(Node *head);
-Node *ll_add(Node *head, TagID tagid, Tag tag);
-Node *ll_remove(Node *head, int key);
-Node *ll_get(Node *head, int key);
-Node *ll_sort(Node *head, char *delim);
-Node *ll_free(Node *head);
+int ll_length(Node *);
+void ll_add(Node **, TagID, Tag);
+void ll_remove(Node **, int);
+Node *ll_get(Node *, int);
+void ll_sort(Node **);
+void ll_free(Node *);
 
 typedef struct Objects {
     char *tFile, *oFile;
+    float sliderMultiplier, sliderTickrate;
     int lineTimingPoints, lineHitObjects;
     Node *llTP, *llHO;
-    float sliderMultiplier, sliderTickrate;
 } Objects;
 
 #endif

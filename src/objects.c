@@ -1,12 +1,5 @@
 #include "objects.h"
 
-char *getType(Types type) {
-    return  type == circle   ?   "cirle"   :
-            type == slider   ?   "slider"  :
-            type == spinner  ?   "spinner" :
-                                 "isnull";
-}
-
 int ll_length(Node *head) {
     int len = 0;
     Node *current;
@@ -16,38 +9,37 @@ int ll_length(Node *head) {
     return len;
 }
 
-Node *ll_add(Node *head, TagID tagid, Tag tag) {
+void ll_add(Node **head, TagID tagid, Tag tag) {
     Node *link = malloc(sizeof(Node));
     link->tagid = tagid;
     link->tag = tag;
-    link->next = head;
-    head = link;
-    return head;
+    link->next = *head;
+    *head = link;
 }
 
-Node *ll_remove(Node *head, int key) {
-    Node *current = head;
+void ll_remove(Node **head, int key) {
+    Node *current = *head;
     int currkey = 0;
     Node *previous = NULL;
     if (head == NULL) {
-        return head;
+        return;
     }
     while (currkey != key) {
         if (current->next == NULL) {
-            return head;
+            return;
         }
         previous = current;
         current = current->next;
         currkey++;
     }
-    if (current == head) {
-        head = head->next;
+    if (current == *head) {
+        *head = (*head)->next;
     } else {
         previous->next = current->next;
     }
-    free(current->line);
+    // if (current->tagid == aho) {} // TODO make a check if hsample is used and free it
     free(current);
-    return head;
+    return;
 }
 
 Node *ll_get(Node *head, int key) {
@@ -66,42 +58,45 @@ Node *ll_get(Node *head, int key) {
     return current;
 }
 
-Node *ll_sort(Node *head, char *delim) {
+void ll_sort(Node **head) {
     Node *current;
     Node *next;
-    int size = ll_length(head);
+    int size = ll_length(*head);
     for (int i = 0, k = size; i < size - 1; i++, k--) {
-        current = head;
-        next = head->next;
+        current = *head;
+        next = (*head)->next;
         for (int j = 1; j < k; j++) {
-            char *tempcurr = strdup(current->line);
-            char *tempnext = strdup(next->line);
-            strtok(tempcurr, delim);
-            strtok(NULL, delim);
-            int tokencurr = atoi(strtok(NULL, delim));
-            strtok(tempnext, delim);
-            strtok(NULL, delim);
-            int tokennext = atoi(strtok(NULL, delim));
-            if (tokencurr > tokennext) {
-                char *tempdata = strdup(current->line);
-                free(current->line);
-                current->line = strdup(next->line);
-                free(next->line);
-                next->line = strdup(tempdata);
-                free(tempdata);
+            int currtemp, nexttemp;
+            switch ((*head)->tagid) {
+                case inp:
+                    currtemp = current->tag.inp.listM.startTime;
+                    nexttemp = next->tag.inp.listM.startTime;
+                    break;
+                case atp:
+                    currtemp = current->tag.atp.time;
+                    nexttemp = next->tag.atp.time;
+                    break;
+                case aho:
+                    currtemp = current->tag.atp.time;
+                    nexttemp = next->tag.atp.time;
+                    break;
             }
-            free(tempnext);
-            free(tempcurr);
+            if (currtemp > nexttemp) {
+                TagID temptid = current->tagid;
+                Tag temptag = current->tag;
+                current->tagid = next->tagid;
+                current->tag = next->tag;
+                next->tagid = temptid;
+                next->tag = temptag;
+            }
             current = current->next;
             next = next->next;
         }
     }
-    return head;
 }
 
-Node *ll_free(Node *head) {
+void ll_free(Node *head) {
     for (int i = 0, size = ll_length(head); i < size; i++) {
-        head = ll_remove(head, 0);
+        ll_remove(&head, 0);
     }
-    return head;
 }

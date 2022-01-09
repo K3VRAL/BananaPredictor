@@ -10,5 +10,6 @@
 
 #include "run.h"
 #include "print.h"
+#include "objects.h"
 
 #endif

@@ -10,38 +10,34 @@
 
 typedef struct {
     void (*function)(void);
-    size_t *set;
+    int *set;
     bool isbool;
+    bool ismap;
     bool *bset;
 } FunCallback;
 
 typedef struct {
-    size_t startTime;
-    size_t endTime;
-    size_t distance;
+    unsigned int startTime;
+    unsigned int endTime;
+    int distance;
     bool onlySpin;
     bool inverted;
 } listMap;
 
 typedef struct {
-    size_t startLPos;
-    size_t endLPos;
-    size_t startRPos;
-    size_t endRPos;
+    int startLPos;
+    int endLPos;
+    int startRPos;
+    int endRPos;
 } listSpin;
 
 typedef struct {
-    size_t id;
+    int id;
     listMap listM;
     listSpin listS;
 } listAll;
 
-typedef struct {
-    listAll *listA;
-    int numAll;
-} listInput;
-
 listAll *addAsk();
-listAll *editAsk(listAll *all);
+listAll *editAsk(listAll *);
 
 #endif

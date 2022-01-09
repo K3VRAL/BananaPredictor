@@ -6,13 +6,13 @@
 #include <stdbool.h>
 #include <limits.h>
 
-void FastRandom(int seed);
+void FastRandom(int);
 unsigned int NextUInt();
 int Next();
 double NextDouble();
-int NextUpper(int upperBound);
-int NextLowerUpper(int lowerBound, int upperBound);
-int NextDoubleLowerUpper(double lowerBound, double upperBound);
+int NextUpper(int);
+int NextLowerUpper(int, int);
+int NextDoubleLowerUpper(double, double);
 bool NextBool();
 
 #endif
