@@ -10,7 +10,7 @@ all: $(TARGET)
 %.o: %.c %.h | $(BINFLR)
 	$(CC) $(CFLAGS) -o $(BINFLR)$(notdir $@) -c $<
 
-$(TARGET): src/main.o src/run.o src/objects.o src/print.o src/fastrandom.o src/process.o
+$(TARGET): src/main.o src/run.o src/objects.o src/print.o src/fastrandom.o src/spinners.o src/file.o
 	$(CC) $(CFLAGS) -o $(BINFLR)$@ $(addprefix $(BINFLR), $(notdir $^)) $(LFLAGS)
 
 $(BINFLR):

@@ -70,7 +70,7 @@ void processingData(char *target, char *output) {
                 tag.atp.volume = atoi(strtok(NULL, ","));
                 tag.atp.uninherited = (bool)atoi(strtok(NULL, ","));
                 tag.atp.effects = atoi(strtok(NULL, ","));
-                ll_add(&obj.llTP, atp, tag);
+                ll_add(&obj.llTP, atp, tag, ll_giveid(obj.llTP));
             } else if (afterHO && (tlen == 6 || tlen == 8 || tlen == 11 || tlen == 7)) {
                 tag.aho.x = atoi(strtok(copy, ","));
                 tag.aho.y = atoi(strtok(NULL, ","));
@@ -98,7 +98,7 @@ void processingData(char *target, char *output) {
                 // *(tag.aho.hsample + 1) = atoi(strtok(NULL, ":"));
                 // *(tag.aho.hsample + 2) = atoi(strtok(NULL, ":"));
                 // *(tag.aho.hsample + 3) = atoi(strtok(NULL, ":"));
-                ll_add(&obj.llHO, aho, tag);
+                ll_add(&obj.llHO, aho, tag, ll_giveid(obj.llTP));
             }
             free(copy);
         }
@@ -117,16 +117,28 @@ void freeObjects() {
 }
 
 void executeBanana(char *target, char *output, Node *llINP) {
-    // Node *llRES = NULL;
     processingData(target, output);
+    FastRandom(1337);       //   []|< |>[-|>|>`/     thanks https://md5decrypt.net/en/Leet-translator/
+    
+    Node *lltemp = NULL;
+    listSpin lltempspin;
     for (int i = 0; i < ll_length(llINP); i++) {
-        // addSpinners(&llRES, ll_get(llINP, i)->tag.inp.listM);
-        // splittingSpinners(&llRES, ll_get(llINP, i)->tag.inp.listM);
-        // addTiming();
+        lltemp = ll_get(llINP, i);
+        lltempspin = lltemp->tag.inp.ls;
+        switch (lltemp->tag.inp.lid) {
+            case als:
+                addTiming(&obj.llTP, lltempspin.als.startTime, lltempspin.als.endTime);
+                addSpinners(&obj.llHO, lltempspin.als.startTime, lltempspin.als.endTime, lltempspin.als.distance);
+                break;
+            case sls:
+                addTiming(&obj.llTP, lltempspin.sls.time, lltempspin.sls.time + 1);
+                addSpinners(&obj.llHO, lltempspin.sls.time, lltempspin.sls.time + 1, 1);
+                break;
+        }
+        processSpinner(&obj.llHO, lltempspin);
+        ll_sort(&obj.llHO);
+        ll_sort(&obj.llTP);
     }
-
-    // const int RNG_SEED = 1337; //   []|< |>[-|>|>`/     thanks https://md5decrypt.net/en/Leet-translator/
-    // FastRandom(RNG_SEED);
-
+    writeToFile(obj); // TODO expand and work on this
     freeObjects();
 }

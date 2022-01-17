@@ -6,7 +6,8 @@
 
 #include "objects.h"
 #include "print.h"
-#include "process.h"
+#include "spinners.h"
+#include "file.h"
 
 void executeBanana(char *, char *, Node *);
 

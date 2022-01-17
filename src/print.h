@@ -8,36 +8,45 @@
 #include <string.h>
 #include <ctype.h>
 
-typedef struct {
+typedef struct FunCallback {
     void (*function)(void);
     int *set;
     bool isbool;
-    bool ismap;
+    bool maplimits;
     bool *bset;
 } FunCallback;
 
-typedef struct {
+typedef struct listA {
     unsigned int startTime;
     unsigned int endTime;
     int distance;
     bool onlySpin;
     bool inverted;
-} listMap;
-
-typedef struct {
     int startLPos;
     int endLPos;
     int startRPos;
     int endRPos;
+} listA;
+
+typedef struct listS {
+    unsigned int time;
+    int pos;
+} listS;
+
+typedef union listSpin {
+    listA als;
+    listS sls;
 } listSpin;
+typedef enum listEnum {
+    als,
+    sls
+} listEnum;
 
-typedef struct {
-    int id;
-    listMap listM;
-    listSpin listS;
-} listAll;
+typedef struct listSpinners {
+    listEnum lid;
+    listSpin ls;
+} listSpinners;
 
-listAll *addAsk();
-listAll *editAsk(listAll *);
+listSpin *addAsk(listEnum);
 
 #endif

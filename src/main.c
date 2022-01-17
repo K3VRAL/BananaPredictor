@@ -6,12 +6,17 @@ int main(int argc, char **argv) {
 	bool quit = false;
 	char command;
 
-	char *target = malloc(sizeof (char));
-	char *output = malloc(sizeof (char));
-
+	char *target = NULL;
+	char *output = NULL;
 	Node *llINP = NULL;
 
 	char temp[4096];
+	listSpin *asktemp;
+	Tag tagtemp;
+	srand(time(NULL));
+	unsigned int tempid;
+	bool tempexists;
+	Node *lltemp;
 	while (!quit) {
 		fprintf(stdout, "Command: ");
 		scanf("%c", &command);
@@ -24,6 +29,7 @@ int main(int argc, char **argv) {
 
 		switch (command) {
 			case 't':
+				fprintf(stdout, "\tTarget File");
 				fprintf(stdout, "\tInput the target map: ");
 				memset(temp, 0, sizeof (temp));
 				fgets(temp, sizeof (temp), stdin);
@@ -37,6 +43,7 @@ int main(int argc, char **argv) {
 				break;
 			
 			case 'o':
+				fprintf(stdout, "\tOutput File");
 				fprintf(stdout, "\tInput the output path: ");
 				memset(temp, 0, sizeof (temp));
 				fgets(temp, sizeof (temp), stdin);
@@ -46,94 +53,146 @@ int main(int argc, char **argv) {
 				break;
 			
 			case 'a':
-				fprintf(stdout, "\tAdding New Spinner\n");
-				listAll *asktemp = addAsk();
+				fprintf(stdout, "\tAdding New LR Spinner\n");
+				asktemp = addAsk(als);
 				if (asktemp == NULL) {
 					break;
 				}
-				Tag tag;
-				tag.inp.listM = asktemp->listM;
-				tag.inp.listS = asktemp->listS;
+				tagtemp.inp.ls = *asktemp;
+				tagtemp.inp.lid = als;
 				free(asktemp);
-				int r;
-				bool exists = true;
-				while (exists) {
-					exists = false;
-					r = rand() % USHRT_MAX;
-					for (int i = 0; i < ll_length(llINP); i++) {
-						if (ll_get(llINP, i)->tag.inp.id == r) {
-							exists = true;
-							break;
-						}
+				tempid = 0;
+				tempexists = true;
+				while (tempexists) {
+					tempexists = false;
+					tempid = rand() % USHRT_MAX;
+					if (ll_get_byid(llINP, tempid) != NULL) {
+						tempexists = true;
 					}
 				}
-				tag.inp.id = r;
-				ll_add(&llINP, inp, tag);
+				ll_add(&llINP, inp, tagtemp, tempid);
 				ll_sort(&llINP);
+				tagtemp = (const Tag){ 0 };
+				fprintf(stdout, "\tSuccessfully added LR spinner - id: %d\n", tempid);
 				break;
 				
-			case 's': // TODO more dynamic/quadratics/mathematical
+			case 's':
+				fprintf(stdout, "\tAdding New Single Spinner\n");
+				asktemp = addAsk(sls);
+				if (asktemp == NULL) {
+					break;
+				}
+				tagtemp.inp.ls = *asktemp;
+				tagtemp.inp.lid = sls;
+				free(asktemp);
+				tempid = 0;
+				tempexists = true;
+				while (tempexists) {
+					tempexists = false;
+					tempid = rand() % USHRT_MAX;
+					if (ll_get_byid(llINP, tempid) != NULL) {
+						tempexists = true;
+					}
+				}
+				ll_add(&llINP, inp, tagtemp, tempid);
+				ll_sort(&llINP);
+				tagtemp = (const Tag){ 0 };
+				fprintf(stdout, "\tSuccessfully added single spinner - id: %d\n", tempid);
+				break;
+
+			case 'd': // TODO more dynamic
 				break;
 			
 			case 'e':
-				// fprintf(stdout, "\tInput id of spinner to edit: ");
-				// memset(temp, 0, sizeof (temp));
-				// fgets(temp, sizeof (temp), stdin);
-				// temp[strcspn(temp, "\n")] = '\0';
-				// int input = atoi(temp);
-				// bool found = false;
-				// for (int i = 0; i < ll_length(llINP); i++) {
-				// 	if (input == ll_get(llINP, i)->tag.inp.id) {
-				// 		listAll *temp = editAsk((input.listA + i));
-				// 		if (temp == NULL) {
-				// 			break;
-				// 		}
-				// 		*(input.listA + input.numAll) = *temp;
-				// 		free(temp);
-				// 		found = true;
-				// 		break;
-				// 	}
-				// }
-				// if (!found) {
-				// 	fprintf(stdout, "\tInputted id (%d) does not exist\n", input);
-				// }
+				fprintf(stdout, "\tEdit Specific Spinner\n");
+				fprintf(stdout, "\tEdit spinner by id: ");
+				memset(temp, 0, sizeof (temp));
+				fgets(temp, sizeof (temp), stdin);
+				temp[strcspn(temp, "\n")] = '\0';
+				tempexists = false;
+				for (int i = 0; i < strlen(temp); i++) {
+                    if (!isdigit(temp[i])) {
+                        tempexists = true;
+                        break;
+                    }
+				}
+				if (tempexists) {
+					fprintf(stdout, "\t\tERROR: non digit found\n");
+					break;
+				}
+				lltemp = ll_get_byid(llINP, atoi(temp));
+				// TODO
 				break;
 			
 			case 'r':
+				fprintf(stdout, "\tRemove Specific Spinner\n");
+				fprintf(stdout, "\t\tRemove spinner by id: ");
+				memset(temp, 0, sizeof (temp));
+				fgets(temp, sizeof (temp), stdin);
+				temp[strcspn(temp, "\n")] = '\0';
+				tempexists = false;
+				for (int i = 0; i < strlen(temp); i++) {
+                    if (!isdigit(temp[i])) {
+                        tempexists = true;
+                        break;
+                    }
+				}
+				if (tempexists) {
+					fprintf(stdout, "\t\tERROR: non digit found\n");
+					break;
+				}
+				ll_remove_byid(&llINP, atoi(temp));
+				fprintf(stdout, "\t\tSuccessfully removed spinner\n");
 				break;
 			
 			case 'x':
 				if (target && output && strlen(target) != 0 && strlen(output) != 0) {
 					executeBanana(target, output, llINP);
 				} else {
-					fprintf(stdout, "Target path or Output path is empty, please to them.");
+					fprintf(stdout, "\tTarget path or Output path is empty, please to them.\n");
 				}
 				break;
 			
 			case 'i':
-				fprintf(stdout, "\tTarget Path: %s\n", target == NULL ? target : "(NO INPUT GIVEN)");
-				fprintf(stdout, "\tOutput Path: %s\n", output == NULL ? output : "(NO INPUT GIVEN)");
+				fprintf(stdout, "\tTarget Path: %s\n", target != NULL ? target : "(NO INPUT GIVEN)");
+				fprintf(stdout, "\tOutput Path: %s\n", output != NULL ? output : "(NO INPUT GIVEN)");
 				for (int i = 0; i < ll_length(llINP); i++) {
-					fprintf(stdout, "\tnum: %d\tid: %d\n"
-								  "\t\tlMap:\tStart-Time=%d\tEnd-Time=%d\tDistance=%d\tOnly-Spin=%s\tInverted=%s\n"
-								  "\t\tlSpin:\tStartLeftPos=%d\tEndLeftPos=%d\tStartRightPos=%d\tEndRightPos=%d\n",
-								  i, ll_get(llINP, i)->tag.inp.id,
-								  ll_get(llINP, i)->tag.inp.listM.startTime, ll_get(llINP, i)->tag.inp.listM.endTime, ll_get(llINP, i)->tag.inp.listM.distance, ll_get(llINP, i)->tag.inp.listM.onlySpin ? "true" : "false", ll_get(llINP, i)->tag.inp.listM.inverted ? "true" : "false",
-								  ll_get(llINP, i)->tag.inp.listS.startLPos, ll_get(llINP, i)->tag.inp.listS.endLPos, ll_get(llINP, i)->tag.inp.listS.startRPos, ll_get(llINP, i)->tag.inp.listS.endRPos);
+					lltemp = ll_get(llINP, i);
+					listSpinners lstemp = lltemp->tag.inp;
+					fprintf(stdout, "\tnum: %d\tid: %u\n", i, lltemp->id);
+					switch (lstemp.lid) {
+						case als:
+							fprintf(stdout, "\t\tStart-Time=%d\tEnd-Time=%d\tDistance=%d\tOnly-Spin=%s\tInverted=%s\n"
+											"\t\tStartLeftPos=%d\tEndLeftPos=%d\tStartRightPos=%d\tEndRightPos=%d\n",
+											lstemp.ls.als.startTime, lstemp.ls.als.endTime, lstemp.ls.als.distance, lstemp.ls.als.onlySpin ? "true" : "false", lstemp.ls.als.inverted ? "true" : "false",
+											lstemp.ls.als.startLPos, lstemp.ls.als.endLPos, lstemp.ls.als.startRPos, lstemp.ls.als.endRPos);
+							break;
+						case sls:
+							fprintf(stdout, "\t\tTime=%d\tPosition=%d\n",
+											lstemp.ls.sls.time, lstemp.ls.sls.pos);
+							break;
+					}
+					fprintf(stdout, "\n");
 				}
 				break;
 			
 			case 'h':
 				fprintf(stdout,
-					"t\t\tTargets the file to process data and output\n"
-					"o\t\tAfter execution, outputs all processed data to file\n"
-					"a\t\tAdds new spinner\n"
-					"e\t\tEdits specific spinner\n"
-					"r\t\tRemoves specific spinner\n"
-					"x\t\tExecutes data based on the input\n"
-					"i\t\tOutputs all information including all added spinner data\n"
-					"h\t\tShows help message\n"
-					"q\t\tQuits application\n"
+					"\tModification Of Spinner\n"
+					"\t\ta\tAdds new LR spinner\n"
+					"\t\ts\tAdds new specific spinner\n"
+					"\t\te\tEdits specific spinner\n"
+					"\t\tr\tRemoves specific spinner\n"
+					
+					"\tInput Of Data\n"
+					"\t\tt\tTargets the file to process data and output\n"
+					"\t\to\tOutputs new file absed on processed data\n"
+					"\t\tx\tExecutes data based on the input\n"
+
+					"\tMiscellaneous\n"
+					"\t\ti\tOutputs all inputted information\n"
+					"\t\th\tShows help message\n"
+					"\t\tq\tQuits application\n"
 				);
 				break;
 

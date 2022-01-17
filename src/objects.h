@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#include <limits.h>
 
 #include "print.h"
 
@@ -41,7 +42,7 @@ typedef struct allHO {
 } allHO;
 
 typedef union Tag {
-    listAll inp;
+    listSpinners inp;
     allHO aho;
     allTP atp;
 } Tag;
@@ -55,14 +56,18 @@ typedef struct Node {
     struct Node *next;
     TagID tagid;
     Tag tag;
+    unsigned int id;
 } Node;
 
 int ll_length(Node *);
-void ll_add(Node **, TagID, Tag);
+void ll_add(Node **, TagID, Tag, unsigned int);
 void ll_remove(Node **, int);
+void ll_remove_byid(Node **, unsigned int);
 Node *ll_get(Node *, int);
+Node *ll_get_byid(Node *, unsigned int);
 void ll_sort(Node **);
 void ll_free(Node *);
+int ll_giveid(Node *);
 
 typedef struct Objects {
     char *tFile, *oFile;
