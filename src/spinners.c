@@ -1,4 +1,4 @@
-#include "spinners.h"
+#include "../include/spinners.h"
 
 void addTiming(Node **llTP, int start, int end) {
     Node *current = *llTP;

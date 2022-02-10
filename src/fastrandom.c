@@ -1,4 +1,4 @@
-#include "fastrandom.h"
+#include "../include/fastrandom.h"
 
 const double int_to_real = 1.0 / (INT_MAX + 1.0);
 const unsigned int int_mask = 0x7FFFFFFF;

@@ -1,4 +1,4 @@
-#include "print.h"
+#include "../include/print.h"
 
 void addAStartTime() {
     fprintf(stdout, "\tStart Time: ");
@@ -72,7 +72,7 @@ void setData(FunCallback **function, int size) {
             (*function + i)->function();
             fgets(temp, sizeof (temp), stdin);
             temp[strcspn(temp, "\n")] = '\0';
-            if (strlen(temp) == 0) {
+            if (!strlen(temp)) {
                 continue;
             }
             if (!(*function + i)->isbool) {
@@ -102,8 +102,8 @@ void setData(FunCallback **function, int size) {
                 }
                 if (isthis) continue;
                 for (int j = 0; j < strlen(temp); j++) temp[j] = tolower(temp[j]);
-                if (strcmp(temp, "yes") == 0 || temp[0] == 'y'
-                 || strcmp(temp, "no") == 0 || temp[0] == 'n') {
+                if (!strcmp(temp, "yes") || temp[0] == 'y'
+                 || !strcmp(temp, "no") || temp[0] == 'n') {
                     *(*function + i)->bset = temp[0] == 'y' ? true : false;
                     break;
                 }

@@ -1,4 +1,4 @@
-#include "run.h"
+#include "../include/run.h"
 
 Objects obj = { NULL, NULL, 0, 0, 0, 0, NULL, NULL };
 
@@ -26,7 +26,7 @@ void processingData(char *target, char *output) {
             }
         }
 
-        if ((obj.sliderMultiplier == 0 && strstr(line, "SliderMultiplier:") != NULL) || (obj.sliderTickrate == 0 && strstr(line, "SliderTickRate:") != NULL)) {
+        if ((!obj.sliderMultiplier && strstr(line, "SliderMultiplier:") != NULL) || (obj.sliderTickrate == 0 && strstr(line, "SliderTickRate:") != NULL)) {
             char *copy = strdup(line);
             strtok(copy, ":");
             if (strstr(line, "SliderMultiplier:") != NULL) {

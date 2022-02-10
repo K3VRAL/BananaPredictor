@@ -1,4 +1,4 @@
-#include "main.h"
+#include "../include/main.h"
 
 int main(int argc, char **argv) {
 	fprintf(stdout, "+BananaPredictor+\n");
@@ -21,7 +21,7 @@ int main(int argc, char **argv) {
 		fprintf(stdout, "Command: ");
 		scanf("%c", &command);
 		command = tolower(command);
-		if (command != '\n' && getchar() != '\n') { // TODO fix issue where if there are only newlines
+		if (command != '\n' && getchar() != '\n') {
 			fprintf(stdout, "\tPlease only input a character, not an entire string.\n");
 			while (getchar() != '\n');
 			continue;
@@ -34,7 +34,7 @@ int main(int argc, char **argv) {
 				memset(temp, 0, sizeof (temp));
 				fgets(temp, sizeof (temp), stdin);
 				temp[strcspn(temp, "\n")] = '\0';
-				if (access(temp, F_OK) != 0) {
+				if (access(temp, F_OK)) {
 					fprintf(stdout, "\tError: Target file (%s) not found\n", temp);
 					break;
 				}
@@ -48,6 +48,20 @@ int main(int argc, char **argv) {
 				memset(temp, 0, sizeof (temp));
 				fgets(temp, sizeof (temp), stdin);
 				temp[strcspn(temp, "\n")] = '\0';
+				struct stat sb;
+				char *folder;
+#ifdef __linux__
+				folder = strndup(temp, strlen(temp) - (strlen(strrchr(temp, '/')) - 1));
+#elif _WIN32
+				folder = strndup(temp, strlen(temp) - (strlen(strrchr(temp, '\\')) - 1));
+#endif
+				fprintf(stdout, "FOLDER: %s\n", folder);
+				if (!(!stat(folder, &sb) && S_ISDIR(sb.st_mode))) {
+					fprintf(stdout, "\tError: Output folder (%s) does not exist\n", folder);
+					free(folder);
+					break;
+				}
+				free(folder);
 				free(output);
 				output = strdup(temp);
 				break;
