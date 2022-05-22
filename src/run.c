@@ -118,7 +118,7 @@ void freeObjects() {
 
 void executeBanana(char *target, char *output, Node *llINP) {
     processingData(target, output);
-    FastRandom(1337);       //   []|< |>[-|>|>`/     thanks https://md5decrypt.net/en/Leet-translator/
+    FastRandom(1337);       //   []|< |>[-|>|>`/
     
     Node *lltemp = NULL;
     listSpin lltempspin;
