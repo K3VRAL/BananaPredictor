@@ -1,15 +1,10 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-#include <sys/stat.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <unistd.h>
-#include <time.h>
+#include <ncurses.h>
+#include <signal.h>
 
-#include "run.h"
-#include "print.h"
-#include "objects.h"
+#include "screen.h"
+#include "menu.h"
 
 #endif

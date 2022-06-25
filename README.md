@@ -1,5 +1,6 @@
 # BananaPredictor
-BananaPredictor is a CLI application that allows the modification and manipulation of bananas in osu!ctb to go into areas of the map that the creator requires.
+
+BananaPredictor is a GUI in CLI application that allows the modification and manipulation of bananas in osu!ctb to go into areas of the map that the creator requires.
 
 ## Table of Contents
 
@@ -8,9 +9,13 @@ BananaPredictor is a CLI application that allows the modification and manipulati
 **[Documentation](#doc)**
 
 <a name='install'></a>
+
 ## Installation
+
 TODO
 
 <a name='doc'></a>
+
 ## Documentation
+
 ### [BananaPredictor](./doc/BananaPredictor.md)

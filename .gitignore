@@ -1,3 +1,4 @@
-bin/
-vgcore.*
-*.o
+*/
+!doc/
+!include/
+!src/

@@ -6,13 +6,17 @@
 #include <stdbool.h>
 #include <limits.h>
 
-void FastRandom(int);
-unsigned int NextUInt();
-int Next();
-double NextDouble();
-int NextUpper(int);
-int NextLowerUpper(int, int);
-int NextDoubleLowerUpper(double, double);
-bool NextBool();
+typedef struct {
+    unsigned int x, y, z, w, bitBuffer;
+    int bitIndex;
+} fastrandom_struct;
+fastrandom_struct fastrandom_FastRandom(int);
+unsigned int fastrandom_NextUInt(fastrandom_struct *);
+int fastrandom_Next(fastrandom_struct *);
+double fastrandom_NextDouble(fastrandom_struct *);
+int fastrandom_NextUpper(fastrandom_struct *, int);
+int fastrandom_NextLowerUpper(fastrandom_struct *, int, int);
+int fastrandom_NextDoubleLowerUpper(fastrandom_struct *, double, double);
+bool fastrandom_NextBool(fastrandom_struct *);
 
 #endif
