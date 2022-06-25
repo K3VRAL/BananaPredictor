@@ -154,7 +154,8 @@ void menu_bar_drawMenuItems(struct_menu *menu) {
 }
 
 // Menu list: File
-char *input_data(char *message) {
+char *input_data(char *message, int y, int x) {
+    mvwprintw(menu_bar.window_menu, y, x, "> %s: ", message);
     unsigned int size = 5, i = 0;
     char *inp = malloc((size + 1) * sizeof(char)), ch;
     bool isnotdone = true;
@@ -166,7 +167,7 @@ char *input_data(char *message) {
             default:
                 *(inp + i) = ch;
                 *(inp + ++i) = '\0';
-                mvwprintw(menu_bar.window_menu, 0, strlen(message), "%s", inp);
+                mvwprintw(menu_bar.window_menu, y, x + strlen(message), "%s", inp);
                 break;
         }
         if (i == size) {
@@ -181,28 +182,23 @@ char *input_data(char *message) {
 }
 
 void menu_list_file_new(void) {
-    char *message = "> Create a name for the new file: ";
-    mvwprintw(menu_bar.window_menu, 0, 0, "%s", message);
-    char *inp = input_data(message);
-    if (inp != NULL) {
-        
-    }
+    char *input_name = input_data("Create a name for the new project", 0, 0);
+
+    free(input_name);
 }
 
 void menu_list_file_open(void) {
-    char *message = "> Input the name of the file to open: ";
-    mvwprintw(menu_bar.window_menu, 0, 0, "%s", message);
-    char *inp = input_data(message);
-    if (inp != NULL) {
-        FILE *fp = fopen(inp, "r");
+    char *input_file = input_data("Input the name of the file to open", 0, 0);
+    if (input_file != NULL) {
+        FILE *fp = fopen(input_file, "r");
         if (fp != NULL) {
-            mvwprintw(menu_bar.window_menu, 1, 1, "File [%s] imported", inp);
+            mvwprintw(menu_bar.window_menu, 1, 1, "File [%s] imported", input_file);
             fclose(fp);
         } else {
-            mvwprintw(menu_bar.window_menu, 1, 1, "File [%s] could not be found", inp);
+            mvwprintw(menu_bar.window_menu, 1, 1, "File [%s] could not be found", input_file);
         }
         fclose(fp);
-        free(inp);
+        free(input_file);
     }
 }
 

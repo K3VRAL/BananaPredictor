@@ -4,11 +4,11 @@
 #include <stdio.h>
 
 #include "map.h"
-#include "user.h"
+#include "project.h"
 
 typedef struct Config {
     Map map;
-    User user;
+    Project project;
 } Config;
 
 extern Config config;
