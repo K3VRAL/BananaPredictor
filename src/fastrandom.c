@@ -6,8 +6,8 @@ const unsigned int y_initial = 842502087;
 const unsigned int z_initial = 3579807591;
 const unsigned int w_initial = 273326509;
 
-fastrandom_struct fastrandom_FastRandom(int seed) {
-    fastrandom_struct frStruct;
+FastRandom fastrandom_FastRandom(int seed) {
+    FastRandom frStruct;
     frStruct.x = (unsigned int)seed;
     frStruct.y = y_initial;
     frStruct.z = z_initial;
@@ -16,8 +16,8 @@ fastrandom_struct fastrandom_FastRandom(int seed) {
     return frStruct;
 }
 
-unsigned int fastrandom_NextUInt(fastrandom_struct *frStruct) {
-    fastrandom_struct dereffrStruct = *frStruct;
+unsigned int fastrandom_NextUInt(FastRandom *frStruct) {
+    FastRandom dereffrStruct = *frStruct;
     unsigned int t = dereffrStruct.x ^ (dereffrStruct.x << 11);
     dereffrStruct.x = dereffrStruct.y;
     dereffrStruct.y = dereffrStruct.z;
@@ -26,28 +26,28 @@ unsigned int fastrandom_NextUInt(fastrandom_struct *frStruct) {
     return dereffrStruct.w;
 }
 
-int fastrandom_Next(fastrandom_struct *frStruct) {
+int fastrandom_Next(FastRandom *frStruct) {
     return (int)(int_mask & fastrandom_NextUInt(&*frStruct));
 }
 
-double fastrandom_NextDouble(fastrandom_struct *frStruct) {
+double fastrandom_NextDouble(FastRandom *frStruct) {
     return int_to_real * fastrandom_Next(&*frStruct);
 }
 
-int fastrandom_NextUpper(fastrandom_struct *frStruct, int upperBound) {
+int fastrandom_NextUpper(FastRandom *frStruct, int upperBound) {
     return (int)(fastrandom_NextDouble(&*frStruct) * upperBound);
 }
 
-int fastrandom_NextLowerUpper(fastrandom_struct *frStruct, int lowerBound, int upperBound) {
+int fastrandom_NextLowerUpper(FastRandom *frStruct, int lowerBound, int upperBound) {
     return (int)(lowerBound + fastrandom_NextDouble(&*frStruct) * (upperBound - lowerBound));
 }
 
-int fastrandom_NextDoubleLowerUpper(fastrandom_struct *frStruct, double lowerBound, double upperBound) {
+int fastrandom_NextDoubleLowerUpper(FastRandom *frStruct, double lowerBound, double upperBound) {
     return (int)(lowerBound + fastrandom_NextDouble(&*frStruct) * (upperBound - lowerBound));
 }
 
-bool fastrandom_NextBool(fastrandom_struct *frStruct) {
-    fastrandom_struct dereffrStruct = *frStruct;
+bool fastrandom_NextBool(FastRandom *frStruct) {
+    FastRandom dereffrStruct = *frStruct;
     if (dereffrStruct.bitIndex == 32) {
         dereffrStruct.bitBuffer = fastrandom_NextUInt(&dereffrStruct);
         dereffrStruct.bitIndex = 1;

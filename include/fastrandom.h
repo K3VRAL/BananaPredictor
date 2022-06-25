@@ -7,16 +7,21 @@
 #include <limits.h>
 
 typedef struct {
-    unsigned int x, y, z, w, bitBuffer;
+    unsigned int x;
+    unsigned int y;
+    unsigned int z;
+    unsigned int w;
+    unsigned int bitBuffer;
     int bitIndex;
-} fastrandom_struct;
-fastrandom_struct fastrandom_FastRandom(int);
-unsigned int fastrandom_NextUInt(fastrandom_struct *);
-int fastrandom_Next(fastrandom_struct *);
-double fastrandom_NextDouble(fastrandom_struct *);
-int fastrandom_NextUpper(fastrandom_struct *, int);
-int fastrandom_NextLowerUpper(fastrandom_struct *, int, int);
-int fastrandom_NextDoubleLowerUpper(fastrandom_struct *, double, double);
-bool fastrandom_NextBool(fastrandom_struct *);
+} FastRandom;
+
+FastRandom fastrandom_FastRandom(int);
+unsigned int fastrandom_NextUInt(FastRandom *);
+int fastrandom_Next(FastRandom *);
+double fastrandom_NextDouble(FastRandom *);
+int fastrandom_NextUpper(FastRandom *, int);
+int fastrandom_NextLowerUpper(FastRandom *, int, int);
+int fastrandom_NextDoubleLowerUpper(FastRandom *, double, double);
+bool fastrandom_NextBool(FastRandom *);
 
 #endif
