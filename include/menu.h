@@ -7,7 +7,6 @@
 #include <stdio.h>
 
 #include "screen.h"
-#include "config.h"
 
 typedef struct {
     char *text, trigger;
