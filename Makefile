@@ -1,17 +1,11 @@
 CC		= gcc
 CFLAGS	= -Wall -c
-LFLAGS	= -lncurses
+LFLAGS	=
 TARGET	= bnprdctr
 BINFLR	= bin/
 
-all:		CFLAGS += -g
-all:		$(TARGET)
-
-Linux64:	CFLAGS += -m64 -O3
-Linux64:	$(TARGET)
-
-Linux32:	CFLAGS += -m64 -O3
-Linux32:	$(TARGET)
+all: CFLAGS += -g
+all: $(TARGET)
 
 %.o: src/%.c include/%.h | $(BINFLR)
 	$(CC) $(CFLAGS) -o $(BINFLR)$(notdir $@) $<
