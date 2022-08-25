@@ -12,7 +12,7 @@ BananaPredictor is a CLI application that allows the modification and manipulati
 
 ## Installation
 
-TODO
+Before you can do anything with the project, you will need to download and install libosu.so.
 
 <a name='doc'></a>
 

@@ -14,25 +14,25 @@ BananaPredictor is an application made to allow for the user to predict and plac
 
 Some arguments are mandatory, and so they will be labeled with a `*`.
 
-## Start (`-s` or `--start`)
+## Start (`-s` or `--start`) - Unsigned Integer
 
-The start of the Banana Predictor. This will place the whole contents within the Banana Predictor to be placed in the part of the map where it starts.
-
-If no argument is provided; the default value is `0`ms.
-
-## Length (`-l` or `--length`) - Unsigned Integer
-
-The length of of the Banana Predictor. This will draw out how long the Banana Predictor is, specifically so the inverter argument knows when to stop (or it would carry on forever). If a point goes above the time value for the length, that will be the new value set for the length.
+When placing the Banana Showers, we would want to give the start for each shower to be. This is different from the Banana Predictor start since if the invert flag were to be used, the .
 
 If no argument is provided; the default value is `0`ms.
 
-## Banana Shower Length (`-r` or `--shower-length`) - Unsigned Integer
+## End (`-e` or `--end`) - Unsigned Integer
 
-When placing the Banana Showers, we would want to give the length for each shower to be, whether to draw out it's length and have more bananas or make it smaller (the minimum always being 2 bananas each shower created).
+When placing the Banana Showers, we would want to give the end for each shower to be; whether to draw out it's end and have more bananas or make it smaller (the minimum always being 2 bananas each shower created).
 
 If no argument is provided; the default value is `1`ms.
 
-## Banana Shower Distance (`-d` or `--shower-distance`) - Unsigned Integer
+## Length (`-l` or `--length`) - Unsigned Integer
+
+When placing each Banana Shower, we would want to give it how long it would take before the Banana Shower should end and thus repeat for the next Banana Shower.
+
+If no argument is provided; the default value is `1`ms.
+
+## Distance (`-d` or `--distance`) - Unsigned Integer
 
 When placing the next Banana Shower relative from the previous one, we would want to give it a distance of how far until the next placement.
 
@@ -69,6 +69,10 @@ Is a point specific seperator such that after we are done filling out one proper
 ### *|
 
 Is a point seperator such that after we are done filling out one point, we can fill out the next point.
+
+## *Juice Stream (`-j` or `--juicestream`)
+
+TODO
 
 # Authors
 

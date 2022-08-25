@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+#include <osu.h>
+
 typedef struct {
     unsigned int x;
     unsigned int time;
@@ -12,14 +14,16 @@ typedef struct {
 
 typedef struct {
     unsigned int start;
+    unsigned int end;
     unsigned int length;
-    unsigned int shower_length;
-    unsigned int shower_distance;
+    unsigned int distance;
     bool invert;
     Point *points;
     unsigned int points_len;
 } Predictor;
 
 extern Predictor predictor;
+
+void predictor_run(void);
 
 #endif

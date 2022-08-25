@@ -1,0 +1,2 @@
+-Iinclude/
+-I/usr/local/include/osu

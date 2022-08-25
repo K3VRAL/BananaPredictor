@@ -1,15 +1,15 @@
-#include "../include/args.h"
+#include <args.h>
 
-void handle_args(int argc, char **argv) {
+void args_handle(int argc, char **argv) {
     for (int i = 1; i < argc; i++) {
         if (strcmp(*(argv + i), "-s") == 0 || strcmp(*(argv + i), "--start") == 0) {
             predictor.start = (unsigned int)strtol(*(argv + ++i), NULL, 10);
+        } else if (strcmp(*(argv + i), "-e") == 0 || strcmp(*(argv + i), "--end") == 0) {
+            predictor.end = (unsigned int)strtol(*(argv + ++i), NULL, 10);
         } else if (strcmp(*(argv + i), "-l") == 0 || strcmp(*(argv + i), "--length") == 0) {
             predictor.length = (unsigned int)strtol(*(argv + ++i), NULL, 10);
-        } else if (strcmp(*(argv + i), "-r") == 0 || strcmp(*(argv + i), "--shower-length") == 0) {
-            predictor.shower_length = (unsigned int)strtol(*(argv + ++i), NULL, 10);
-        } else if (strcmp(*(argv + i), "-d") == 0 || strcmp(*(argv + i), "--shower-distance") == 0) {
-            predictor.shower_distance = (unsigned int)strtol(*(argv + ++i), NULL, 10);
+        } else if (strcmp(*(argv + i), "-d") == 0 || strcmp(*(argv + i), "--distance") == 0) {
+            predictor.distance = (unsigned int)strtol(*(argv + ++i), NULL, 10);
         } else if (strcmp(*(argv + i), "-i") == 0 || strcmp(*(argv + i), "--invert") == 0) {
             predictor.invert = true;
         } else if (strcmp(*(argv + i), "-p") == 0 || strcmp(*(argv + i), "--points") == 0) {

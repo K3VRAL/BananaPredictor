@@ -1,17 +1,17 @@
-CC		= gcc
-CFLAGS	= -Wall -c
-LFLAGS	=
+CC	= gcc
+CFLAGS	= -Wall -c -Iinclude/
+LFLAGS	= -losu
 TARGET	= bnprdctr
 BINFLR	= bin/
 
-all: CFLAGS += -g
-all: $(TARGET)
+all:	CFLAGS += -g
+all:	$(TARGET)
 
-%.o: src/%.c include/%.h | $(BINFLR)
+%.o: %.c | $(BINFLR)
 	$(CC) $(CFLAGS) -o $(BINFLR)$(notdir $@) $<
 
-$(TARGET): $(addsuffix .o, $(basename $(notdir $(wildcard include/*.h))))
-	$(CC) $(LFLAGS) -o $(BINFLR)$@ $(addprefix $(BINFLR), $(notdir $^))
+$(TARGET): $(addsuffix .o, $(basename $(shell find include/ -type f -name "*.h" | grep -Po '(?<=include/).*' | sed 's/^/src\//')))
+	$(CC) -o $(BINFLR)$@ $(addprefix $(BINFLR), $(notdir $^)) $(LFLAGS)
 
 $(BINFLR):
 	[ -d $(BINFLR) ] || mkdir -p $(BINFLR)

@@ -7,6 +7,6 @@
 
 #include "predictor.h"
 
-void handle_args(int, char **);
+void args_handle(int, char **);
 
 #endif
