@@ -2,28 +2,57 @@
 #define PREDICTOR_H
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdbool.h>
+#include <limits.h>
 
 #include <osu.h>
 
-typedef struct {
-    unsigned int x;
-    unsigned int time;
-    bool bezier;
+typedef struct Point {
+    float x;
+    float time;
 } Point;
 
-typedef struct {
-    unsigned int start;
-    unsigned int end;
-    unsigned int length;
-    unsigned int distance;
-    bool invert;
+typedef struct Line {
+    double a;
+    double b;
+    double c;
+} Line;
+
+typedef struct Predictor {
+    char *beatmap;
     Point *points;
     unsigned int points_len;
 } Predictor;
 
 extern Predictor predictor;
 
+/*
+    The BananaPredictor running and evaluating based off of the inputs given
+*/
 void predictor_run(void);
+
+// Basing answer off of https://stackoverflow.com/a/20679579 because I suck at math
+/*
+    Calculating the Line using Cramer's Rule
+
+    argsreturn
+        Line *
+    args
+        Point
+        Point
+*/
+void predictor_line(Line *, Point, Point);
+
+/*
+    Calculating the Line of Intersection with Determinants
+
+    argsreturn
+        Point ** - NULLABLE
+    args
+        Line
+        Line
+*/
+void predictor_intersection(Point **, Line, Line);
 
 #endif

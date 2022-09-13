@@ -4,7 +4,7 @@ BananaPredictor - An application to predict where bananas will be placed for osu
 
 # Synopsis
 
-bnprdctr
+bnprdctr [-b file] [-p x:time[|...]]
 
 # Description
 
@@ -12,67 +12,29 @@ BananaPredictor is an application made to allow for the user to predict and plac
 
 # Resources
 
-Some arguments are mandatory, and so they will be labeled with a `*`.
+## Beatmap (`-b` or `--beatmap`) - String
 
-## Start (`-s` or `--start`) - Unsigned Integer
+Uses the beatmap file as input for difficulty, timing point, and hit object values to reference from.
 
-When placing the Banana Showers, we would want to give the start for each shower to be. This is different from the Banana Predictor start since if the invert flag were to be used, the .
+## Points (`-p` or `--points`)
 
-If no argument is provided; the default value is `0`ms.
+The format for a point is `x:time|...`. The final point will always go back to the first point.
 
-## End (`-e` or `--end`) - Unsigned Integer
-
-When placing the Banana Showers, we would want to give the end for each shower to be; whether to draw out it's end and have more bananas or make it smaller (the minimum always being 2 bananas each shower created).
-
-If no argument is provided; the default value is `1`ms.
-
-## Length (`-l` or `--length`) - Unsigned Integer
-
-When placing each Banana Shower, we would want to give it how long it would take before the Banana Shower should end and thus repeat for the next Banana Shower.
-
-If no argument is provided; the default value is `1`ms.
-
-## Distance (`-d` or `--distance`) - Unsigned Integer
-
-When placing the next Banana Shower relative from the previous one, we would want to give it a distance of how far until the next placement.
-
-If no argument is provided; the default value is `0`ms.
-
-## Invert (`-i` or `--invert`) - Included or Not
-
-If no argument is provided; the default value is `false`.
-
-## *Points (`-p` or `--points`)
-
-The format for a point is `x:time[:bezier]|`. The final point will always go back to the first point.
-
-### *x - unsigned integer
+### x - integer
 
 Is the x-axis for the point. It can go from 0 to 256 as that's how wide osu maps can be.
 
-### *time - unsigned integer
+### time - integer
 
 Is the time for the point relative to the spinner predictor's start time. If the point's time is bigger than the length of the spinner predictor, then the point's time will override it.
 
-### bezier - Included (`0` or `1`) or Not
-
-Is whether or not to make the point have the bezier property. If it is 0, it will not include the bezier property meaning that in a point of time, the point will not influence the line of the previous point to the next point. If it is 1, it will include the bezier property meaning that it will influence the line of the previous point to the next point. (Please [watch this video](https://www.youtube.com/watch?v=pnYccz1Ha34) about bezier curves, I cannot explain it properly).
-
-The first point is mandatorily false (might change in the future).
-
-If no argument is provided; the default value is `0`.
-
-### *:
+### :
 
 Is a point specific seperator such that after we are done filling out one property of the point, we can fill out the next property.
 
-### *|
+### |
 
 Is a point seperator such that after we are done filling out one point, we can fill out the next point.
-
-## *Juice Stream (`-j` or `--juicestream`)
-
-TODO
 
 # Authors
 
