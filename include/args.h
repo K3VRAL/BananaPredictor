@@ -7,6 +7,15 @@
 
 #include "predictor.h"
 
+/*
+    Handling the arguments given from the input of the terminal
+    
+    return
+        void
+    args
+        int
+        char **
+*/
 void args_handle(int, char **);
 
 #endif

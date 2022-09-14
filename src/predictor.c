@@ -7,16 +7,34 @@ Predictor predictor = {
 };
 
 void predictor_run(void) {
-    // Create the CatchHitObjects and their nested objects
+    // Get time where we should start and stop the loops
+    int points_start;
+    int points_end;
+    points_start = INT_MAX;
+    points_end = INT_MIN;
+    for (int i = 0; i < predictor.points_len; i++) {
+        if ((predictor.points + i)->time < points_start) {
+            points_start = (predictor.points + i)->time;
+        }
+        if ((predictor.points + i)->time > points_end) {
+            points_end = (predictor.points + i)->time;
+        }
+    }
+    
+    // Store all `HitObjects` and create their nested objects up to what we need
     CatchHitObject *object = NULL;
     unsigned int object_len = 0;
-    
     {
         // Evaluate Objects from the Beatmap
         Beatmap beatmap = {0};
         of_beatmap_init(&beatmap);
         of_beatmap_set(&beatmap, predictor.beatmap);
+        oos_hitobject_sort(beatmap.hit_objects, beatmap.num_ho);
         for (int i = 0; i < beatmap.num_ho; i++) {
+            if ((beatmap.hit_objects + i)->time > points_start) {
+                break;
+            }
+            // Expand the size of `object` and store the newly created `CatchHitObject`
             object = realloc(object, (object_len + 1) * sizeof(*object));
             switch ((beatmap.hit_objects + i)->type) {
                 case circle:
@@ -38,47 +56,36 @@ void predictor_run(void) {
             }
             object_len++;
         }
-        ooc_hitobject_sort(object, object_len);
         of_beatmap_free(beatmap);
     }
 
+    // Evaluation RNG up to what we need
     LegacyRandom rng;
-    int points_start;
-    {
-        // Get time where we should stop the loop
-        points_start = INT_MAX;
-        for (int i = 0; i < predictor.points_len; i++) {
-            if ((predictor.points + i)->time < points_start) {
-                points_start = (predictor.points + i)->time;
-            }
-        }
-        // Evaluation RNG up to what we need
-        ou_legacyrandom_init(&rng, ooc_processor_RNGSEED);
-        for (int i = 0; i < object_len; i++) {
-            ooc_processor_applypositionoffsetrngstarttime(object, i, i + 1, &rng, false);
-            if (points_start < (object + i)->start_time) {
-                break;
-            }
+    ou_legacyrandom_init(&rng, ooc_processor_RNGSEED);
+    for (int i = 0; i < object_len; i++) {
+        ooc_processor_applypositionoffsetrngstarttime(object, i, i + 1, &rng, false);
+        if (points_start < (object + i)->start_time) {
+            break;
         }
     }
 
-    // Doing BananaPredictor
-    {
-        for (int i = 0; i < predictor.points_len; i++) {
+    // Evaluating the BananaPredictor
+    for (int i = points_start; i < points_end; i++ /* TODO increment based on Banana Shower's distance for each banana */) {
+        // Checking if the intersection is valid so we can place our Banana Showers
+        for (int j = 0; j < predictor.points_len; j++) {
             Line l1;
-            Point p1_l1 = *(predictor.points + i);
-            Point p2_l1 = i != predictor.points_len - 1 ? *(predictor.points + i + 1) : *(predictor.points + 0);
+            Point p1_l1 = *(predictor.points + j);
+            Point p2_l1 = j != predictor.points_len - 1 ? *(predictor.points + j + 1) : *(predictor.points + 0);
             predictor_line(&l1, p1_l1, p2_l1);
             
             Line l2;
-            Point p1_l2 = { .x = -1, .time = points_start };
-            Point p2_l2 = { .x = 1, .time = points_start };
+            Point p1_l2 = { .x = -1, .time = i };
+            Point p2_l2 = { .x = 1, .time = i };
             predictor_line(&l2, p1_l2, p2_l2);
 
             Point *r = NULL;
             predictor_intersection(&r, l1, l2);
             if (r == NULL) {
-                printf("No intersection\n");
                 continue;
             }
             if (r->x >= 0 && r->x <= 512) { 

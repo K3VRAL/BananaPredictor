@@ -29,13 +29,19 @@ extern Predictor predictor;
 
 /*
     The BananaPredictor running and evaluating based off of the inputs given
+    
+    return
+        void
 */
 void predictor_run(void);
 
-// Basing answer off of https://stackoverflow.com/a/20679579 because I suck at math
+// Basing below functions off of https://stackoverflow.com/a/20679579 because I suck at math
+
 /*
     Calculating the Line using Cramer's Rule
 
+    return
+        void
     argsreturn
         Line *
     args
@@ -47,6 +53,8 @@ void predictor_line(Line *, Point, Point);
 /*
     Calculating the Line of Intersection with Determinants
 
+    return
+        void
     argsreturn
         Point ** - NULLABLE
     args

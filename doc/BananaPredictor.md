@@ -1,6 +1,6 @@
 # Name
 
-BananaPredictor - An application to predict where bananas will be placed for osu!ctb maps.
+BananaPredictor - An application to predict where bananas will be placed
 
 # Synopsis
 
@@ -8,7 +8,9 @@ bnprdctr [-b file] [-p x:time[|...]]
 
 # Description
 
-BananaPredictor is an application made to allow for the user to predict and place bananas in specific areas that they want. This is done so with the help of sliders as they help allow the spinner to change it's seed to be placed in another area. Because of how many sliders, droplets, or tiny droplets exists, we can be able to influence where the banana will end up based on how many times we can keep putting in these seed affecting objects.
+BananaPredictor is an application made to allow for the user to predict and place Banana Shower's bananas in areas which alone couldn't be done without the utilisation of Juice Streams as they help allow the bananas to change it's RNG seed to be placed in different areas. When each Banana Shower's bananas are being evaluated on their x-axis, they modify the RNG values for the rest of the map.
+
+Unlike Banana Showers; Juice Streams are highly controlable in their placement, high count of nested objects, and ability to easily influence the RNG factor. There are three ways in which the application uses the Juice Stream in order to generate // TODO
 
 # Resources
 
