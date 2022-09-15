@@ -12,10 +12,12 @@
     
     return
         void
+    argsreturn
+        bool *
     args
         int
         char **
 */
-void args_handle(int, char **);
+void args_handle(bool *, int, char **);
 
 #endif

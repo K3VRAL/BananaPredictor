@@ -2,15 +2,11 @@
 
 int main(int argc, char **argv) {
     // Handle arguments given
-    if (argc <= 1) {
-        printf("Use `-h` or check out the documentation if you need help.\n");
-        return 1;
-    }
-    args_handle(argc, argv);
+    bool keep_running = false;
+    args_handle(&keep_running, argc, argv);
 
     // Make a few tests before we run things
-    FILE *fp = fopen(predictor.beatmap, "r");
-    if (predictor.beatmap == NULL || predictor.points == NULL || fp == NULL) {
+    if (!keep_running) {
         return 1;
     }
 
