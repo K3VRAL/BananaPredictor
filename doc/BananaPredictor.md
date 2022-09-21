@@ -4,13 +4,13 @@ BananaPredictor - An application to predict where bananas will be placed
 
 # Synopsis
 
-bnprdctr [-b file] [-p x:time[|...]]
+bnprdctr [-b file] [-p x:time|...] [-d distance]
 
 # Description
 
 BananaPredictor is an application made to allow for the user to predict and place Banana Shower's bananas in areas which alone couldn't be done without the utilisation of Juice Streams as they help allow the bananas to change it's RNG seed to be placed in different areas. When each Banana Shower's bananas are being evaluated on their x-axis, they modify the RNG values for the rest of the map.
 
-Unlike Banana Showers; Juice Streams are highly controlable in their placement, high count of nested objects, and ability to easily influence the RNG factor. There are three ways in which the application uses the Juice Stream in order to generate // TODO
+Unlike Banana Showers; Juice Streams are highly controlable in their placement, high count of nested objects, and ability to easily influence the RNG factor; the nested objects in which we can effect the RNG are the Droplets and TinyDroplets. The porocess in which Juice Streams follows; the new placement of the Juice Stream is to be as small as possible while reaching at least 3 nested objects which much have a Droplet or TinyDroplet. Once the Juice Stream has been placed, we evaluate the RNG and see if the Banana Shower's bananas are in the areas given by the user. If so, go to the next point to be evaluated. If not, make the Juice Stream as long as possible before it hits the BananaShower end time; if this case is hit then we start over by placing a new Juice Streams then repeat.
 
 # Resources
 
@@ -20,7 +20,11 @@ Uses the beatmap file as input for difficulty, timing point, and hit object valu
 
 ## Points (`-p` or `--points`)
 
-The format for a point is `x:time|...`. The final point will always go back to the first point.
+The format for a point is `x:time|...`. It is mandatory that there is at least three points. The final point will always go back to the first point.
+
+## Distance (`-d` or `--distance`)
+
+## `x:time|...`
 
 ### x - integer
 

@@ -6,20 +6,21 @@ int main(int argc, char **argv) {
     args_handle(&keep_running, argc, argv);
 
     // Make a few tests before we run things
-    if (!keep_running) {
-        return 1;
+    if (keep_running) {
+        // Where the magic happens
+        predictor_run();
     }
 
-    // Where the magic happens
-    predictor_run();
-
     // Free
+    if (predictor.output != NULL) {
+        fclose(predictor.output);
+    }
     if (predictor.beatmap != NULL) {
-        free(predictor.beatmap);
+        fclose(predictor.beatmap);
     }
     if (predictor.points != NULL) {
         free(predictor.points);
     }
 
-    return 0;
+    return !keep_running;
 }
