@@ -1,5 +1,7 @@
 #include "predictor.h"
 
+// TODO something is breaking in the code when there are either; sliders/sliders + timing point with weird decimals
+
 Predictor predictor = {
     .output = NULL,
     .beatmap = NULL,
@@ -28,12 +30,19 @@ void predictor_run(void) {
     // We need the RNG of the beatmap until the point that we start
     LegacyRandom rng;
     ou_legacyrandom_init(&rng, ooc_processor_RNGSEED);
-    ooc_processor_applypositionoffsetrng(object, object_len, &rng, false);   
+    ooc_processor_applypositionoffsetrng(object, object_len, &rng, false);
+
+    // Now we reuse and only store the BananaPredictor to the `object` variable
+    ooc_hitobject_freebulk(object, object_len);
+    object = NULL;
+    object_len = 0;
     
     // Evaluating BananaPredictor
     for (double i = points_start; i < points_end; i += predictor.distance) {
         // Update Progress Bar
-        predictor_progressbar((((i - points_start) / (points_end - points_start)) * 100) + 1);
+        if (predictor.output != stdout) {
+            predictor_progressbar((((i - points_start) / (points_end - points_start)) * 100) + 1);
+        }
 
         // Recording the areas of the x-axis at the current time which can place the bananas
         unsigned int areas_len = 0;
@@ -174,7 +183,6 @@ void predictor_areas(unsigned short **areas, unsigned int *areas_len, int i) {
     *(*areas + *areas_len - 1) = 512;
 
     if (*areas_len == 2) {
-        // TODO check if this is necessary
         exit(1);
     }
 }
@@ -200,6 +208,7 @@ void predictor_generatejs(CatchHitObject **bnpd, unsigned int *bnpd_len, int i, 
     for (int j = *bnpd_len - 1; j > 0; j--) {
         *(*bnpd + j) = *(*bnpd + j - 1);
     }
+
     HitObject slider_hit_object = { .x = 0, .y = 384, .time = i, .type = slider, .hit_sound = 0,
         .ho.slider = {
             .curve_type = slidertype_linear,
@@ -213,18 +222,30 @@ void predictor_generatejs(CatchHitObject **bnpd, unsigned int *bnpd_len, int i, 
     slider_hit_object.ho.slider.curves = calloc(++slider_hit_object.ho.slider.num_curve, sizeof(*slider_hit_object.ho.slider.curves));
     (slider_hit_object.ho.slider.curves + 0)->x = 0;
     (slider_hit_object.ho.slider.curves + 0)->y = 0;
+    ooc_juicestream_init((*bnpd + 0), beatmap.difficulty, beatmap.timing_points, beatmap.num_tp, slider_hit_object);
+    
+    InheritedTimingPoint inherited;
+    oos_inheritedpoint_init(&inherited, beatmap.timing_points, beatmap.num_tp);
+    TimingPoint tp_inherited;
+    oos_timingpoint_attime(&tp_inherited, slider_hit_object.time, inherited.tp, inherited.num);
 
+    UninheritedTimingPoint uninherited;
+    oos_uninheritedpoint_init(&uninherited, beatmap.timing_points, beatmap.num_tp);
+    TimingPoint tp_uninherited;
+    oos_timingpoint_attime(&tp_uninherited, slider_hit_object.time, uninherited.tp, uninherited.num);
     while (true) {
-        // TODO reinitialising the juicestream just so we can reset the slider variables is inefficient when it comes to memory; fix `libosu` on this
-        ooc_juicestream_init((*bnpd + 0), beatmap.difficulty, beatmap.timing_points, beatmap.num_tp, slider_hit_object);
         ooc_juicestream_createnestedjuice((*bnpd + 0));
         if ((*bnpd + 0)->cho.js.num_nested > 3) {
             break;
         }
         slider_hit_object.ho.slider.length++;
-        ooc_hitobject_free(*(*bnpd + 0));
+        free((*bnpd + 0)->cho.js.nested);
+        (*bnpd + 0)->cho.js.nested = NULL;
+        (*bnpd + 0)->cho.js.num_nested = 0;
+        oos_slider_calculateslider(&(*bnpd + 0)->cho.js.slider_data, beatmap.difficulty, tp_inherited, tp_uninherited, slider_hit_object);
     }
-
+    oos_inheritedpoint_free(inherited);
+    oos_uninheritedpoint_free(uninherited);
     oos_hitobject_free(slider_hit_object);
 }
 
@@ -267,11 +288,11 @@ void predictor_output(CatchHitObject *object, unsigned int object_len) {
         if ((object + i)->type == catchhitobject_bananashower) {
             fprintf(predictor.output, "256,192,%d,8,0,%d\n", (int) (object + i)->start_time, (object + i)->cho.bs.end_time);
         } else if ((object + i)->type == catchhitobject_juicestream) {
-            fprintf(predictor.output, "%d,384,%d,6,0,%c", (int) (object + i)->x, (int) (object + i)->start_time, (object + i)->cho.js.slider_data.ho_data->curve_type);
+            fprintf(predictor.output, "%d,%d,%d,6,0,%c", (int) (object + i)->cho.js.slider_data.start_position.x, (int) (object + i)->cho.js.slider_data.start_position.y, (int) (object + i)->start_time, (object + i)->cho.js.slider_data.ho_data->curve_type);
             for (int j = 0; j < (object + i)->cho.js.slider_data.ho_data->num_curve; j++) {
                 fprintf(predictor.output, "|%d:%d", ((object + i)->cho.js.slider_data.ho_data->curves + j)->x, ((object + i)->cho.js.slider_data.ho_data->curves + j)->y);
             }
-            fprintf(predictor.output, ",1,%d\n", (int) (object + i)->cho.js.slider_data.path.distance);
+            fprintf(predictor.output, ",%d,%d\n", (int) (object + i)->cho.js.slider_data.span_count, (int) (object + i)->cho.js.slider_data.path.distance);
         }
     }
 }

@@ -14,7 +14,7 @@ BananaPredictor is a CLI application that allows for the modification and manipu
 
 Before you can do anything with the project, you will need to [download and install libosu.so](https://github.com/K3VRAL/libosu).
 
-Once the library has been installed, in your terminal while still in the same folder location of `Makefile`, write `make && sudo make install`.
+Once the library has been installed, in your terminal while still in the same folder location of this project's `Makefile`, write `make && sudo make install`.
 
 <a name='doc'></a>
 

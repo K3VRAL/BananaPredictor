@@ -1,12 +1,11 @@
 CC	= gcc
 # $(shell pkg-config --cflags osu)
-CFLAGS	= -Wall -c -Iinclude/ -I/usr/include/osu
+CFLAGS	= -Wall -c -Iinclude/ -g -I/usr/include/osu
 # $(shell pkg-config --libs osu)
 LFLAGS	= -losu
 TARGET	= bnprdctr
 BINFLR	= bin/
 
-all:	CFLAGS += -g
 all:	$(TARGET)
 
 %.o: %.c | $(BINFLR)

@@ -4,7 +4,7 @@ BananaPredictor - An application to predict where bananas will be placed
 
 # Synopsis
 
-bnprdctr [-b file] [-p x:time|...] [-d distance]
+bnprdctr [-o file] [-b file] [-p x:time|...] [-d distance]
 
 # Description
 
@@ -13,6 +13,10 @@ BananaPredictor is an application made to allow for the user to predict and plac
 Unlike Banana Showers; Juice Streams are highly controlable in their placement, high count of nested objects, and ability to easily influence the RNG factor; the nested objects in which we can effect the RNG are the Droplets and TinyDroplets. The porocess in which Juice Streams follows; the new placement of the Juice Stream is to be as small as possible while reaching at least 3 nested objects which much have a Droplet or TinyDroplet. Once the Juice Stream has been placed, we evaluate the RNG and see if the Banana Shower's bananas are in the areas given by the user. If so, go to the next point to be evaluated. If not, make the Juice Stream as long as possible before it hits the BananaShower end time; if this case is hit then we start over by placing a new Juice Streams then repeat.
 
 # Resources
+
+## Beatmap (`-o` or `--output`) - String
+
+Uses the output file as output all the stored objects that were identified to modify the Banana Shower's bananas.
 
 ## Beatmap (`-b` or `--beatmap`) - String
 
