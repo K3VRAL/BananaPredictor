@@ -125,9 +125,10 @@ void predictor_intersection(Point **, Line, Line);
         unsigned int *
     args
         int
+        int
         Beatmap
 */
-void predictor_generatejs(CatchHitObject **, unsigned int *, int, Beatmap);
+void predictor_generatejs(CatchHitObject **, unsigned int *, int, int, Beatmap);
 
 /*
     Returns if we need to retry or store the current positions of the objects

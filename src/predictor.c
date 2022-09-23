@@ -1,6 +1,6 @@
 #include "predictor.h"
 
-// TODO something is breaking in the code when there are either; sliders/sliders + timing point with weird decimals
+// TODO something is breaking in the code when there are either; sliders or sliders with the timing point(s because of either inherit or uninherit)
 
 Predictor predictor = {
     .output = NULL,
@@ -57,7 +57,7 @@ void predictor_run(void) {
 
         while (true) {
             // Generate new Juice Stream or, if previous object is a Juice Stream, expand on said Juice Stream
-            predictor_generatejs(&bnpd, &bnpd_len, (int) i, beatmap);
+            predictor_generatejs(&bnpd, &bnpd_len, (int) i, points_end, beatmap);
 
             // Apply the RNG to the new objects
             LegacyRandom test_rng = rng;
@@ -102,7 +102,7 @@ void predictor_points(int *points_start, int *points_end) {
 void predictor_beatmap(CatchHitObject **object, unsigned int *object_len, Beatmap *beatmap, int points_start) {
     of_beatmap_init(beatmap);
     of_beatmap_set(beatmap, predictor.beatmap);
-    // oos_hitobject_sort(beatmap.hit_objects, beatmap.num_ho); // TODO look into why this function don't end
+    oos_hitobject_sort(beatmap->hit_objects, beatmap->num_ho);
     for (int i = 0; i < beatmap->num_ho; i++) {
         if ((beatmap->hit_objects + i)->time > points_start) {
             break;
@@ -202,13 +202,7 @@ void predictor_intersection(Point **r, Line l1, Line l2) {
     }
 }
 
-void predictor_generatejs(CatchHitObject **bnpd, unsigned int *bnpd_len, int i, Beatmap beatmap) {
-    // TODO Make the Slider/Juice Stream longer if the previous object is a juice stream and doesn't have an end time above the point's end time
-    *bnpd = realloc(*bnpd, ++*bnpd_len * sizeof(**bnpd));
-    for (int j = *bnpd_len - 1; j > 0; j--) {
-        *(*bnpd + j) = *(*bnpd + j - 1);
-    }
-
+void predictor_generatejs(CatchHitObject **bnpd, unsigned int *bnpd_len, int i, int end_time, Beatmap beatmap) {
     HitObject slider_hit_object = { .x = 0, .y = 384, .time = i, .type = slider, .hit_sound = 0,
         .ho.slider = {
             .curve_type = slidertype_linear,
@@ -219,10 +213,6 @@ void predictor_generatejs(CatchHitObject **bnpd, unsigned int *bnpd_len, int i, 
             .length = 1
         }, .hit_sample = {0}
     };
-    slider_hit_object.ho.slider.curves = calloc(++slider_hit_object.ho.slider.num_curve, sizeof(*slider_hit_object.ho.slider.curves));
-    (slider_hit_object.ho.slider.curves + 0)->x = 0;
-    (slider_hit_object.ho.slider.curves + 0)->y = 0;
-    ooc_juicestream_init((*bnpd + 0), beatmap.difficulty, beatmap.timing_points, beatmap.num_tp, slider_hit_object);
     
     InheritedTimingPoint inherited;
     oos_inheritedpoint_init(&inherited, beatmap.timing_points, beatmap.num_tp);
@@ -233,17 +223,63 @@ void predictor_generatejs(CatchHitObject **bnpd, unsigned int *bnpd_len, int i, 
     oos_uninheritedpoint_init(&uninherited, beatmap.timing_points, beatmap.num_tp);
     TimingPoint tp_uninherited;
     oos_timingpoint_attime(&tp_uninherited, slider_hit_object.time, uninherited.tp, uninherited.num);
-    while (true) {
-        ooc_juicestream_createnestedjuice((*bnpd + 0));
-        if ((*bnpd + 0)->cho.js.num_nested > 3) {
-            break;
+
+    bool make_new = true;
+
+    // TODO maybe when over the end time; add in more timing points to help with the slider's speed
+    if ((*bnpd + 0)->type == catchhitobject_juicestream && (*bnpd + 0)->cho.js.slider_data.end_time < end_time) {
+        unsigned int nested_num = (*bnpd + 0)->cho.js.num_nested;
+        slider_hit_object.x = (*bnpd + 0)->cho.js.slider_data.start_position.x;
+        slider_hit_object.time = (*bnpd + 0)->cho.js.slider_data.start_time;
+        slider_hit_object.ho.slider.curve_type = (*bnpd + 0)->cho.js.slider_data.ho_data->curve_type;
+        slider_hit_object.ho.slider.num_curve = (*bnpd + 0)->cho.js.slider_data.ho_data->num_curve;
+        slider_hit_object.ho.slider.curves = calloc(slider_hit_object.ho.slider.num_curve, sizeof(*slider_hit_object.ho.slider.curves));
+        for (int i = 0; i < slider_hit_object.ho.slider.num_curve; i++) {
+            (slider_hit_object.ho.slider.curves + i)->x = ((*bnpd + 0)->cho.js.slider_data.ho_data->curves + i)->x;
+            (slider_hit_object.ho.slider.curves + i)->y = ((*bnpd + 0)->cho.js.slider_data.ho_data->curves + i)->y;
         }
-        slider_hit_object.ho.slider.length++;
-        free((*bnpd + 0)->cho.js.nested);
-        (*bnpd + 0)->cho.js.nested = NULL;
-        (*bnpd + 0)->cho.js.num_nested = 0;
-        oos_slider_calculateslider(&(*bnpd + 0)->cho.js.slider_data, beatmap.difficulty, tp_inherited, tp_uninherited, slider_hit_object);
+        slider_hit_object.ho.slider.slides = (*bnpd + 0)->cho.js.slider_data.span_count;
+        slider_hit_object.ho.slider.length = (*bnpd + 0)->cho.js.slider_data.path.distance;
+
+        while (true) {
+            free((*bnpd + 0)->cho.js.nested);
+            (*bnpd + 0)->cho.js.nested = NULL;
+            (*bnpd + 0)->cho.js.num_nested = 0;
+            oos_slider_calculateslider(&(*bnpd + 0)->cho.js.slider_data, beatmap.difficulty, tp_inherited, tp_uninherited, slider_hit_object);
+            ooc_juicestream_createnestedjuice((*bnpd + 0));
+            if ((*bnpd + 0)->cho.js.num_nested > nested_num) {
+                make_new = false;
+                break;
+            } else if ((*bnpd + 0)->cho.js.slider_data.end_time >= end_time) {
+                break;
+            }
+            slider_hit_object.ho.slider.length++;
+        }
     }
+    if (make_new) {
+        slider_hit_object.ho.slider.curves = calloc(++slider_hit_object.ho.slider.num_curve, sizeof(*slider_hit_object.ho.slider.curves));
+        (slider_hit_object.ho.slider.curves + 0)->x = 0;
+        (slider_hit_object.ho.slider.curves + 0)->y = 0;
+        
+        *bnpd = realloc(*bnpd, ++*bnpd_len * sizeof(**bnpd));
+        for (int j = *bnpd_len - 1; j > 0; j--) {
+            *(*bnpd + j) = *(*bnpd + j - 1);
+        }
+        ooc_juicestream_init((*bnpd + 0), beatmap.difficulty, beatmap.timing_points, beatmap.num_tp, slider_hit_object);
+
+        while (true) {
+            ooc_juicestream_createnestedjuice((*bnpd + 0));
+            if ((*bnpd + 0)->cho.js.num_nested > 3) {
+                break;
+            }
+            slider_hit_object.ho.slider.length++;
+            free((*bnpd + 0)->cho.js.nested);
+            (*bnpd + 0)->cho.js.nested = NULL;
+            (*bnpd + 0)->cho.js.num_nested = 0;
+            oos_slider_calculateslider(&(*bnpd + 0)->cho.js.slider_data, beatmap.difficulty, tp_inherited, tp_uninherited, slider_hit_object);
+        }
+    }
+    
     oos_inheritedpoint_free(inherited);
     oos_uninheritedpoint_free(uninherited);
     oos_hitobject_free(slider_hit_object);
