@@ -8,7 +8,7 @@ int main(int argc, char **argv) {
     // Make a few tests before we run things
     if (keep_running) {
         // Where the magic happens
-        predictor_run();
+        predictor_main();
     }
 
     // Free

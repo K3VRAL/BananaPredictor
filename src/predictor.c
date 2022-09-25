@@ -1,16 +1,17 @@
 #include "predictor.h"
 
-// TODO something is breaking in the code when there are either; sliders or sliders with the timing point(s because of either inherit or uninherit)
+// TODO something is breaking in the code when there are inherit or uninherit timing points
 
 Predictor predictor = {
     .output = NULL,
+    .prefer_circles = false,
     .beatmap = NULL,
     .points = NULL,
     .points_len = 0,
     .distance = 1
 };
 
-void predictor_run(void) {
+void predictor_main(void) {
     // Get time where we should start and stop the loops
     int points_start;
     int points_end;
@@ -203,6 +204,13 @@ void predictor_intersection(Point **r, Line l1, Line l2) {
 }
 
 void predictor_generatejs(CatchHitObject **bnpd, unsigned int *bnpd_len, int i, int end_time, Beatmap beatmap) {
+    // TODO make tests on other objects
+    // 1 - smallest being 3 nested objects
+    // 2 - biggest hitting the end time
+    // 3 - prioritising droplet (see 5/6)
+    // 4 - prioritising tinydroplets (see 5/6)
+    // 5 - changing the inherit timing points
+    // 6 - changing the uninherit timing points
     HitObject slider_hit_object = { .x = 0, .y = 384, .time = i, .type = slider, .hit_sound = 0,
         .ho.slider = {
             .curve_type = slidertype_linear,
@@ -226,7 +234,6 @@ void predictor_generatejs(CatchHitObject **bnpd, unsigned int *bnpd_len, int i, 
 
     bool make_new = true;
 
-    // TODO maybe when over the end time; add in more timing points to help with the slider's speed
     if ((*bnpd + 0)->type == catchhitobject_juicestream && (*bnpd + 0)->cho.js.slider_data.end_time < end_time) {
         unsigned int nested_num = (*bnpd + 0)->cho.js.num_nested;
         slider_hit_object.x = (*bnpd + 0)->cho.js.slider_data.start_position.x;
@@ -320,15 +327,26 @@ void predictor_storeobjects(CatchHitObject **object, unsigned int *object_len, L
 }
 
 void predictor_output(CatchHitObject *object, unsigned int object_len) {
-    for (int i = 0; i < object_len; i++) {
-        if ((object + i)->type == catchhitobject_bananashower) {
-            fprintf(predictor.output, "256,192,%d,8,0,%d\n", (int) (object + i)->start_time, (object + i)->cho.bs.end_time);
-        } else if ((object + i)->type == catchhitobject_juicestream) {
-            fprintf(predictor.output, "%d,%d,%d,6,0,%c", (int) (object + i)->cho.js.slider_data.start_position.x, (int) (object + i)->cho.js.slider_data.start_position.y, (int) (object + i)->start_time, (object + i)->cho.js.slider_data.ho_data->curve_type);
-            for (int j = 0; j < (object + i)->cho.js.slider_data.ho_data->num_curve; j++) {
-                fprintf(predictor.output, "|%d:%d", ((object + i)->cho.js.slider_data.ho_data->curves + j)->x, ((object + i)->cho.js.slider_data.ho_data->curves + j)->y);
+    if (!predictor.prefer_circles) {
+        for (int i = 0; i < object_len; i++) {
+            if ((object + i)->type == catchhitobject_bananashower) {
+                fprintf(predictor.output, "256,192,%d,8,0,%d\n", (int) (object + i)->start_time, (object + i)->cho.bs.end_time);
+            } else if ((object + i)->type == catchhitobject_juicestream) {
+                fprintf(predictor.output, "%d,%d,%d,6,0,%c", (int) (object + i)->cho.js.slider_data.start_position.x, (int) (object + i)->cho.js.slider_data.start_position.y, (int) (object + i)->start_time, (object + i)->cho.js.slider_data.ho_data->curve_type);
+                for (int j = 0; j < (object + i)->cho.js.slider_data.ho_data->num_curve; j++) {
+                    fprintf(predictor.output, "|%d:%d", ((object + i)->cho.js.slider_data.ho_data->curves + j)->x, ((object + i)->cho.js.slider_data.ho_data->curves + j)->y);
+                }
+                fprintf(predictor.output, ",%d,%d\n", (int) (object + i)->cho.js.slider_data.span_count, (int) (object + i)->cho.js.slider_data.path.distance);
             }
-            fprintf(predictor.output, ",%d,%d\n", (int) (object + i)->cho.js.slider_data.span_count, (int) (object + i)->cho.js.slider_data.path.distance);
+        }
+    } else {
+        for (int i = 0; i < object_len; i++) {
+            if ((object + i)->type == catchhitobject_bananashower) {
+                for (int j = 0; j < (object + i)->cho.bs.num_banana; j++) {
+                    int banana_x = (int) (((object + i)->cho.bs.bananas + j)->x + ((object + i)->cho.bs.bananas + j)->x_offset);
+                    fprintf(predictor.output, "%d,192,%d,5,0\n", banana_x, (int) ((object + i)->cho.bs.bananas + j)->start_time);
+                }
+            }
         }
     }
 }

@@ -11,6 +11,8 @@ void args_handle(bool *keep_running, int argc, char **argv) {
                 continue;
             }
             predictor.output = fp;
+        } else if (strcmp(*(argv + i), "--prefer-circles") == 0) {
+            predictor.prefer_circles = true;
         } else if (strcmp(*(argv + i), "-b") == 0 || strcmp(*(argv + i), "--beatmap") == 0) {
             FILE *fp = fopen(*(argv + ++i), "r");
             if (fp == NULL) {

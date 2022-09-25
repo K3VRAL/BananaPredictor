@@ -23,6 +23,7 @@ typedef struct Line {
 
 typedef struct Predictor {
     FILE *output;
+    bool prefer_circles;
     FILE *beatmap;
     Point *points;
     unsigned int points_len;
@@ -37,7 +38,7 @@ extern Predictor predictor;
     return
         void
 */
-void predictor_run(void);
+void predictor_main(void);
 
 /*
     Sets the values for the points to start and stop the main loop

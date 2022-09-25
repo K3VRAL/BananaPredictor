@@ -4,7 +4,7 @@ BananaPredictor - An application to predict where bananas will be placed
 
 # Synopsis
 
-bnprdctr [-o file] [-b file] [-p x:time|...] [-d distance]
+bnprdctr [-o file] [-b file] [-p x:time|...] [-d distance] [--prefer-circle]
 
 # Description
 
@@ -14,21 +14,35 @@ Unlike Banana Showers; Juice Streams are highly controlable in their placement, 
 
 # Resources
 
-## Beatmap (`-o` or `--output`) - String
+## Output (`-o` or `--output`) - String (file location)
 
 Uses the output file as output all the stored objects that were identified to modify the Banana Shower's bananas.
 
-## Beatmap (`-b` or `--beatmap`) - String
+If argument is not used, it will be defaulted to the terminal's output.
+
+## Prefer Circles (`--prefer-circles`) - Boolean
+
+Outputs the given Banana Shower's bananas to circles (ignores Juice Streams). This can be used for debugging if the application is not giving the proper output; whether it be an error on the user's part or an error on the application's part.
+
+If argument is not used, it will be defaulted to `false`.
+
+## Beatmap (`-b` or `--beatmap`) - String (file location)
 
 Uses the beatmap file as input for difficulty, timing point, and hit object values to reference from.
 
-## Points (`-p` or `--points`)
+If argument is not used, it will be defaulted to `NULL` and prevent the application from running.
+
+## Distance (`-d` or `--distance`) - Unsigned Integer
+
+Allows for the distance for each Banana Shower. Since Banana Showers and Juice Streams requires a lot of load, this can be reduced by spreading the them out.
+
+If argument is not used, it will be defaulted to `1`.
+
+## Points (`-p` or `--points`) - String (formatted as `x:time|...`)
 
 The format for a point is `x:time|...`. It is mandatory that there is at least three points. The final point will always go back to the first point.
 
-## Distance (`-d` or `--distance`)
-
-## `x:time|...`
+If argument is not used, it will be defaulted to `NULL` and prevent the application from running.
 
 ### x - integer
 
