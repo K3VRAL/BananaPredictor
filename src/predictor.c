@@ -1,7 +1,5 @@
 #include "predictor.h"
 
-// TODO something is breaking in the code when there are inherit or uninherit timing points
-
 Predictor predictor = {
     .output = NULL,
     .prefer_circles = false,
@@ -70,14 +68,17 @@ void predictor_main(void) {
             }
 
             // Stores the objects
-            predictor_storeobjects(&object, &object_len, &rng, test_rng, bnpd, bnpd_len);
+            predictor_storeobjects(&object, &object_len, &rng, bnpd, bnpd_len, test_rng);
             break;
         }
 
         free(bnpd);
         free(areas);
     }
-    fprintf(stdout, "\n");
+    if (predictor.output != stdout) {
+        predictor_progressbar(100);
+        fprintf(stdout, "\n");
+    }
 
     // Write to output
     predictor_output(object, object_len);
@@ -117,7 +118,7 @@ void predictor_beatmap(CatchHitObject **object, unsigned int *object_len, Beatma
 
             case slider:
             case nc_slider:
-                ooc_juicestream_init((*object + *object_len - 1), beatmap->difficulty, beatmap->timing_points, beatmap->num_tp, *(beatmap->hit_objects + i));
+                ooc_juicestream_initwslidertp((*object + *object_len - 1), beatmap->difficulty, beatmap->timing_points, beatmap->num_tp, *(beatmap->hit_objects + i));
                 ooc_juicestream_createnestedjuice((*object + *object_len - 1));
                 break;
             
@@ -204,13 +205,9 @@ void predictor_intersection(Point **r, Line l1, Line l2) {
 }
 
 void predictor_generatejs(CatchHitObject **bnpd, unsigned int *bnpd_len, int i, int end_time, Beatmap beatmap) {
-    // TODO make tests on other objects
-    // 1 - smallest being 3 nested objects
-    // 2 - biggest hitting the end time
-    // 3 - prioritising droplet (see 5/6)
-    // 4 - prioritising tinydroplets (see 5/6)
-    // 5 - changing the inherit timing points
-    // 6 - changing the uninherit timing points
+    // TODO Figure out how to make optimisations
+    // 1 - smallest being 3 nested objects  (easier load but more population)
+    // 2 - biggest hitting the end time     (less population but load at end of bnprdctr)
     HitObject slider_hit_object = { .x = 0, .y = 384, .time = i, .type = slider, .hit_sound = 0,
         .ho.slider = {
             .curve_type = slidertype_linear,
@@ -234,6 +231,7 @@ void predictor_generatejs(CatchHitObject **bnpd, unsigned int *bnpd_len, int i, 
 
     bool make_new = true;
 
+    // Extend current slider
     if ((*bnpd + 0)->type == catchhitobject_juicestream && (*bnpd + 0)->cho.js.slider_data.end_time < end_time) {
         unsigned int nested_num = (*bnpd + 0)->cho.js.num_nested;
         slider_hit_object.x = (*bnpd + 0)->cho.js.slider_data.start_position.x;
@@ -258,13 +256,20 @@ void predictor_generatejs(CatchHitObject **bnpd, unsigned int *bnpd_len, int i, 
                 make_new = false;
                 break;
             } else if ((*bnpd + 0)->cho.js.slider_data.end_time >= end_time) {
+                // If unable to extend slider anymore
                 break;
             }
             slider_hit_object.ho.slider.length++;
         }
     }
+
+    // Make a new slider
     if (make_new) {
-        slider_hit_object.ho.slider.curves = calloc(++slider_hit_object.ho.slider.num_curve, sizeof(*slider_hit_object.ho.slider.curves));
+        if (slider_hit_object.ho.slider.curves != NULL) {
+            free(slider_hit_object.ho.slider.curves);
+        }
+        slider_hit_object.ho.slider.num_curve = 1;
+        slider_hit_object.ho.slider.curves = calloc(slider_hit_object.ho.slider.num_curve, sizeof(*slider_hit_object.ho.slider.curves));
         (slider_hit_object.ho.slider.curves + 0)->x = 0;
         (slider_hit_object.ho.slider.curves + 0)->y = 0;
         
@@ -272,7 +277,7 @@ void predictor_generatejs(CatchHitObject **bnpd, unsigned int *bnpd_len, int i, 
         for (int j = *bnpd_len - 1; j > 0; j--) {
             *(*bnpd + j) = *(*bnpd + j - 1);
         }
-        ooc_juicestream_init((*bnpd + 0), beatmap.difficulty, beatmap.timing_points, beatmap.num_tp, slider_hit_object);
+        ooc_juicestream_initwsliderspecific((*bnpd + 0), beatmap.difficulty, tp_inherited, tp_uninherited, slider_hit_object);
 
         while (true) {
             ooc_juicestream_createnestedjuice((*bnpd + 0));
@@ -317,7 +322,7 @@ bool predictor_breakout(unsigned short *areas, unsigned int areas_len, CatchHitO
     return true;
 }
 
-void predictor_storeobjects(CatchHitObject **object, unsigned int *object_len, LegacyRandom *rng, LegacyRandom test_rng, CatchHitObject *bnpd, unsigned int bnpd_len) {
+void predictor_storeobjects(CatchHitObject **object, unsigned int *object_len, LegacyRandom *rng, CatchHitObject *bnpd, unsigned int bnpd_len, LegacyRandom test_rng) {
     *rng = test_rng;
     *object_len += bnpd_len;
     *object = realloc(*object, *object_len * sizeof(**object));

@@ -158,7 +158,7 @@ bool predictor_breakout(unsigned short *, unsigned int, CatchHitObject *, unsign
         CatchHitObject *
         unsigned int
 */
-void predictor_storeobjects(CatchHitObject **, unsigned int *, LegacyRandom *, LegacyRandom, CatchHitObject *, unsigned int);
+void predictor_storeobjects(CatchHitObject **, unsigned int *, LegacyRandom *, CatchHitObject *, unsigned int, LegacyRandom);
 
 /*
     Outputs data

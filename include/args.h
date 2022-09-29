@@ -18,6 +18,6 @@
         int
         char **
 */
-void args_handle(bool *, int, char **);
+void args_main(bool *, int, char **);
 
 #endif

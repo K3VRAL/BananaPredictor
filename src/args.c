@@ -1,6 +1,6 @@
 #include "args.h"
 
-void args_handle(bool *keep_running, int argc, char **argv) {
+void args_main(bool *keep_running, int argc, char **argv) {
     if (argc < 1) {
         fprintf(stdout, "Use `-h` or check out the documentation if you need help.\n");
     }
