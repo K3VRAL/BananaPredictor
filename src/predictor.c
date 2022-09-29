@@ -205,9 +205,10 @@ void predictor_intersection(Point **r, Line l1, Line l2) {
 }
 
 void predictor_generatejs(CatchHitObject **bnpd, unsigned int *bnpd_len, int i, int end_time, Beatmap beatmap) {
-    // TODO Figure out how to make optimisations
+    // TODO Figure out how to make optimisations/allow for the best of both worlds for the current optimisations
     // 1 - smallest being 3 nested objects  (easier load but more population)
     // 2 - biggest hitting the end time     (less population but load at end of bnprdctr)
+
     HitObject slider_hit_object = { .x = 0, .y = 384, .time = i, .type = slider, .hit_sound = 0,
         .ho.slider = {
             .curve_type = slidertype_linear,
