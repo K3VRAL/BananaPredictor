@@ -4,8 +4,8 @@ Predictor predictor = {
     .output = NULL,
     .prefer_circles = false,
     .beatmap = NULL,
-    .points = NULL,
-    .points_len = 0,
+    .shapes = NULL,
+    .shapes_len = 0,
     .distance = 1
 };
 
@@ -44,9 +44,9 @@ void predictor_main(void) {
         }
 
         // Recording the areas of the x-axis at the current time which can place the bananas
-        unsigned int areas_len = 0;
-        unsigned short *areas = calloc(++areas_len, sizeof(*areas));
-        predictor_areas(&areas, &areas_len, (int) i);
+        unsigned int lines_num = 0;
+        XLine *lines = NULL;
+        predictor_areas(&lines, &lines_num, (int) i);
 
         // Make a variable to store the new objects and house the Banana Shower
         unsigned int bnpd_len = 0;
@@ -63,7 +63,7 @@ void predictor_main(void) {
             ooc_processor_applypositionoffsetrng(bnpd, bnpd_len, &test_rng, false);
 
             // Check if they are within the areas we wanted them to be in; if not, we repeat the loop
-            if (!predictor_breakout(areas, areas_len, bnpd, bnpd_len)) {
+            if (!predictor_breakout(lines, lines_num, bnpd, bnpd_len)) {
                 continue;
             }
 
@@ -72,8 +72,17 @@ void predictor_main(void) {
             break;
         }
 
-        free(bnpd);
-        free(areas);
+        if (bnpd != NULL) {
+            free(bnpd);
+        }
+        if (lines != NULL) {
+            for (int j = 0; j < lines_num; j++) {
+                if ((lines + j)->areas != NULL) {
+                    free((lines + j)->areas);
+                }
+            }
+            free(lines);
+        }
     }
     if (predictor.output != stdout) {
         predictor_progressbar(100);
@@ -91,12 +100,14 @@ void predictor_main(void) {
 void predictor_points(int *points_start, int *points_end) {
     *points_start = INT_MAX;
     *points_end = INT_MIN;
-    for (int i = 0; i < predictor.points_len; i++) {
-        if ((predictor.points + i)->time < *points_start) {
-            *points_start = (predictor.points + i)->time;
-        }
-        if ((predictor.points + i)->time > *points_end) {
-            *points_end = (predictor.points + i)->time;
+    for (int i = 0; i < predictor.shapes_len; i++) {
+        for (int j = 0; j < (predictor.shapes + i)->len; j++) {
+            if (((predictor.shapes + i)->points + j)->time < *points_start) {
+                *points_start = ((predictor.shapes + i)->points + j)->time;
+            }
+            if (((predictor.shapes + i)->points + j)->time > *points_end) {
+                *points_end = ((predictor.shapes + i)->points + j)->time;
+            }
         }
     }
 }
@@ -148,59 +159,63 @@ void predictor_progressbar(unsigned int percent) {
     fflush(stdout);
 }
 
-void predictor_areas(unsigned short **areas, unsigned int *areas_len, int i) {
-    *(*areas + 0) = 0;
-    for (int j = 0; j < predictor.points_len; j++) {
-        Line l1;
-        Point p1_l1 = *(predictor.points + j);
-        Point p2_l1 = j != predictor.points_len - 1 ? *(predictor.points + j + 1) : *(predictor.points + 0);
-        predictor_line(&l1, p1_l1, p2_l1);
-        
-        Line l2;
-        Point p1_l2 = { .x = -1, .time = i };
-        Point p2_l2 = { .x = 1, .time = i };
-        predictor_line(&l2, p1_l2, p2_l2);
+void predictor_areas(XLine **lines, unsigned int *lines_num, int time) {
+    for (int i = 0; i < predictor.shapes_len; i++) {
+        *lines = realloc(*lines, ++(*lines_num) * sizeof(**lines));
+        (*lines + *lines_num - 1)->len = 1;
+        (*lines + *lines_num - 1)->areas = calloc((*lines + *lines_num - 1)->len, sizeof(*(*lines + *lines_num - 1)->areas));
+        *((*lines + *lines_num - 1)->areas + (*lines + *lines_num - 1)->len - 1) = 0;
+        for (int j = 0; j < (predictor.shapes + i)->len; j++) {
+            Coefficient c1;
+            Point p1_l1 = *((predictor.shapes + i)->points + j);
+            Point p2_l1 = j != (predictor.shapes + i)->len - 1 ? *((predictor.shapes + i)->points + j + 1) : *((predictor.shapes + i)->points + 0);
+            predictor_line(&c1, p1_l1, p2_l1);
+            
+            Coefficient c2;
+            Point p1_l2 = { .x = -1, .time = time };
+            Point p2_l2 = { .x = 1, .time = time };
+            predictor_line(&c2, p1_l2, p2_l2);
 
-        Point *r = NULL;
-        predictor_intersection(&r, l1, l2);
-        if (r == NULL) {
-            continue;
+            Point *r = NULL;
+            predictor_intersection(&r, c1, c2);
+            if (r == NULL) {
+                continue;
+            }
+            if (r->x >= 0 && r->x <= 512) {
+                (*lines + *lines_num - 1)->areas = realloc((*lines + *lines_num - 1)->areas, (++(*lines + *lines_num - 1)->len * sizeof(*(*lines + *lines_num - 1)->areas)));
+                *((*lines + *lines_num - 1)->areas + (*lines + *lines_num - 1)->len - 1) = r->x;
+            }
+            free(r);
         }
-        if (r->x >= 0 && r->x <= 512) {
-            *areas = realloc(*areas, (++*areas_len * sizeof(**areas)));
-            *(*areas + *areas_len - 1) = r->x;
-        }
-        free(r);
-    }
-    for (int j = 0; j < *areas_len - 1; j++) {
-        for (int k = 0; k < *areas_len - j - 1; k++) {
-            if (*(*areas + k) > *(*areas + k + 1)) {
-                unsigned short temp = *(*areas + k + 1);
-                *(*areas + k + 1) = *(*areas + k);
-                *(*areas + k) = temp;
+        for (int j = 0; j < (*lines + *lines_num - 1)->len - 1; j++) {
+            for (int k = 0; k < (*lines + *lines_num - 1)->len - j - 1; k++) {
+                if (*((*lines + *lines_num - 1)->areas + k) > *((*lines + *lines_num - 1)->areas + k + 1)) {
+                    unsigned short temp = *((*lines + *lines_num - 1)->areas + k + 1);
+                    *((*lines + *lines_num - 1)->areas + k + 1) = *((*lines + *lines_num - 1)->areas + k);
+                    *((*lines + *lines_num - 1)->areas + k) = temp;
+                }
             }
         }
-    }
-    *areas = realloc(*areas, (++*areas_len * sizeof(**areas)));
-    *(*areas + *areas_len - 1) = 512;
-
-    if (*areas_len == 2) {
-        exit(1);
+        (*lines + *lines_num - 1)->areas = realloc((*lines + *lines_num - 1)->areas, (++(*lines + *lines_num - 1)->len * sizeof(*(*lines + *lines_num - 1)->areas)));
+        *((*lines + *lines_num - 1)->areas + (*lines + *lines_num - 1)->len - 1) = 512;
+        if ((*lines + *lines_num - 1)->len == 2) {
+            exit(1);
+        }
     }
 }
 
-void predictor_line(Line *line, Point p1, Point p2) {
-    line->a = p1.time - p2.time;
-    line->b = p2.x - p1.x;
-    line->c = -((p1.x * p2.time) - (p2.x * p1.time));
+void predictor_line(Coefficient *coefficient, Point p1, Point p2) {
+    coefficient->a = p1.time - p2.time;
+    coefficient->b = p2.x - p1.x;
+    coefficient->c = -((p1.x * p2.time) - (p2.x * p1.time));
 }
 
-void predictor_intersection(Point **r, Line l1, Line l2) {
-    double d = l1.a * l2.b - l1.b * l2.a;
+void predictor_intersection(Point **r, Coefficient c1, Coefficient c2) {
+    double d = c1.a * c2.b - c1.b * c2.a;
     if (d != 0) {
         *r = calloc(1, sizeof(**r));
-        (*r)->x = (l1.c * l2.b - l1.b * l2.c) / d;
-        (*r)->time = (l1.a * l2.c - l1.c * l2.a) / d;
+        (*r)->x = (c1.c * c2.b - c1.b * c2.c) / d;
+        (*r)->time = (c1.a * c2.c - c1.c * c2.a) / d;
     }
 }
 
@@ -275,8 +290,8 @@ void predictor_generatejs(CatchHitObject **bnpd, unsigned int *bnpd_len, int i, 
         (slider_hit_object.ho.slider.curves + 0)->y = 0;
         
         *bnpd = realloc(*bnpd, ++*bnpd_len * sizeof(**bnpd));
-        for (int j = *bnpd_len - 1; j > 0; j--) {
-            *(*bnpd + j) = *(*bnpd + j - 1);
+        for (int i = *bnpd_len - 1; i > 0; i--) {
+            *(*bnpd + i) = *(*bnpd + i - 1);
         }
         ooc_juicestream_initwsliderspecific((*bnpd + 0), beatmap.difficulty, tp_inherited, tp_uninherited, slider_hit_object);
 
@@ -298,21 +313,25 @@ void predictor_generatejs(CatchHitObject **bnpd, unsigned int *bnpd_len, int i, 
     oos_hitobject_free(slider_hit_object);
 }
 
-bool predictor_breakout(unsigned short *areas, unsigned int areas_len, CatchHitObject *bnpd, unsigned int bnpd_len) {
-    for (int j = 0; j < (bnpd + bnpd_len - 1)->cho.bs.num_banana; j++) {
-        bool correct_area;
-        int banana_x = (int) ((bnpd + bnpd_len - 1)->cho.bs.bananas + j)->x + (int) ((bnpd + bnpd_len - 1)->cho.bs.bananas + j)->x_offset;
-        for (int k = 0; k < areas_len - 1; k++) {
-            unsigned int left = *(areas + k);
-            unsigned int right = *(areas + k + 1);
-            if (banana_x >= left && banana_x <= right) {
-                // If the number is odd; we know it's in the right position
-                // If the number is even; we know it's in the wrong position
-                if (k % 2 != 0) {
-                    correct_area = true;
-                } else if (k % 2 == 0) {
-                    correct_area = false;
+bool predictor_breakout(XLine *lines, unsigned int lines_num, CatchHitObject *bnpd, unsigned int bnpd_len) {
+    // Look at bananas currently generated
+    for (int i = 0; i < (bnpd + bnpd_len - 1)->cho.bs.num_banana; i++) {
+        bool correct_area = false;
+        int banana_x = (int) ((bnpd + bnpd_len - 1)->cho.bs.bananas + i)->x + (int) ((bnpd + bnpd_len - 1)->cho.bs.bananas + i)->x_offset;
+        // Look at a specific shape/line
+        for (int j = 0; j < lines_num; j++) {
+            // Look at the specific axis it's trying to meet
+            for (int k = 0; k < (lines + j)->len - 1; k++) {
+                unsigned short left = *((lines + j)->areas + k);
+                unsigned short right = *((lines + j)->areas + k + 1);
+                if (banana_x >= left && banana_x <= right) {
+                    // If the number is odd; we know it's in the right position
+                    // If the number is even; we know it's in the wrong position
+                    correct_area = k % 2 != 0;
+                    break;
                 }
+            }
+            if (correct_area) {
                 break;
             }
         }
@@ -327,8 +346,8 @@ void predictor_storeobjects(CatchHitObject **object, unsigned int *object_len, L
     *rng = test_rng;
     *object_len += bnpd_len;
     *object = realloc(*object, *object_len * sizeof(**object));
-    for (int j = *object_len - bnpd_len, k = 0; j < *object_len; j++, k++) {
-        *(*object + j) = *(bnpd + k);
+    for (int i = *object_len - bnpd_len, k = 0; i < *object_len; i++, k++) {
+        *(*object + i) = *(bnpd + k);
     }
 }
 

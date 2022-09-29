@@ -10,23 +10,33 @@
 
 #include <osu.h>
 
+typedef struct XLine {
+    unsigned short *areas;
+    unsigned int len;
+} XLine;
+
+typedef struct Coefficient {
+    double a;
+    double b;
+    double c;
+} Coefficient;
+
 typedef struct Point {
     float x;
     float time;
 } Point;
 
-typedef struct Line {
-    double a;
-    double b;
-    double c;
-} Line;
+typedef struct Shape {
+    Point *points;
+    unsigned int len;
+} Shape;
 
 typedef struct Predictor {
     FILE *output;
     bool prefer_circles;
     FILE *beatmap;
-    Point *points;
-    unsigned int points_len;
+    Shape *shapes;
+    unsigned int shapes_len;
     double distance;
 } Predictor;
 
@@ -87,7 +97,7 @@ void predictor_progressbar(unsigned int);
     args
         int
 */
-void predictor_areas(unsigned short **, unsigned int *, int);
+void predictor_areas(XLine **, unsigned int *, int);
 
 /*
     Calculating the Line using Cramer's Rule
@@ -100,7 +110,7 @@ void predictor_areas(unsigned short **, unsigned int *, int);
         Point
         Point
 */
-void predictor_line(Line *, Point, Point);
+void predictor_line(Coefficient *, Point, Point);
 
 /*
     Calculating the Line of Intersection with Determinants
@@ -113,7 +123,7 @@ void predictor_line(Line *, Point, Point);
         Line
         Line
 */
-void predictor_intersection(Point **, Line, Line);
+void predictor_intersection(Point **, Coefficient, Coefficient);
 // End of stackoverflow
 
 /*
@@ -142,7 +152,7 @@ void predictor_generatejs(CatchHitObject **, unsigned int *, int, int, Beatmap);
         CatchHitObject *
         unsigned int
 */
-bool predictor_breakout(unsigned short *, unsigned int, CatchHitObject *, unsigned int);
+bool predictor_breakout(XLine *, unsigned int, CatchHitObject *, unsigned int);
 
 /*
     Stores the objects and amount of them including the new rng for future reference

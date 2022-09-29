@@ -38,11 +38,11 @@ Allows for the distance for each Banana Shower. Since Banana Showers and Juice S
 
 If argument is not used, it will be defaulted to `1`.
 
-## Points (`-p` or `--points`) - String (formatted as `x:time|...`)
+## Shapes (`-s` or `--shapes`) - String (formatted as `x:time|...`)
 
 The format for a point is `x:time|...`. It is mandatory that there is at least three points. The final point will always go back to the first point.
 
-If argument is not used, it will be defaulted to `NULL` and prevent the application from running.
+If argument is not used, it will be defaulted to `NULL` and prevent the application from running. You also can stack the argument multiple times, allowing you to have multiple shapes.
 
 ### x - Integer
 

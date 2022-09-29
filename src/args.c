@@ -21,8 +21,7 @@ void args_main(bool *keep_running, int argc, char **argv) {
                 continue;
             }
             predictor.beatmap = fp;
-            *keep_running = true;
-        } else if (strcmp(*(argv + i), "-p") == 0 || strcmp(*(argv + i), "--points") == 0) {
+        } else if (strcmp(*(argv + i), "-s") == 0 || strcmp(*(argv + i), "--shapes") == 0) {
             char *copy = strdup(*(argv + ++i));
             char *token = strtok(*(argv + i), ":|\0");
             enum {
@@ -30,21 +29,23 @@ void args_main(bool *keep_running, int argc, char **argv) {
                 time,
             } type;
             char used_delim = '\0';
+            predictor.shapes = realloc(predictor.shapes, (++predictor.shapes_len) * sizeof(*predictor.shapes));
+            (predictor.shapes + predictor.shapes_len - 1)->points = NULL;
+            (predictor.shapes + predictor.shapes_len - 1)->len = 0;
             while (token != NULL) {
-                if (used_delim == '|' || predictor.points_len == 0) {
-                    predictor.points = realloc(predictor.points, (++predictor.points_len) * sizeof(*predictor.points));
+                if (used_delim == '|' || (predictor.shapes + predictor.shapes_len - 1)->len == 0) {
+                    (predictor.shapes + predictor.shapes_len - 1)->points = realloc((predictor.shapes + predictor.shapes_len - 1)->points, ++(predictor.shapes + predictor.shapes_len - 1)->len * sizeof(*(predictor.shapes + predictor.shapes_len - 1)->points));
                     type = x;
                 }
                 switch (type) {
                     case x:
-                        (predictor.points + predictor.points_len - 1)->x = strtol(token, NULL, 10);
+                        ((predictor.shapes + predictor.shapes_len - 1)->points + (predictor.shapes + predictor.shapes_len - 1)->len - 1)->x = strtol(token, NULL, 10);
                         type = time;
                         break;
 
                     case time:
-                        (predictor.points + predictor.points_len - 1)->time = strtol(token, NULL, 10);
+                        ((predictor.shapes + predictor.shapes_len - 1)->points + (predictor.shapes + predictor.shapes_len - 1)->len - 1)->time = strtol(token, NULL, 10);
                         type = x; // Why not
-                        *keep_running = true;
                         break;
                 }
                 used_delim = *(copy + (token - *(argv + i) + strlen(token)));
@@ -68,8 +69,8 @@ void args_main(bool *keep_running, int argc, char **argv) {
             *(arguments + 3) = "outputs the Banana Shower's bananas instead of the Juice Stream and Banana Shower";
             *(arguments + 4) = "-b, --beatmap [file]";
             *(arguments + 5) = "inputs the beatmap from the file location";
-            *(arguments + 6) = "-p, --points [x:time|...]";
-            *(arguments + 7) = "gives the points of the vector";
+            *(arguments + 6) = "-s, --shapes [x:time|...]";
+            *(arguments + 7) = "the points of the vector";
             *(arguments + 8) = "-d, --distance [time]";
             *(arguments + 9) = "gives the distance for the best Banana Shower";
             *(arguments + 10) = "-h, --help";
@@ -95,10 +96,23 @@ void args_main(bool *keep_running, int argc, char **argv) {
     if (predictor.output == NULL) {
         predictor.output = stdout;
     }
-    if (predictor.points_len < 3) {
+    if (predictor.beatmap == NULL) {
         *keep_running = false;
+        return;
+    }
+    if (predictor.shapes_len < 1) {
+        *keep_running = false;
+        return;
+    } else {
+        for (int i = 0; i < predictor.shapes_len; i++) {
+            if ((predictor.shapes + i)->len < 3) {
+                *keep_running = false;
+                return;
+            }
+        }
     }
     if (argument_404) {
         *keep_running = false;
+        return;
     }
 }
