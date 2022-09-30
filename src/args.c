@@ -1,7 +1,7 @@
 #include "args.h"
 
 void args_main(bool *keep_running, int argc, char **argv) {
-    if (argc < 1) {
+    if (argc < 2) {
         fprintf(stdout, "Use `-h` or check out the documentation if you need help.\n");
         *keep_running = false;
     }
