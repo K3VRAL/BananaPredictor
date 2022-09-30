@@ -1,8 +1,6 @@
 CC	= gcc
-# $(shell pkg-config --cflags osu)
-CFLAGS	= -Wall -c -Iinclude/ -g -I/usr/include/osu
-# $(shell pkg-config --libs osu)
-LFLAGS	= -losu
+CFLAGS	= -Wall -c -Iinclude/ -g $(shell pkg-config --cflags libosu)
+LFLAGS	= $(shell pkg-config --libs libosu)
 TARGET	= bnprdctr
 BINFLR	= bin/
 
