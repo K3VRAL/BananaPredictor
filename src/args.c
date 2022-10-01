@@ -15,7 +15,7 @@ void args_main(bool *keep_running, int argc, char **argv) {
 			predictor.output = fp;
 		} else if (strcmp(*(argv + i), "--prefer-circles") == 0) {
 			predictor.prefer_circles = true;
-	} else if (strcmp(*(argv + i), "--record-beatmap") == 0) {
+	} else if (strcmp(*(argv + i), "--record-objects") == 0) {
 		predictor.record_objects = true;
 	} else if (strcmp(*(argv + i), "-b") == 0 || strcmp(*(argv + i), "--beatmap") == 0) {
 			FILE *fp = fopen(*(argv + ++i), "r");
