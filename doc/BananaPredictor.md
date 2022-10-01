@@ -26,6 +26,12 @@ Outputs the given Banana Shower's bananas to circles (ignores Juice Streams). Th
 
 If argument is not used, it will be defaulted to `false`.
 
+## Record Objects (`--record-objects`) - Boolean
+
+Outputs enitre beatmap's objects as well.
+
+If argument is not used, it will be defaulted to `false`.
+
 ## Beatmap (`-b` or `--beatmap`) - String (file location)
 
 Uses the beatmap file as input for difficulty, timing point, and hit object values to reference from.

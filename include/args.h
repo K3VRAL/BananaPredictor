@@ -8,15 +8,15 @@
 #include "predictor.h"
 
 /*
-    Handling the arguments given from the input of the terminal
-    
-    return
-        void
-    argsreturn
-        bool *
-    args
-        int
-        char **
+	Handling the arguments given from the input of the terminal
+	
+	return
+		void
+	argsreturn
+		bool *
+	args
+		int
+		char **
 */
 void args_main(bool *, int, char **);
 
