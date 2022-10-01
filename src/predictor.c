@@ -93,8 +93,6 @@ void predictor_main(void) {
 		predictor_beatmap(&object, &object_len, &beatmap, start, end);
 	}
 
-	ooc_hitobject_sort(object, object_len);
-
 	if (predictor.output != stdout) {
 		predictor_progressbar(100);
 		fprintf(stdout, "\n");
