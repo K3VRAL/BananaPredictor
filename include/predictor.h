@@ -60,7 +60,7 @@ void predictor_main(void);
 		int *
 		int *
 */
-void predictor_points(int *, int *);
+void predictor_shapes(int *, int *);
 
 /*
 	Sets the values of the beatmap and the catch objects
@@ -74,7 +74,7 @@ void predictor_points(int *, int *);
 	args
 		int
 */
-void predictor_beatmap(CatchHitObject **, unsigned int *, Beatmap *, int, int);
+void predictor_beatmap(CatchHitObject **, unsigned int *, Beatmap *, int);
 
 /*
 	Prints out the progress bar in the terminal. Resizing the terminal will also resize the output
