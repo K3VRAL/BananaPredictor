@@ -50,11 +50,19 @@ The format for a point is `x:time|...`. It is mandatory that there is at least t
 
 If argument is not used, it will be defaulted to `NULL` and prevent the application from running. You also can stack the argument multiple times, allowing you to have multiple shapes.
 
+## Juice Points (`-j` or `--juice-points`) - String (formatted as `x:y|...`)
+
+The format for a point is `x:y|...`. It is mandatory that there is at least two points. The first point will always be the x and y coordinates for Juice Stream whereas the rest will be it's curve.
+
+If argument is not used, it will be defaulted to `NULL` and the default format will be used instead. You also can stack the argument multiple times, allowing you to have multiple Juice Streams.
+
+## Point format
+
 ### x - Integer
 
 Is the x-axis for the point. It can go from 0 to 256 as that's how wide osu maps can be.
 
-### time - Integer
+### time or y - Integer
 
 Is the time for the point relative to the spinner predictor's start time. If the point's time is bigger than the length of the spinner predictor, then the point's time will override it.
 

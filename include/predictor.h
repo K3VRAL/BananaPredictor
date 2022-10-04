@@ -21,23 +21,32 @@ typedef struct Coefficient {
 	double c;
 } Coefficient;
 
-typedef struct Point {
+typedef struct Vector {
 	float x;
-	float time;
-} Point;
+	union {
+		float time;
+		float y;
+	} ty;
+} Vector;
 
-typedef struct Shape {
-	Point *points;
+typedef struct Point {
+	Vector *vectors;
 	unsigned int len;
-} Shape;
+} Point;
 
 typedef struct Predictor {
 	FILE *output;
 	bool prefer_circles;
 	bool record_objects;
+
 	FILE *beatmap;
-	Shape *shapes;
+
+	Point *shapes;
 	unsigned int shapes_len;
+
+	Point *jspoints;
+	unsigned int jspoints_len;
+
 	double distance;
 } Predictor;
 
@@ -108,10 +117,10 @@ void predictor_areas(XLine **, unsigned int *, int);
 	argsreturn
 		Line *
 	args
-		Point
-		Point
+		Vector
+		Vector
 */
-void predictor_line(Coefficient *, Point, Point);
+void predictor_line(Coefficient *, Vector, Vector);
 
 /*
 	Calculating the Line of Intersection with Determinants
@@ -119,12 +128,12 @@ void predictor_line(Coefficient *, Point, Point);
 	return
 		void
 	argsreturn
-		Point ** - NULLABLE
+		Vector ** - NULLABLE
 	args
 		Line
 		Line
 */
-void predictor_intersection(Point **, Coefficient, Coefficient);
+void predictor_intersection(Vector **, Coefficient, Coefficient);
 // End of stackoverflow
 
 /*

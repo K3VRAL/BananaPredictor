@@ -15,49 +15,66 @@ void args_main(bool *keep_running, int argc, char **argv) {
 			predictor.output = fp;
 		} else if (strcmp(*(argv + i), "--prefer-circles") == 0) {
 			predictor.prefer_circles = true;
-	} else if (strcmp(*(argv + i), "--record-objects") == 0) {
-		predictor.record_objects = true;
-	} else if (strcmp(*(argv + i), "-b") == 0 || strcmp(*(argv + i), "--beatmap") == 0) {
+		} else if (strcmp(*(argv + i), "--record-objects") == 0) {
+			predictor.record_objects = true;
+		} else if (strcmp(*(argv + i), "-b") == 0 || strcmp(*(argv + i), "--beatmap") == 0) {
 			FILE *fp = fopen(*(argv + ++i), "r");
 			if (fp == NULL) {
 				continue;
 			}
 			predictor.beatmap = fp;
+		} else if (strcmp(*(argv + i), "-d") == 0 || strcmp(*(argv + i), "--distance") == 0) {
+			predictor.distance = strtod(*(argv + ++i), NULL);
 		} else if (strcmp(*(argv + i), "-s") == 0 || strcmp(*(argv + i), "--shapes") == 0) {
 			char *copy = strdup(*(argv + ++i));
 			char *token = strtok(*(argv + i), ":|\0");
-			enum {
-				x,
-				time,
-			} type;
 			char used_delim = '\0';
 			predictor.shapes = realloc(predictor.shapes, (++predictor.shapes_len) * sizeof(*predictor.shapes));
-			(predictor.shapes + predictor.shapes_len - 1)->points = NULL;
+			(predictor.shapes + predictor.shapes_len - 1)->vectors = NULL;
 			(predictor.shapes + predictor.shapes_len - 1)->len = 0;
 			while (token != NULL) {
 				if (used_delim == '|' || (predictor.shapes + predictor.shapes_len - 1)->len == 0) {
-					(predictor.shapes + predictor.shapes_len - 1)->points = realloc((predictor.shapes + predictor.shapes_len - 1)->points, ++(predictor.shapes + predictor.shapes_len - 1)->len * sizeof(*(predictor.shapes + predictor.shapes_len - 1)->points));
-					type = x;
+					(predictor.shapes + predictor.shapes_len - 1)->vectors = realloc((predictor.shapes + predictor.shapes_len - 1)->vectors, ++(predictor.shapes + predictor.shapes_len - 1)->len * sizeof(*(predictor.shapes + predictor.shapes_len - 1)->vectors));
 				}
-				switch (type) {
-					case x:
-						((predictor.shapes + predictor.shapes_len - 1)->points + (predictor.shapes + predictor.shapes_len - 1)->len - 1)->x = strtol(token, NULL, 10);
-						type = time;
+				switch (used_delim) {
+					case '\0':
+					case '|':
+						((predictor.shapes + predictor.shapes_len - 1)->vectors + (predictor.shapes + predictor.shapes_len - 1)->len - 1)->x = strtol(token, NULL, 10);
 						break;
 
-					case time:
-						((predictor.shapes + predictor.shapes_len - 1)->points + (predictor.shapes + predictor.shapes_len - 1)->len - 1)->time = strtol(token, NULL, 10);
-						type = x; // Why not
+					case ':':
+						((predictor.shapes + predictor.shapes_len - 1)->vectors + (predictor.shapes + predictor.shapes_len - 1)->len - 1)->ty.time = strtol(token, NULL, 10);
 						break;
 				}
 				used_delim = *(copy + (token - *(argv + i) + strlen(token)));
 				token = strtok(NULL, ":|\0");
 			}
 			free(copy);
-		} else if (strcmp(*(argv + i), "-d") == 0 || strcmp(*(argv + i), "--distance") == 0) {
-			predictor.distance = strtod(*(argv + ++i), NULL);
-		} else if (strcmp(*(argv + i), "-p") == 0 || strcmp(*(argv + i), "--placement") == 0) {
-			// TODO
+		} else if (strcmp(*(argv + i), "-j") == 0 || strcmp(*(argv + i), "--juice-points") == 0) {
+			char *copy = strdup(*(argv + ++i));
+			char *token = strtok(*(argv + i), ":|\0");
+			char used_delim = '\0';
+			predictor.jspoints = realloc(predictor.jspoints, (++predictor.jspoints_len) * sizeof(*predictor.jspoints));
+			(predictor.jspoints + predictor.jspoints_len - 1)->vectors = NULL;
+			(predictor.jspoints + predictor.jspoints_len - 1)->len = 0;
+			while (token != NULL) {
+				if (used_delim == '|' || (predictor.jspoints + predictor.jspoints_len - 1)->len == 0) {
+					(predictor.jspoints + predictor.jspoints_len - 1)->vectors = realloc((predictor.jspoints + predictor.jspoints_len - 1)->vectors, ++(predictor.jspoints + predictor.jspoints_len - 1)->len * sizeof(*(predictor.jspoints + predictor.jspoints_len - 1)->vectors));
+				}
+				switch (used_delim) {
+					case '\0':
+					case '|':
+						((predictor.jspoints + predictor.jspoints_len - 1)->vectors + (predictor.jspoints + predictor.jspoints_len - 1)->len - 1)->x = strtol(token, NULL, 10);
+						break;
+
+					case ':':
+						((predictor.jspoints + predictor.jspoints_len - 1)->vectors + (predictor.jspoints + predictor.jspoints_len - 1)->len - 1)->ty.y = strtol(token, NULL, 10);
+						break;
+				}
+				used_delim = *(copy + (token - *(argv + i) + strlen(token)));
+				token = strtok(NULL, ":|\0");
+			}
+			free(copy);
 		} else if (strcmp(*(argv + i), "-h") == 0 || strcmp(*(argv + i), "--help") == 0) {
 			char *title = "K 3 V R A L's BananaPredictor";
 			fprintf(stdout, "%s\n\n", title);
@@ -65,20 +82,17 @@ void args_main(bool *keep_running, int argc, char **argv) {
 			char *usage = "bnprdctr [arguments]";
 			fprintf(stdout, "usage:\n\t%s\n\n", usage);
 
-			unsigned int arguments_num = 6 * 2;
-			char **arguments = calloc(arguments_num, sizeof(*arguments));
-			*(arguments + 0) = "-o, --output [file]";
-			*(arguments + 1) = "outputs the BananaPredictor to the file location";
-			*(arguments + 2) = "--prefer-circles";
-			*(arguments + 3) = "outputs the Banana Shower's bananas instead of the Juice Stream and Banana Shower";
-			*(arguments + 4) = "-b, --beatmap [file]";
-			*(arguments + 5) = "inputs the beatmap from the file location";
-			*(arguments + 6) = "-s, --shapes [x:time|...]";
-			*(arguments + 7) = "the points of the vector";
-			*(arguments + 8) = "-d, --distance [time]";
-			*(arguments + 9) = "gives the distance for the best Banana Shower";
-			*(arguments + 10) = "-h, --help";
-			*(arguments + 11) = "gives this help message";
+			unsigned int arguments_num = 8 * 2;
+			char *arguments[8 * 2] = {
+				"-o, --output [file]", "outputs the BananaPredictor to the file location",
+				"--prefer-circles", "outputs the Banana Shower's bananas instead of the Juice Stream and Banana Shower",
+				"--record-objects", "records and outputs the entire map file",
+				"-b, --beatmap [file]", "inputs the beatmap from the file location",
+				"-d, --distance [time]", "gives the distance for the best Banana Shower",
+				"-s, --shapes [x:time|...]", "the points for the vector of the shape",
+				"-j, --juice-points [x:y|...]", "the points for the vector of the Juice Streams",
+				"-h, --help", "gives this help message"
+			};
 			fprintf(stdout, "arguments:\n");
 			
 			// For the spaces
@@ -95,7 +109,6 @@ void args_main(bool *keep_running, int argc, char **argv) {
 				int num = space_num - strlen(*(arguments + j)) + 1;
 				fprintf(stdout, "\t%s%*c%s\n", *(arguments + j), num, ' ', *(arguments + j + 1));
 			}
-			free(arguments);
 		} else {
 			fprintf(stdout, "Argument not found: %s\n", *(argv + i));
 			argument_404 = true;
@@ -108,12 +121,28 @@ void args_main(bool *keep_running, int argc, char **argv) {
 		*keep_running = false;
 		return;
 	}
-	if (predictor.shapes_len < 1) {
+	if (predictor.shapes == NULL) {
 		*keep_running = false;
 		return;
 	} else {
 		for (int i = 0; i < predictor.shapes_len; i++) {
 			if ((predictor.shapes + i)->len < 3) {
+				*keep_running = false;
+				return;
+			}
+		}
+	}
+	if (predictor.jspoints == NULL) {
+		predictor.jspoints = calloc(++predictor.jspoints_len, sizeof(*predictor.jspoints));
+		(predictor.jspoints + 0)->len = 2;
+		(predictor.jspoints + 0)->vectors = calloc((predictor.jspoints + 0)->len, sizeof(*(predictor.jspoints + 0)->vectors));
+		((predictor.jspoints + 0)->vectors + 0)->x = 256;
+		((predictor.jspoints + 0)->vectors + 0)->ty.y = 384;
+		((predictor.jspoints + 0)->vectors + 1)->x = 256;
+		((predictor.jspoints + 0)->vectors + 1)->ty.y = 0;
+	} else {
+		for (int i = 0; i < predictor.jspoints_len; i++) {
+			if ((predictor.jspoints + i)->len < 2) {
 				*keep_running = false;
 				return;
 			}
