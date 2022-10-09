@@ -48,20 +48,23 @@ void predictor_main(void) {
 		}
 		
 		// Getting current time
+		bool is_shape = false;
 		int time = INT_MAX;
 		if (beatmap.num_ho >= i && beatmap.hit_objects != NULL) {
 			time = (beatmap.hit_objects + i)->time;
+			is_shape = false;
 		}
 		if (time > (int) j) {
 			time = (int) j;
+			is_shape = true;
 		}
 		
 		// Evaluating BananaPredictor
-		if (time >= shapes_start && time < shapes_end) {
+		if (is_shape && time >= shapes_start && time < shapes_end) {
 			// Recording the areas of the x-axis at the current time which can place the bananas
 			unsigned int lines_num = 0;
 			XLine *lines = NULL;
-			predictor_areas(&lines, &lines_num, (int) j);
+			predictor_areas(&lines, &lines_num, time);
 
 			// Make a variable to store the new objects and house the Banana Shower
 			unsigned int bnpd_len = 0;
@@ -133,9 +136,18 @@ void predictor_shapes(int *shapes_start, int *shapes_end) {
 	*shapes_start = INT_MAX;
 	*shapes_end = INT_MIN;
 	for (int i = 0; i < predictor.shapes_len; i++) {
+		(predictor.shapes + i)->start = INT_MAX;
+		(predictor.shapes + i)->end = INT_MIN;
 		for (int j = 0; j < (predictor.shapes + i)->len; j++) {
+			if (((predictor.shapes + i)->vectors + j)->ty.time < (predictor.shapes + i)->start) {
+				(predictor.shapes + i)->start = ((predictor.shapes + i)->vectors + j)->ty.time;
+			}
 			if (((predictor.shapes + i)->vectors + j)->ty.time < *shapes_start) {
 				*shapes_start = ((predictor.shapes + i)->vectors + j)->ty.time;
+			}
+
+			if (((predictor.shapes + i)->vectors + j)->ty.time > (predictor.shapes + i)->end) {
+				(predictor.shapes + i)->end = ((predictor.shapes + i)->vectors + j)->ty.time;
 			}
 			if (((predictor.shapes + i)->vectors + j)->ty.time > *shapes_end) {
 				*shapes_end = ((predictor.shapes + i)->vectors + j)->ty.time;
@@ -185,6 +197,9 @@ void predictor_progressbar(unsigned int percent) {
 
 void predictor_areas(XLine **lines, unsigned int *lines_num, int time) {
 	for (int i = 0; i < predictor.shapes_len; i++) {
+		if (!(time >= (predictor.shapes + i)->start && time < (predictor.shapes + i)->end)) { // TODO remove
+			continue;
+		}
 		*lines = realloc(*lines, ++(*lines_num) * sizeof(**lines));
 		(*lines + *lines_num - 1)->len = 1;
 		(*lines + *lines_num - 1)->areas = calloc((*lines + *lines_num - 1)->len, sizeof(*(*lines + *lines_num - 1)->areas));
@@ -244,11 +259,12 @@ void predictor_intersection(Vector **r, Coefficient c1, Coefficient c2) {
 }
 
 void predictor_generatejs(CatchHitObject **bnpd, unsigned int *bnpd_len, int start_time, int end_time, Beatmap beatmap) {
+	// TODO fix issue where Juice Stream is over the end time
+	// TODO change -j/--juice-points not to be the literal points for the Juice Streams but to be referenced on the progression of the BananaPredictor
 	// TODO Figure out how to make optimisations/allow for the best of both worlds for the current optimisations
 	// 1 - smallest being 3 nested objects  (easier load but more population)
 	// 2 - biggest hitting the end time     (less population but load at end of bnprdctr)
 
-	// TODO fix issue where Juice Stream is over the end time
 	static unsigned int index = 0;
 	HitObject slider_hit_object = {
 		.x = ((predictor.jspoints + index)->vectors + 0)->x,

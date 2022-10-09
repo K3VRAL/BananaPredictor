@@ -32,6 +32,9 @@ typedef struct Vector {
 typedef struct Point {
 	Vector *vectors;
 	unsigned int len;
+
+	int start;
+	int end;
 } Point;
 
 typedef struct Predictor {
