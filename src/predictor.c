@@ -197,7 +197,7 @@ void predictor_progressbar(unsigned int percent) {
 
 void predictor_areas(XLine **lines, unsigned int *lines_num, int time) {
 	for (int i = 0; i < predictor.shapes_len; i++) {
-		if (!(time >= (predictor.shapes + i)->start && time < (predictor.shapes + i)->end)) { // TODO remove
+		if (!(time >= (predictor.shapes + i)->start && time < (predictor.shapes + i)->end)) {
 			continue;
 		}
 		*lines = realloc(*lines, ++(*lines_num) * sizeof(**lines));
