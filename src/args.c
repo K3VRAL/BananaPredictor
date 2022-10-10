@@ -76,7 +76,7 @@ void args_main(bool *keep_running, int argc, char **argv) {
 			}
 			free(copy);
 		} else if (strcmp(*(argv + i), "-h") == 0 || strcmp(*(argv + i), "--help") == 0) {
-			char *title = "K 3 V R A L's BananaPredictor";
+			char *title = "BananaPredictor";
 			fprintf(stdout, "%s\n\n", title);
 			
 			char *usage = "bnprdctr [arguments]";
