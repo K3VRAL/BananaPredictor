@@ -73,15 +73,14 @@ void predictor_main(void) {
 			ooc_bananashower_createnestedbananas((bnpd + 0));
 
 			while (true) {
-				// Generate new Juice Stream or, if previous object is a Juice Stream, expand on said Juice Stream
-				predictor_generatejs(&bnpd, &bnpd_len, (int) j, shapes_end, beatmap);
-
 				// Apply the RNG to the new objects
 				LegacyRandom test_rng = rng;
 				ooc_processor_applypositionoffsetrng(bnpd, bnpd_len, &test_rng, false);
 
-				// Check if they are within the areas we wanted them to be in; if not, we repeat the loop
+				// Check if they are within the areas we wanted them to be in; if not, we generate the Juice Stream and repeat the loop
 				if (!predictor_breakout(lines, lines_num, bnpd, bnpd_len)) {
+					// Create new Juice Stream or, if previous object is a Juice Stream, expand on said Juice Stream
+					predictor_generatejs(&bnpd, &bnpd_len, (int) j, shapes_end, beatmap);
 					continue;
 				}
 
