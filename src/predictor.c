@@ -1,5 +1,7 @@
 #include "predictor.h"
 
+// TODO fix errors with generated with valgrind in BananaPredictor and libosu
+
 Predictor predictor = {
 	.output = NULL,
 	.prefer_circles = false,
@@ -204,6 +206,7 @@ void predictor_areas(XLine **lines, unsigned int *lines_num, int time) {
 		(*lines + *lines_num - 1)->areas = calloc((*lines + *lines_num - 1)->len, sizeof(*(*lines + *lines_num - 1)->areas));
 		*((*lines + *lines_num - 1)->areas + (*lines + *lines_num - 1)->len - 1) = 0;
 		for (int j = 0; j < (predictor.shapes + i)->len; j++) {
+			// TODO Not sure if using Cramer's Rule is correct because it seems if vector's time is same then it just failed; do more testing
 			Coefficient c1;
 			Vector p1_l1 = *((predictor.shapes + i)->vectors + j);
 			Vector p2_l1 = j != (predictor.shapes + i)->len - 1 ? *((predictor.shapes + i)->vectors + j + 1) : *((predictor.shapes + i)->vectors + 0);
