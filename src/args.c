@@ -30,20 +30,20 @@ void args_main(bool *keep_running, int argc, char **argv) {
 			char *token = strtok(*(argv + i), ":|\0");
 			char used_delim = '\0';
 			predictor.shapes = realloc(predictor.shapes, (++predictor.shapes_len) * sizeof(*predictor.shapes));
-			(predictor.shapes + predictor.shapes_len - 1)->vectors = NULL;
-			(predictor.shapes + predictor.shapes_len - 1)->len = 0;
+			(predictor.shapes + predictor.shapes_len - 1)->points.vectors = NULL;
+			(predictor.shapes + predictor.shapes_len - 1)->points.len = 0;
 			while (token != NULL) {
-				if (used_delim == '|' || (predictor.shapes + predictor.shapes_len - 1)->len == 0) {
-					(predictor.shapes + predictor.shapes_len - 1)->vectors = realloc((predictor.shapes + predictor.shapes_len - 1)->vectors, ++(predictor.shapes + predictor.shapes_len - 1)->len * sizeof(*(predictor.shapes + predictor.shapes_len - 1)->vectors));
+				if (used_delim == '|' || (predictor.shapes + predictor.shapes_len - 1)->points.len == 0) {
+					(predictor.shapes + predictor.shapes_len - 1)->points.vectors = realloc((predictor.shapes + predictor.shapes_len - 1)->points.vectors, ++(predictor.shapes + predictor.shapes_len - 1)->points.len * sizeof(*(predictor.shapes + predictor.shapes_len - 1)->points.vectors));
 				}
 				switch (used_delim) {
 					case '\0':
 					case '|':
-						((predictor.shapes + predictor.shapes_len - 1)->vectors + (predictor.shapes + predictor.shapes_len - 1)->len - 1)->x = strtol(token, NULL, 10);
+						((predictor.shapes + predictor.shapes_len - 1)->points.vectors + (predictor.shapes + predictor.shapes_len - 1)->points.len - 1)->x = strtol(token, NULL, 10);
 						break;
 
 					case ':':
-						((predictor.shapes + predictor.shapes_len - 1)->vectors + (predictor.shapes + predictor.shapes_len - 1)->len - 1)->ty.time = strtol(token, NULL, 10);
+						((predictor.shapes + predictor.shapes_len - 1)->points.vectors + (predictor.shapes + predictor.shapes_len - 1)->points.len - 1)->ty.time = strtol(token, NULL, 10);
 						break;
 				}
 				used_delim = *(copy + (token - *(argv + i) + strlen(token)));
@@ -55,20 +55,20 @@ void args_main(bool *keep_running, int argc, char **argv) {
 			char *token = strtok(*(argv + i), ":|\0");
 			char used_delim = '\0';
 			predictor.jspoints = realloc(predictor.jspoints, (++predictor.jspoints_len) * sizeof(*predictor.jspoints));
-			(predictor.jspoints + predictor.jspoints_len - 1)->vectors = NULL;
-			(predictor.jspoints + predictor.jspoints_len - 1)->len = 0;
+			(predictor.jspoints + predictor.jspoints_len - 1)->points.vectors = NULL;
+			(predictor.jspoints + predictor.jspoints_len - 1)->points.len = 0;
 			while (token != NULL) {
-				if (used_delim == '|' || (predictor.jspoints + predictor.jspoints_len - 1)->len == 0) {
-					(predictor.jspoints + predictor.jspoints_len - 1)->vectors = realloc((predictor.jspoints + predictor.jspoints_len - 1)->vectors, ++(predictor.jspoints + predictor.jspoints_len - 1)->len * sizeof(*(predictor.jspoints + predictor.jspoints_len - 1)->vectors));
+				if (used_delim == '|' || (predictor.jspoints + predictor.jspoints_len - 1)->points.len == 0) {
+					(predictor.jspoints + predictor.jspoints_len - 1)->points.vectors = realloc((predictor.jspoints + predictor.jspoints_len - 1)->points.vectors, ++(predictor.jspoints + predictor.jspoints_len - 1)->points.len * sizeof(*(predictor.jspoints + predictor.jspoints_len - 1)->points.vectors));
 				}
 				switch (used_delim) {
 					case '\0':
 					case '|':
-						((predictor.jspoints + predictor.jspoints_len - 1)->vectors + (predictor.jspoints + predictor.jspoints_len - 1)->len - 1)->x = strtol(token, NULL, 10);
+						((predictor.jspoints + predictor.jspoints_len - 1)->points.vectors + (predictor.jspoints + predictor.jspoints_len - 1)->points.len - 1)->x = strtol(token, NULL, 10);
 						break;
 
 					case ':':
-						((predictor.jspoints + predictor.jspoints_len - 1)->vectors + (predictor.jspoints + predictor.jspoints_len - 1)->len - 1)->ty.y = strtol(token, NULL, 10);
+						((predictor.jspoints + predictor.jspoints_len - 1)->points.vectors + (predictor.jspoints + predictor.jspoints_len - 1)->points.len - 1)->ty.y = strtol(token, NULL, 10);
 						break;
 				}
 				used_delim = *(copy + (token - *(argv + i) + strlen(token)));
@@ -88,7 +88,7 @@ void args_main(bool *keep_running, int argc, char **argv) {
 				"--prefer-circles", "outputs the Banana Shower's bananas instead of the Juice Stream and Banana Shower",
 				"--record-objects", "records and outputs the entire map file",
 				"-b, --beatmap [file]", "inputs the beatmap from the file location",
-				"-d, --distance [time]", "gives the distance for the best Banana Shower",
+				"-d, --distance [time]", "gives the distance for each Banana Shower as a double",
 				"-s, --shapes [x:time|...]", "the points for the vector of the shape",
 				"-j, --juice-points [x:y|...]", "the points for the vector of the Juice Streams",
 				"-h, --help", "gives this help message"
@@ -126,7 +126,7 @@ void args_main(bool *keep_running, int argc, char **argv) {
 		return;
 	} else {
 		for (int i = 0; i < predictor.shapes_len; i++) {
-			if ((predictor.shapes + i)->len < 3) {
+			if ((predictor.shapes + i)->points.len < 3) {
 				*keep_running = false;
 				return;
 			}
@@ -134,15 +134,15 @@ void args_main(bool *keep_running, int argc, char **argv) {
 	}
 	if (predictor.jspoints == NULL) {
 		predictor.jspoints = calloc(++predictor.jspoints_len, sizeof(*predictor.jspoints));
-		(predictor.jspoints + 0)->len = 2;
-		(predictor.jspoints + 0)->vectors = calloc((predictor.jspoints + 0)->len, sizeof(*(predictor.jspoints + 0)->vectors));
-		((predictor.jspoints + 0)->vectors + 0)->x = 256;
-		((predictor.jspoints + 0)->vectors + 0)->ty.y = 384;
-		((predictor.jspoints + 0)->vectors + 1)->x = 256;
-		((predictor.jspoints + 0)->vectors + 1)->ty.y = 0;
+		(predictor.jspoints + 0)->points.len = 2;
+		(predictor.jspoints + 0)->points.vectors = calloc((predictor.jspoints + 0)->points.len, sizeof(*(predictor.jspoints + 0)->points.vectors));
+		((predictor.jspoints + 0)->points.vectors + 0)->x = 256;
+		((predictor.jspoints + 0)->points.vectors + 0)->ty.y = 384;
+		((predictor.jspoints + 0)->points.vectors + 1)->x = 256;
+		((predictor.jspoints + 0)->points.vectors + 1)->ty.y = 0;
 	} else {
 		for (int i = 0; i < predictor.jspoints_len; i++) {
-			if ((predictor.jspoints + i)->len < 2) {
+			if ((predictor.jspoints + i)->points.len < 2) {
 				*keep_running = false;
 				return;
 			}

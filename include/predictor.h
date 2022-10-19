@@ -32,10 +32,18 @@ typedef struct Vector {
 typedef struct Point {
 	Vector *vectors;
 	unsigned int len;
+} Point;
 
+typedef struct ShapePoints {
+	Point points;
 	int start;
 	int end;
-} Point;
+} ShapePoints;
+
+typedef struct JuiceStreamPoints {
+	Point points;
+	// char *type; // TODO allow for the user to change types of the slider
+} JuiceStreamPoints;
 
 typedef struct Predictor {
 	FILE *output;
@@ -44,10 +52,10 @@ typedef struct Predictor {
 
 	FILE *beatmap;
 
-	Point *shapes;
+	ShapePoints *shapes;
 	unsigned int shapes_len;
 
-	Point *jspoints;
+	JuiceStreamPoints *jspoints;
 	unsigned int jspoints_len;
 
 	double distance;
@@ -73,20 +81,6 @@ void predictor_main(void);
 		int *
 */
 void predictor_shapes(int *, int *);
-
-/*
-	Sets the values of the beatmap and the catch objects
-
-	return
-		void
-	argsreturn
-		CatchHitObject **
-		unsigned int *
-		Beatmap *
-	args
-		int
-*/
-void predictor_beatmap(CatchHitObject **, unsigned int *, Beatmap *, int);
 
 /*
 	Prints out the progress bar in the terminal. Resizing the terminal will also resize the output
@@ -118,7 +112,7 @@ void predictor_areas(XLine **, unsigned int *, int);
 	return
 		void
 	argsreturn
-		Line *
+		Coefficient *
 	args
 		Vector
 		Vector
@@ -131,7 +125,7 @@ void predictor_line(Coefficient *, Vector, Vector);
 	return
 		void
 	argsreturn
-		Vector ** - NULLABLE
+		Vector **
 	args
 		Line
 		Line
@@ -160,7 +154,7 @@ void predictor_generatejs(CatchHitObject **, unsigned int *, int, int, Beatmap);
 	return
 		bool
 	args
-		unsigned short *
+		XLine *
 		unsigned int
 		CatchHitObject *
 		unsigned int
@@ -168,20 +162,31 @@ void predictor_generatejs(CatchHitObject **, unsigned int *, int, int, Beatmap);
 bool predictor_breakout(XLine *, unsigned int, CatchHitObject *, unsigned int);
 
 /*
-	Stores the objects and amount of them including the new rng for future reference
+	Gets the values of the beatmap and svaes rng based on the converted catch object
 
 	return
 		void
 	argsreturn
-		CatchHitObject **
-		unsigned int *
+		LegacyRandom *
+	args
+		Beatmap *
+		int
+*/
+void predictor_beatmap(LegacyRandom *, Beatmap *, int);
+
+/*
+	Output the object generated and saves the rng
+
+	return
+		void
+	argsreturn
 		LegacyRandom *
 	args
 		LegacyRandom
 		CatchHitObject *
 		unsigned int
 */
-void predictor_storeobjects(CatchHitObject **, unsigned int *, LegacyRandom *, CatchHitObject *, unsigned int, LegacyRandom);
+void predictor_saverng(LegacyRandom *, CatchHitObject *, unsigned int, LegacyRandom);
 
 /*
 	Outputs data
@@ -189,9 +194,8 @@ void predictor_storeobjects(CatchHitObject **, unsigned int *, LegacyRandom *, C
 	return
 		void
 	args
-		CatchHitObject *
-		unsigned int
+		CatchHitObject
 */
-void predictor_output(CatchHitObject *, unsigned int);
+void predictor_output(CatchHitObject);
 
 #endif

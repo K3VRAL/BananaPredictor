@@ -20,16 +20,16 @@ int main(int argc, char **argv) {
 	}
 	if (predictor.shapes != NULL) {
 		for (int i = 0; i < predictor.shapes_len; i++) {
-			if ((predictor.shapes + i)->vectors != NULL) {
-				free((predictor.shapes + i)->vectors);
+			if ((predictor.shapes + i)->points.vectors != NULL) {
+				free((predictor.shapes + i)->points.vectors);
 			}
 		}
 		free(predictor.shapes);
 	}
 	if (predictor.jspoints != NULL) {
 		for (int i = 0; i < predictor.jspoints_len; i++) {
-			if ((predictor.jspoints + i)->vectors != NULL) {
-				free((predictor.jspoints + i)->vectors);
+			if ((predictor.jspoints + i)->points.vectors != NULL) {
+				free((predictor.jspoints + i)->points.vectors);
 			}
 		}
 		free(predictor.jspoints);

@@ -14,18 +14,17 @@ all:	$(TARGET)
 $(TARGET): $(addsuffix .o, $(basename $(shell find include/ -type f -name "*.h" | grep -Po '(?<=include/).*' | sed 's/^/src\//')))
 	$(CC) -o $(BINFLR)$@ $(addprefix $(BINFLR), $(notdir $^)) $(LFLAGS)
 
-# TODO man pages
 # Install
 install:
-	$(shell rm -rf /usr/local/bin/$(TARGET))
+	$(uninstall)
 	$(shell cp ./bin/bnprdctr /usr/local/bin/$(TARGET))
-	$(shell rm -rf /usr/bin/$(TARGET))
+	$(shell chmod 755 /usr/local/bin/$(TARGET))
 	$(shell ln -s /usr/local/bin/$(TARGET) /usr/bin/)
 
 # Uninstall
 uninstall:
 	$(shell rm -rf /usr/local/bin/$(TARGET))
-	$(shell rm -rf /usr/bin/$(TARGET))
+	$(shell unlink /usr/bin/$(TARGET))
 
 # Make bin/ folder
 $(BINFLR):

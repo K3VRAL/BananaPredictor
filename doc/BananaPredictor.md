@@ -38,7 +38,7 @@ Uses the beatmap file as input for difficulty, timing point, and hit object valu
 
 If argument is not used, it will be defaulted to `NULL` and prevent the application from running.
 
-## Distance (`-d` or `--distance`) - Unsigned Integer
+## Distance (`-d` or `--distance`) - Double
 
 Allows for the distance for each Banana Shower. Since Banana Showers and Juice Streams requires a lot of load, this can be reduced by spreading the them out.
 

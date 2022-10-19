@@ -1,6 +1,6 @@
 #include "predictor.h"
 
-// TODO fix errors with generated with valgrind in BananaPredictor and libosu
+// TODO fix errors with generated with valgrind in libosu `slider.c:462`
 
 Predictor predictor = {
 	.output = NULL,
@@ -19,10 +19,6 @@ Predictor predictor = {
 };
 
 void predictor_main(void) {
-	// Store all `HitObjects` and create their nested objects
-	CatchHitObject *object = NULL;
-	unsigned int object_len = 0;
-
 	// Evaluate Objects and RNG from the Beatmap
 	if (predictor.beatmap == NULL) {
 		return;
@@ -52,7 +48,7 @@ void predictor_main(void) {
 		// Getting current time
 		bool is_shape = false;
 		int time = INT_MAX;
-		if (beatmap.num_ho >= i && beatmap.hit_objects != NULL) {
+		if (beatmap.num_ho > i && beatmap.hit_objects != NULL) {
 			time = (beatmap.hit_objects + i)->time;
 			is_shape = false;
 		}
@@ -71,7 +67,19 @@ void predictor_main(void) {
 			// Make a variable to store the new objects and house the Banana Shower
 			unsigned int bnpd_len = 0;
 			CatchHitObject *bnpd = calloc(++bnpd_len, sizeof(*bnpd));
-			ooc_bananashower_init((bnpd + 0), (HitObject){ .x = 256, .y = 192, .time = (int) j, .type = spinner, .hit_sound = 0, .ho.spinner.end_time = (int) j + 1, .hit_sample = {0} });
+			HitObject *bnpd_shower = calloc(1, sizeof(*bnpd_shower));
+			bnpd_shower->x = 256;
+			bnpd_shower->y = 192;
+			bnpd_shower->time = (int) j;
+			bnpd_shower->type = spinner;
+			bnpd_shower->hit_sound = 0;
+			bnpd_shower->ho.spinner.end_time = (int) j + 1;
+			bnpd_shower->hit_sample.normal_set = 0;
+			bnpd_shower->hit_sample.addition_set = 0;
+			bnpd_shower->hit_sample.index = 0;
+			bnpd_shower->hit_sample.volume = 0;
+			bnpd_shower->hit_sample.filename = NULL;
+			ooc_bananashower_init((bnpd + 0), bnpd_shower);
 			ooc_bananashower_createnestedbananas((bnpd + 0));
 
 			while (true) {
@@ -86,13 +94,13 @@ void predictor_main(void) {
 					continue;
 				}
 
-				// Stores the objects
-				predictor_storeobjects(&object, &object_len, &rng, bnpd, bnpd_len, test_rng);
+				// Saves the rng and outputs the current saved data
+				predictor_saverng(&rng, bnpd, bnpd_len, test_rng);
 				break;
 			}
 
 			if (bnpd != NULL) {
-				free(bnpd);
+				ooc_hitobject_freebulk(bnpd, bnpd_len);
 			}
 			if (lines != NULL) {
 				for (int j = 0; j < lines_num; j++) {
@@ -106,18 +114,8 @@ void predictor_main(void) {
 			continue;
 		}
 
-		if (predictor.record_objects) {
-			// Store all objects
-			predictor_beatmap(&object, &object_len, &beatmap, i);
-			ooc_processor_applypositionoffsetrngstarttime(object, i, i + 1, &rng, false);
-		} else {
-			// Store temporary objects them remove it
-			CatchHitObject *temp = NULL;
-			unsigned int len = 0;
-			predictor_beatmap(&temp, &len, &beatmap, i);
-			ooc_processor_applypositionoffsetrngstarttime(temp, 0, len, &rng, false);
-			ooc_hitobject_freebulk(temp, len);
-		}
+		// Processes next object in beatmap
+		predictor_beatmap(&rng, &beatmap, i);
 		i++;
 	}
 	if (predictor.output != stdout) {
@@ -125,11 +123,8 @@ void predictor_main(void) {
 		fprintf(stdout, "\n");
 	}
 
-	// Write to output
-	predictor_output(object, object_len);
 
 	// Free
-	ooc_hitobject_freebulk(object, object_len);
 	of_beatmap_free(beatmap);
 }
 
@@ -139,43 +134,21 @@ void predictor_shapes(int *shapes_start, int *shapes_end) {
 	for (int i = 0; i < predictor.shapes_len; i++) {
 		(predictor.shapes + i)->start = INT_MAX;
 		(predictor.shapes + i)->end = INT_MIN;
-		for (int j = 0; j < (predictor.shapes + i)->len; j++) {
-			if (((predictor.shapes + i)->vectors + j)->ty.time < (predictor.shapes + i)->start) {
-				(predictor.shapes + i)->start = ((predictor.shapes + i)->vectors + j)->ty.time;
+		for (int j = 0; j < (predictor.shapes + i)->points.len; j++) {
+			if (((predictor.shapes + i)->points.vectors + j)->ty.time < (predictor.shapes + i)->start) {
+				(predictor.shapes + i)->start = ((predictor.shapes + i)->points.vectors + j)->ty.time;
 			}
-			if (((predictor.shapes + i)->vectors + j)->ty.time < *shapes_start) {
-				*shapes_start = ((predictor.shapes + i)->vectors + j)->ty.time;
+			if (((predictor.shapes + i)->points.vectors + j)->ty.time < *shapes_start) {
+				*shapes_start = ((predictor.shapes + i)->points.vectors + j)->ty.time;
 			}
 
-			if (((predictor.shapes + i)->vectors + j)->ty.time > (predictor.shapes + i)->end) {
-				(predictor.shapes + i)->end = ((predictor.shapes + i)->vectors + j)->ty.time;
+			if (((predictor.shapes + i)->points.vectors + j)->ty.time > (predictor.shapes + i)->end) {
+				(predictor.shapes + i)->end = ((predictor.shapes + i)->points.vectors + j)->ty.time;
 			}
-			if (((predictor.shapes + i)->vectors + j)->ty.time > *shapes_end) {
-				*shapes_end = ((predictor.shapes + i)->vectors + j)->ty.time;
+			if (((predictor.shapes + i)->points.vectors + j)->ty.time > *shapes_end) {
+				*shapes_end = ((predictor.shapes + i)->points.vectors + j)->ty.time;
 			}
 		}
-	}
-}
-
-void predictor_beatmap(CatchHitObject **object, unsigned int *object_len, Beatmap *beatmap, int index) {
-	*object = realloc(*object, ++*object_len * sizeof(**object));
-	switch ((beatmap->hit_objects + index)->type) {
-		case circle:
-		case nc_circle:
-			ooc_fruit_init((*object + *object_len - 1), *(beatmap->hit_objects + index));
-			break;
-
-		case slider:
-		case nc_slider:
-			ooc_juicestream_initwslidertp((*object + *object_len - 1), beatmap->difficulty, beatmap->timing_points, beatmap->num_tp, *(beatmap->hit_objects + index));
-			ooc_juicestream_createnestedjuice((*object + *object_len - 1));
-			break;
-		
-		case spinner:
-		case nc_spinner:
-			ooc_bananashower_init((*object + *object_len - 1), *(beatmap->hit_objects + index));
-			ooc_bananashower_createnestedbananas((*object + *object_len - 1));
-			break;
 	}
 }
 
@@ -205,11 +178,11 @@ void predictor_areas(XLine **lines, unsigned int *lines_num, int time) {
 		(*lines + *lines_num - 1)->len = 1;
 		(*lines + *lines_num - 1)->areas = calloc((*lines + *lines_num - 1)->len, sizeof(*(*lines + *lines_num - 1)->areas));
 		*((*lines + *lines_num - 1)->areas + (*lines + *lines_num - 1)->len - 1) = 0;
-		for (int j = 0; j < (predictor.shapes + i)->len; j++) {
+		for (int j = 0; j < (predictor.shapes + i)->points.len; j++) {
 			// TODO Not sure if using Cramer's Rule is correct because it seems if vector's time is same then it just failed; do more testing
 			Coefficient c1;
-			Vector p1_l1 = *((predictor.shapes + i)->vectors + j);
-			Vector p2_l1 = j != (predictor.shapes + i)->len - 1 ? *((predictor.shapes + i)->vectors + j + 1) : *((predictor.shapes + i)->vectors + 0);
+			Vector p1_l1 = *((predictor.shapes + i)->points.vectors + j);
+			Vector p2_l1 = j != (predictor.shapes + i)->points.len - 1 ? *((predictor.shapes + i)->points.vectors + j + 1) : *((predictor.shapes + i)->points.vectors + 0);
 			predictor_line(&c1, p1_l1, p2_l1);
 			
 			Coefficient c2;
@@ -262,24 +235,28 @@ void predictor_intersection(Vector **r, Coefficient c1, Coefficient c2) {
 
 void predictor_generatejs(CatchHitObject **bnpd, unsigned int *bnpd_len, int start_time, int end_time, Beatmap beatmap) {
 	// TODO fix issue where Juice Stream is over the end time
-	// TODO change -j/--juice-points not to be the literal points for the Juice Streams but to be referenced on the progression of the BananaPredictor
 	// TODO Figure out how to make optimisations/allow for the best of both worlds for the current optimisations
 	// 1 - smallest being 3 nested objects  (easier load but more population)
 	// 2 - biggest hitting the end time     (less population but load at end of bnprdctr)
 
 	static unsigned int index = 0;
-	HitObject slider_hit_object = {
-		.x = ((predictor.jspoints + index)->vectors + 0)->x,
-		.y = ((predictor.jspoints + index)->vectors + 0)->ty.y, .time = start_time, .type = slider, .hit_sound = 0,
-		.ho.slider = {
-			.curve_type = slidertype_linear,
-			.curves = NULL,
-			.num_curve = 0,
-			.slides = 1,
-			// We can keep increasing the length until we get the amount of droplets/tiny droplets needed            
-			.length = 1
-		}, .hit_sample = {0}
-	};
+	HitObject *slider_hit_object = calloc(1, sizeof(*slider_hit_object));
+	slider_hit_object->x = ((predictor.jspoints + index)->points.vectors + 0)->x;
+	slider_hit_object->y = ((predictor.jspoints + index)->points.vectors + 0)->ty.y;
+	slider_hit_object->time = start_time;
+	slider_hit_object->type = nc_slider;
+	slider_hit_object->hit_sound = 0;
+	slider_hit_object->ho.slider.curve_type = slidertype_linear;
+	slider_hit_object->ho.slider.curves = NULL;
+	slider_hit_object->ho.slider.num_curve = 0;
+	slider_hit_object->ho.slider.slides = 1;
+	// We can keep increasing the length until we get the amount of droplets/tiny droplets needed            
+	slider_hit_object->ho.slider.length = 1;
+	slider_hit_object->hit_sample.normal_set = 0;
+	slider_hit_object->hit_sample.addition_set = 0;
+	slider_hit_object->hit_sample.index = 0;
+	slider_hit_object->hit_sample.volume = 0;
+	slider_hit_object->hit_sample.filename = NULL;
 	
 	InheritedTimingPoint inherited;
 	oos_inheritedpoint_init(&inherited, beatmap.timing_points, beatmap.num_tp);
@@ -296,46 +273,47 @@ void predictor_generatejs(CatchHitObject **bnpd, unsigned int *bnpd_len, int sta
 	// Extend current slider
 	if ((*bnpd + 0)->type == catchhitobject_juicestream && (*bnpd + 0)->cho.js.slider_data.end_time < end_time) {
 		unsigned int nested_num = (*bnpd + 0)->cho.js.num_nested;
-		slider_hit_object.x = (*bnpd + 0)->cho.js.slider_data.start_position.x;
-		slider_hit_object.time = (*bnpd + 0)->cho.js.slider_data.start_time;
-		slider_hit_object.ho.slider.curve_type = (*bnpd + 0)->cho.js.slider_data.ho_data->curve_type;
-		slider_hit_object.ho.slider.num_curve = (*bnpd + 0)->cho.js.slider_data.ho_data->num_curve;
-		slider_hit_object.ho.slider.curves = calloc(slider_hit_object.ho.slider.num_curve, sizeof(*slider_hit_object.ho.slider.curves));
-		for (int i = 0; i < slider_hit_object.ho.slider.num_curve; i++) {
-			(slider_hit_object.ho.slider.curves + i)->x = ((*bnpd + 0)->cho.js.slider_data.ho_data->curves + i)->x;
-			(slider_hit_object.ho.slider.curves + i)->y = ((*bnpd + 0)->cho.js.slider_data.ho_data->curves + i)->y;
+		slider_hit_object->x = (*bnpd + 0)->cho.js.slider_data.start_position.x;
+		slider_hit_object->time = (*bnpd + 0)->cho.js.slider_data.start_time;
+		slider_hit_object->ho.slider.curve_type = (*bnpd + 0)->cho.js.slider_data.ho_data->curve_type;
+		slider_hit_object->ho.slider.num_curve = (*bnpd + 0)->cho.js.slider_data.ho_data->num_curve;
+		slider_hit_object->ho.slider.curves = calloc(slider_hit_object->ho.slider.num_curve, sizeof(*slider_hit_object->ho.slider.curves));
+		for (int i = 0; i < slider_hit_object->ho.slider.num_curve; i++) {
+			(slider_hit_object->ho.slider.curves + i)->x = ((*bnpd + 0)->cho.js.slider_data.ho_data->curves + i)->x;
+			(slider_hit_object->ho.slider.curves + i)->y = ((*bnpd + 0)->cho.js.slider_data.ho_data->curves + i)->y;
 		}
-		slider_hit_object.ho.slider.slides = (*bnpd + 0)->cho.js.slider_data.span_count;
-		slider_hit_object.ho.slider.length = (*bnpd + 0)->cho.js.slider_data.path.distance;
+		slider_hit_object->ho.slider.slides = (*bnpd + 0)->cho.js.slider_data.span_count;
+		slider_hit_object->ho.slider.length = (*bnpd + 0)->cho.js.slider_data.path.distance;
 
 		while (true) {
 			free((*bnpd + 0)->cho.js.nested);
 			(*bnpd + 0)->cho.js.nested = NULL;
 			(*bnpd + 0)->cho.js.num_nested = 0;
-			oos_slider_calculateslider(&(*bnpd + 0)->cho.js.slider_data, beatmap.difficulty, tp_inherited, tp_uninherited, slider_hit_object);
+			oos_slider_calculateslider(&(*bnpd + 0)->cho.js.slider_data, beatmap.difficulty, tp_inherited, tp_uninherited, *slider_hit_object);
 			ooc_juicestream_createnestedjuice((*bnpd + 0));
 			if ((*bnpd + 0)->cho.js.num_nested > nested_num) {
 				make_new = false;
+				oos_hitobject_freebulk(slider_hit_object, 1);
 				break;
 			} else if ((*bnpd + 0)->cho.js.slider_data.end_time >= end_time) {
 				// If unable to extend slider anymore
 				break;
 			}
-			slider_hit_object.ho.slider.length++;
+			slider_hit_object->ho.slider.length++;
 		}
 	}
 
 	// Make a new slider
 	if (make_new) {
-		if (slider_hit_object.ho.slider.curves != NULL) {
-			free(slider_hit_object.ho.slider.curves);
+		if (slider_hit_object->ho.slider.curves != NULL) {
+			free(slider_hit_object->ho.slider.curves);
 		}
-		slider_hit_object.x = ((predictor.jspoints + index)->vectors + 0)->x;
-		slider_hit_object.ho.slider.num_curve = (predictor.jspoints + index)->len - 1;
-		slider_hit_object.ho.slider.curves = calloc(slider_hit_object.ho.slider.num_curve, sizeof(*slider_hit_object.ho.slider.curves));
-		for (int i = 0; i < (predictor.jspoints + index)->len - 1; i++) {
-			(slider_hit_object.ho.slider.curves + i)->x = ((predictor.jspoints + index)->vectors + i + 1)->x;
-			(slider_hit_object.ho.slider.curves + i)->y = ((predictor.jspoints + index)->vectors + i + 1)->ty.y;
+		slider_hit_object->x = ((predictor.jspoints + index)->points.vectors + 0)->x;
+		slider_hit_object->ho.slider.num_curve = (predictor.jspoints + index)->points.len - 1;
+		slider_hit_object->ho.slider.curves = calloc(slider_hit_object->ho.slider.num_curve, sizeof(*slider_hit_object->ho.slider.curves));
+		for (int i = 0; i < (predictor.jspoints + index)->points.len - 1; i++) {
+			(slider_hit_object->ho.slider.curves + i)->x = ((predictor.jspoints + index)->points.vectors + i + 1)->x;
+			(slider_hit_object->ho.slider.curves + i)->y = ((predictor.jspoints + index)->points.vectors + i + 1)->ty.y;
 		}
 		
 		*bnpd = realloc(*bnpd, ++*bnpd_len * sizeof(**bnpd));
@@ -349,11 +327,11 @@ void predictor_generatejs(CatchHitObject **bnpd, unsigned int *bnpd_len, int sta
 			if ((*bnpd + 0)->cho.js.num_nested > 3) {
 				break;
 			}
-			slider_hit_object.ho.slider.length++;
+			slider_hit_object->ho.slider.length++;
 			free((*bnpd + 0)->cho.js.nested);
 			(*bnpd + 0)->cho.js.nested = NULL;
 			(*bnpd + 0)->cho.js.num_nested = 0;
-			oos_slider_calculateslider(&(*bnpd + 0)->cho.js.slider_data, beatmap.difficulty, tp_inherited, tp_uninherited, slider_hit_object);
+			oos_slider_calculateslider(&(*bnpd + 0)->cho.js.slider_data, beatmap.difficulty, tp_inherited, tp_uninherited, *slider_hit_object);
 		}
 
 		index = (index + 1) % predictor.jspoints_len;
@@ -361,7 +339,6 @@ void predictor_generatejs(CatchHitObject **bnpd, unsigned int *bnpd_len, int sta
 
 	oos_inheritedpoint_free(inherited);
 	oos_uninheritedpoint_free(uninherited);
-	oos_hitobject_free(slider_hit_object);
 }
 
 bool predictor_breakout(XLine *lines, unsigned int lines_num, CatchHitObject *bnpd, unsigned int bnpd_len) {
@@ -393,38 +370,56 @@ bool predictor_breakout(XLine *lines, unsigned int lines_num, CatchHitObject *bn
 	return true;
 }
 
-void predictor_storeobjects(CatchHitObject **object, unsigned int *object_len, LegacyRandom *rng, CatchHitObject *bnpd, unsigned int bnpd_len, LegacyRandom test_rng) {
+void predictor_saverng(LegacyRandom *rng, CatchHitObject *bnpd, unsigned int bnpd_len, LegacyRandom test_rng) {
 	*rng = test_rng;
-	*object_len += bnpd_len;
-	*object = realloc(*object, *object_len * sizeof(**object));
-	for (int i = *object_len - bnpd_len, k = 0; i < *object_len; i++, k++) {
-		*(*object + i) = *(bnpd + k);
+	for (int i = 0; i < bnpd_len; i++) {
+		predictor_output(*(bnpd + i));
 	}
 }
 
-void predictor_output(CatchHitObject *object, unsigned int object_len) {
+void predictor_beatmap(LegacyRandom *rng, Beatmap *beatmap, int index) {
+	CatchHitObject object = {0};
+	switch ((beatmap->hit_objects + index)->type) {
+		case circle:
+		case nc_circle:
+			ooc_fruit_init(&object, (beatmap->hit_objects + index));
+			break;
+
+		case slider:
+		case nc_slider:
+			ooc_juicestream_initwslidertp(&object, beatmap->difficulty, beatmap->timing_points, beatmap->num_tp, (beatmap->hit_objects + index));
+			ooc_juicestream_createnestedjuice(&object);
+			break;
+		
+		case spinner:
+		case nc_spinner:
+			ooc_bananashower_init(&object, (beatmap->hit_objects + index));
+			ooc_bananashower_createnestedbananas(&object);
+			break;
+	}
+	ooc_processor_applypositionoffsetrngstarttime(&object, index, index + 1, rng, false);
+	if (predictor.record_objects) {
+		predictor_output(object);
+	}
+
+	if (object.type == catchhitobject_juicestream) {
+		ooc_juicestream_free(object.cho.js);
+	} else if (object.type == catchhitobject_bananashower) {
+		ooc_bananashower_free(object.cho.bs);
+	}
+}
+
+void predictor_output(CatchHitObject object) {
 	if (!predictor.prefer_circles) {
-		// TODO print out objects with their own dedicated propertise/make a function in libosu to do this for me
-		for (int i = 0; i < object_len; i++) {
-			if ((object + i)->type == catchhitobject_bananashower) {
-				fprintf(predictor.output, "256,192,%d,8,0,%d\n", (int) (object + i)->start_time, (object + i)->cho.bs.end_time);
-			} else if ((object + i)->type == catchhitobject_juicestream) {
-				fprintf(predictor.output, "%d,%d,%d,6,0,%c", (int) (object + i)->cho.js.slider_data.start_position.x, (int) (object + i)->cho.js.slider_data.start_position.y, (int) (object + i)->start_time, (object + i)->cho.js.slider_data.ho_data->curve_type);
-				for (int j = 0; j < (object + i)->cho.js.slider_data.ho_data->num_curve; j++) {
-					fprintf(predictor.output, "|%d:%d", ((object + i)->cho.js.slider_data.ho_data->curves + j)->x, ((object + i)->cho.js.slider_data.ho_data->curves + j)->y);
-				}
-				fprintf(predictor.output, ",%d,%d\n", (int) (object + i)->cho.js.slider_data.span_count, (int) (object + i)->cho.js.slider_data.path.distance);
-			} else if ((object + i)->type == catchhitobject_fruit) {
-				fprintf(predictor.output, "%d,192,%d,5,0\n", (int) (object + i)->x, (int) (object + i)->start_time);
-			}
-		}
+		char *output = NULL;
+		ofb_hitobject_catchtostring(&output, object);
+		fprintf(predictor.output, "%s", output);
+		free(output);
 	} else {
-		for (int i = 0; i < object_len; i++) {
-			if ((object + i)->type == catchhitobject_bananashower) {
-				for (int j = 0; j < (object + i)->cho.bs.num_banana; j++) {
-					int banana_x = (int) (((object + i)->cho.bs.bananas + j)->x + ((object + i)->cho.bs.bananas + j)->x_offset);
-					fprintf(predictor.output, "%d,192,%d,5,0\n", banana_x, (int) ((object + i)->cho.bs.bananas + j)->start_time);
-				}
+		if (object.type == catchhitobject_bananashower) {
+			for (int j = 0; j < object.cho.bs.num_banana; j++) {
+				int banana_x = (int) ((object.cho.bs.bananas + j)->x + (object.cho.bs.bananas + j)->x_offset);
+				fprintf(predictor.output, "%d,192,%d,5,0\n", banana_x, (int) (object.cho.bs.bananas + j)->start_time);
 			}
 		}
 	}
