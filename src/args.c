@@ -43,7 +43,7 @@ void args_main(bool *keep_running, int argc, char **argv) {
 						break;
 
 					case ':':
-						((predictor.shapes + predictor.shapes_len - 1)->points.vectors + (predictor.shapes + predictor.shapes_len - 1)->points.len - 1)->ty.time = strtol(token, NULL, 10);
+						((predictor.shapes + predictor.shapes_len - 1)->points.vectors + (predictor.shapes + predictor.shapes_len - 1)->points.len - 1)->ty = strtol(token, NULL, 10);
 						break;
 				}
 				used_delim = *(copy + (token - *(argv + i) + strlen(token)));
@@ -68,7 +68,7 @@ void args_main(bool *keep_running, int argc, char **argv) {
 						break;
 
 					case ':':
-						((predictor.jspoints + predictor.jspoints_len - 1)->points.vectors + (predictor.jspoints + predictor.jspoints_len - 1)->points.len - 1)->ty.y = strtol(token, NULL, 10);
+						((predictor.jspoints + predictor.jspoints_len - 1)->points.vectors + (predictor.jspoints + predictor.jspoints_len - 1)->points.len - 1)->ty = strtol(token, NULL, 10);
 						break;
 				}
 				used_delim = *(copy + (token - *(argv + i) + strlen(token)));
@@ -137,9 +137,9 @@ void args_main(bool *keep_running, int argc, char **argv) {
 		(predictor.jspoints + 0)->points.len = 2;
 		(predictor.jspoints + 0)->points.vectors = calloc((predictor.jspoints + 0)->points.len, sizeof(*(predictor.jspoints + 0)->points.vectors));
 		((predictor.jspoints + 0)->points.vectors + 0)->x = 256;
-		((predictor.jspoints + 0)->points.vectors + 0)->ty.y = 384;
+		((predictor.jspoints + 0)->points.vectors + 0)->ty = 384;
 		((predictor.jspoints + 0)->points.vectors + 1)->x = 256;
-		((predictor.jspoints + 0)->points.vectors + 1)->ty.y = 0;
+		((predictor.jspoints + 0)->points.vectors + 1)->ty = 0;
 	} else {
 		for (int i = 0; i < predictor.jspoints_len; i++) {
 			if ((predictor.jspoints + i)->points.len < 2) {

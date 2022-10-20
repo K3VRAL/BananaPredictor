@@ -135,18 +135,18 @@ void predictor_shapes(int *shapes_start, int *shapes_end) {
 		(predictor.shapes + i)->start = INT_MAX;
 		(predictor.shapes + i)->end = INT_MIN;
 		for (int j = 0; j < (predictor.shapes + i)->points.len; j++) {
-			if (((predictor.shapes + i)->points.vectors + j)->ty.time < (predictor.shapes + i)->start) {
-				(predictor.shapes + i)->start = ((predictor.shapes + i)->points.vectors + j)->ty.time;
+			if (((predictor.shapes + i)->points.vectors + j)->ty < (predictor.shapes + i)->start) {
+				(predictor.shapes + i)->start = ((predictor.shapes + i)->points.vectors + j)->ty;
 			}
-			if (((predictor.shapes + i)->points.vectors + j)->ty.time < *shapes_start) {
-				*shapes_start = ((predictor.shapes + i)->points.vectors + j)->ty.time;
+			if (((predictor.shapes + i)->points.vectors + j)->ty < *shapes_start) {
+				*shapes_start = ((predictor.shapes + i)->points.vectors + j)->ty;
 			}
 
-			if (((predictor.shapes + i)->points.vectors + j)->ty.time > (predictor.shapes + i)->end) {
-				(predictor.shapes + i)->end = ((predictor.shapes + i)->points.vectors + j)->ty.time;
+			if (((predictor.shapes + i)->points.vectors + j)->ty > (predictor.shapes + i)->end) {
+				(predictor.shapes + i)->end = ((predictor.shapes + i)->points.vectors + j)->ty;
 			}
-			if (((predictor.shapes + i)->points.vectors + j)->ty.time > *shapes_end) {
-				*shapes_end = ((predictor.shapes + i)->points.vectors + j)->ty.time;
+			if (((predictor.shapes + i)->points.vectors + j)->ty > *shapes_end) {
+				*shapes_end = ((predictor.shapes + i)->points.vectors + j)->ty;
 			}
 		}
 	}
@@ -179,15 +179,18 @@ void predictor_areas(XLine **lines, unsigned int *lines_num, int time) {
 		(*lines + *lines_num - 1)->areas = calloc((*lines + *lines_num - 1)->len, sizeof(*(*lines + *lines_num - 1)->areas));
 		*((*lines + *lines_num - 1)->areas + (*lines + *lines_num - 1)->len - 1) = 0;
 		for (int j = 0; j < (predictor.shapes + i)->points.len; j++) {
-			// TODO Not sure if using Cramer's Rule is correct because it seems if vector's time is same then it just failed; do more testing
-			Coefficient c1;
 			Vector p1_l1 = *((predictor.shapes + i)->points.vectors + j);
 			Vector p2_l1 = j != (predictor.shapes + i)->points.len - 1 ? *((predictor.shapes + i)->points.vectors + j + 1) : *((predictor.shapes + i)->points.vectors + 0);
+			if (!((p1_l1.ty >= time && p2_l1.ty <= time) || (p1_l1.ty <= time && p2_l1.ty >= time))) {
+				continue;
+			}
+
+			Coefficient c1;
 			predictor_line(&c1, p1_l1, p2_l1);
-			
+
+			Vector p1_l2 = { .x = -1, .ty = time };
+			Vector p2_l2 = { .x = 1, .ty = time };
 			Coefficient c2;
-			Vector p1_l2 = { .x = -1, .ty.time = time };
-			Vector p2_l2 = { .x = 1, .ty.time = time };
 			predictor_line(&c2, p1_l2, p2_l2);
 
 			Vector *r = NULL;
@@ -219,9 +222,9 @@ void predictor_areas(XLine **lines, unsigned int *lines_num, int time) {
 }
 
 void predictor_line(Coefficient *coefficient, Vector p1, Vector p2) {
-	coefficient->a = p1.ty.time - p2.ty.time;
+	coefficient->a = p1.ty - p2.ty;
 	coefficient->b = p2.x - p1.x;
-	coefficient->c = -((p1.x * p2.ty.time) - (p2.x * p1.ty.time));
+	coefficient->c = -((p1.x * p2.ty) - (p2.x * p1.ty));
 }
 
 void predictor_intersection(Vector **r, Coefficient c1, Coefficient c2) {
@@ -229,7 +232,7 @@ void predictor_intersection(Vector **r, Coefficient c1, Coefficient c2) {
 	if (d != 0) {
 		*r = calloc(1, sizeof(**r));
 		(*r)->x = (c1.c * c2.b - c1.b * c2.c) / d;
-		(*r)->ty.time = (c1.a * c2.c - c1.c * c2.a) / d;
+		(*r)->ty = (c1.a * c2.c - c1.c * c2.a) / d;
 	}
 }
 
@@ -242,7 +245,7 @@ void predictor_generatejs(CatchHitObject **bnpd, unsigned int *bnpd_len, int sta
 	static unsigned int index = 0;
 	HitObject *slider_hit_object = calloc(1, sizeof(*slider_hit_object));
 	slider_hit_object->x = ((predictor.jspoints + index)->points.vectors + 0)->x;
-	slider_hit_object->y = ((predictor.jspoints + index)->points.vectors + 0)->ty.y;
+	slider_hit_object->y = ((predictor.jspoints + index)->points.vectors + 0)->ty;
 	slider_hit_object->time = start_time;
 	slider_hit_object->type = nc_slider;
 	slider_hit_object->hit_sound = 0;
@@ -313,7 +316,7 @@ void predictor_generatejs(CatchHitObject **bnpd, unsigned int *bnpd_len, int sta
 		slider_hit_object->ho.slider.curves = calloc(slider_hit_object->ho.slider.num_curve, sizeof(*slider_hit_object->ho.slider.curves));
 		for (int i = 0; i < (predictor.jspoints + index)->points.len - 1; i++) {
 			(slider_hit_object->ho.slider.curves + i)->x = ((predictor.jspoints + index)->points.vectors + i + 1)->x;
-			(slider_hit_object->ho.slider.curves + i)->y = ((predictor.jspoints + index)->points.vectors + i + 1)->ty.y;
+			(slider_hit_object->ho.slider.curves + i)->y = ((predictor.jspoints + index)->points.vectors + i + 1)->ty;
 		}
 		
 		*bnpd = realloc(*bnpd, ++*bnpd_len * sizeof(**bnpd));

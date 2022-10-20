@@ -23,10 +23,7 @@ typedef struct Coefficient {
 
 typedef struct Vector {
 	float x;
-	union {
-		float time;
-		float y;
-	} ty;
+	float ty;
 } Vector;
 
 typedef struct Point {
@@ -42,7 +39,6 @@ typedef struct ShapePoints {
 
 typedef struct JuiceStreamPoints {
 	Point points;
-	// char *type; // TODO allow for the user to change types of the slider
 } JuiceStreamPoints;
 
 typedef struct Predictor {
