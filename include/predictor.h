@@ -95,12 +95,11 @@ void predictor_progressbar(unsigned int);
 	return
 		void
 	argsreturn
-		unsigned short **
-		unsigned int *
+		XLine *
 	args
 		int
 */
-void predictor_areas(XLine **, unsigned int *, int);
+void predictor_areas(XLine *, int);
 
 /*
 	Calculating the Line using Cramer's Rule
@@ -150,12 +149,11 @@ void predictor_generatejs(CatchHitObject **, unsigned int *, int, int, Beatmap);
 	return
 		bool
 	args
-		XLine *
-		unsigned int
+		XLine
 		CatchHitObject *
 		unsigned int
 */
-bool predictor_breakout(XLine *, unsigned int, CatchHitObject *, unsigned int);
+bool predictor_breakout(XLine, CatchHitObject *, unsigned int);
 
 /*
 	Gets the values of the beatmap and svaes rng based on the converted catch object
