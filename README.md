@@ -16,7 +16,7 @@ Before you can do anything with the project, you will need to [download and inst
 
 The tools you will also need before you can do anything is `make`, `gcc` and `pkg-config`.
 
-Once you have the necessary tools and the library has been installed, in your terminal while still in the same folder location of this project's `Makefile`, write `make`, to compile the project to a binary, then `sudo make install`, to install the binary to `/usr/bin/` safely.
+Once you have the necessary tools and the library has been installed, in your terminal while still in the same folder location of this project's `Makefile`, write `make`, to compile the project to a binary, then `sudo make install` to install the binary.
 
 If you wish to uninstall the program, do `sudo make uninstall` and that should get rid of everything.
 

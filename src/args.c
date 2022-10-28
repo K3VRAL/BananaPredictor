@@ -5,6 +5,7 @@ void args_main(bool *keep_running, int argc, char **argv) {
 		fprintf(stdout, "Use `-h` or check out the documentation if you need help.\n");
 		*keep_running = false;
 	}
+	// TODO use `getopt()`
 	bool argument_404 = false;
 	for (int i = 1; i < argc; i++) {
 		if (strcmp(*(argv + i), "-o") == 0 || strcmp(*(argv + i), "--output") == 0) {
@@ -84,13 +85,13 @@ void args_main(bool *keep_running, int argc, char **argv) {
 
 			unsigned int arguments_num = 8 * 2;
 			char *arguments[8 * 2] = {
+				"-b, --beatmap file", "inputs the beatmap from the file location",
 				"-o, --output [file]", "outputs the BananaPredictor to the file location",
+				"-s, --shapes x:time|x:time|x:time[|...]", "the points for the vector of the shape",
+				"-j, --juice-points [x:y|...]", "the points for the vector of the Juice Streams",
+				"-d, --distance [time]", "gives the distance for each Banana Shower as a double",
 				"--prefer-circles", "outputs the Banana Shower's bananas instead of the Juice Stream and Banana Shower",
 				"--record-objects", "records and outputs the entire map file",
-				"-b, --beatmap [file]", "inputs the beatmap from the file location",
-				"-d, --distance [time]", "gives the distance for each Banana Shower as a double",
-				"-s, --shapes [x:time|...]", "the points for the vector of the shape",
-				"-j, --juice-points [x:y|...]", "the points for the vector of the Juice Streams",
 				"-h, --help", "gives this help message"
 			};
 			fprintf(stdout, "arguments:\n");
@@ -109,6 +110,8 @@ void args_main(bool *keep_running, int argc, char **argv) {
 				int num = space_num - strlen(*(arguments + j)) + 1;
 				fprintf(stdout, "\t%s%*c%s\n", *(arguments + j), num, ' ', *(arguments + j + 1));
 			}
+
+			exit(EXIT_SUCCESS);
 		} else {
 			fprintf(stdout, "Argument not found: %s\n", *(argv + i));
 			argument_404 = true;
