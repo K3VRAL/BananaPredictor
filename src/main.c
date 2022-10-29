@@ -1,11 +1,11 @@
 #include "main.h"
 
-int main(int argc, char **argv) {
-	// Handle arguments given
-	bool keep_running = true;
-	args_main(&keep_running, argc, argv);
+// TODO something is going wrong here
 
-	// Make a few tests before we run things
+int main(int argc, char **argv) {
+	// Handle arguments given and make a few tests before we run things
+	bool keep_running = args_main(argc, argv);
+
 	if (keep_running) {
 		// Where the magic happens
 		predictor_main();

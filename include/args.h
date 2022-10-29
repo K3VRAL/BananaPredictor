@@ -2,7 +2,7 @@
 #define ARGS_H
 
 #include <stdbool.h>
-#include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
 #include "predictor.h"
@@ -18,6 +18,6 @@
 		int
 		char **
 */
-void args_main(bool *, int, char **);
+bool args_main(int, char **);
 
 #endif

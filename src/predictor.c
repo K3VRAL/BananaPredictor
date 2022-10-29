@@ -284,7 +284,7 @@ void predictor_generatejs(CatchHitObject **bnpd, unsigned int *bnpd_len, int sta
 			free((*bnpd + 0)->cho.js.nested);
 			(*bnpd + 0)->cho.js.nested = NULL;
 			(*bnpd + 0)->cho.js.num_nested = 0;
-			oos_slider_calculateslider(&(*bnpd + 0)->cho.js.slider_data, beatmap.difficulty, tp_inherited, tp_uninherited, *slider_hit_object);
+			oos_slider_calculateslider(&(*bnpd + 0)->cho.js.slider_data, *beatmap.difficulty, tp_inherited, tp_uninherited, *slider_hit_object);
 			ooc_juicestream_createnestedjuice((*bnpd + 0));
 			if ((*bnpd + 0)->cho.js.num_nested > nested_num) {
 				make_new = false;
@@ -315,7 +315,7 @@ void predictor_generatejs(CatchHitObject **bnpd, unsigned int *bnpd_len, int sta
 		for (int i = *bnpd_len - 1; i > 0; i--) {
 			*(*bnpd + i) = *(*bnpd + i - 1);
 		}
-		ooc_juicestream_initwsliderspecific((*bnpd + 0), beatmap.difficulty, tp_inherited, tp_uninherited, slider_hit_object);
+		ooc_juicestream_initwsliderspecific((*bnpd + 0), *beatmap.difficulty, tp_inherited, tp_uninherited, slider_hit_object);
 
 		while (true) {
 			ooc_juicestream_createnestedjuice((*bnpd + 0));
@@ -326,7 +326,7 @@ void predictor_generatejs(CatchHitObject **bnpd, unsigned int *bnpd_len, int sta
 			free((*bnpd + 0)->cho.js.nested);
 			(*bnpd + 0)->cho.js.nested = NULL;
 			(*bnpd + 0)->cho.js.num_nested = 0;
-			oos_slider_calculateslider(&(*bnpd + 0)->cho.js.slider_data, beatmap.difficulty, tp_inherited, tp_uninherited, *slider_hit_object);
+			oos_slider_calculateslider(&(*bnpd + 0)->cho.js.slider_data, *beatmap.difficulty, tp_inherited, tp_uninherited, *slider_hit_object);
 		}
 
 		index = (index + 1) % predictor.jspoints_len;
@@ -376,7 +376,7 @@ void predictor_beatmap(LegacyRandom *rng, Beatmap *beatmap, int index) {
 
 		case slider:
 		case nc_slider:
-			ooc_juicestream_initwslidertp(&object, beatmap->difficulty, beatmap->timing_points, beatmap->num_tp, (beatmap->hit_objects + index));
+			ooc_juicestream_initwslidertp(&object, *beatmap->difficulty, beatmap->timing_points, beatmap->num_tp, (beatmap->hit_objects + index));
 			ooc_juicestream_createnestedjuice(&object);
 			break;
 		
