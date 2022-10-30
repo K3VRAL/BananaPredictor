@@ -1,33 +1,33 @@
 #include "args.h"
 
 #define args_arg_num 8
-char *args_arg[args_arg_num][2] = {
-	{ "-b", "--beatmap" },
-	{ "-o", "--output" },
-	{ "-s", "--shapes" },
-	{ "-j", "--juice-points" },
-	{ "-d", "--distance" },
-	{ "-p", "--prefer-circles" },
-	{ "-r", "--record-objects" },
-	{ "-h", "--help" }
+char *args_arg[args_arg_num][4] = {
+	{ "-b", "--beatmap", "file", "inputs the beatmap from the file location" },
+	{ "-o", "--output", "[file]", "outputs the BananaPredictor to the file location" },
+	{ "-s", "--shapes", "x:time|x:time|x:time[|...]", "the points for the vector of the shape" },
+	{ "-j", "--juice-points", "[x:y|x:y[|...]]", "the points for the vector of the Juice Streams" },
+	{ "-d", "--distance", "[time]", "gives the distance for each Banana Shower as a double" },
+	{ "-p", "--prefer-circles", "", "outputs the Banana Shower's bananas instead of the Juice Stream and Banana Shower" },
+	{ "-r", "--record-objects", "", "records and outputs the entire map file" },
+	{ "-h", "--help", "", "gives this help message" }
 };
 
-bool args_beatmap(char *option) {
+void args_beatmap(bool *assign, char *option) {
 	FILE *fp = fopen(option, "r");
 	if (fp == NULL) {
-		return true;
+		*assign = false;
+		return;
 	}
 	predictor.beatmap = fp;
-	return false;
 }
 
-bool args_output(char *option) {
+void args_output(bool *assign, char *option) {
 	FILE *fp = fopen(option, "w");
 	if (fp == NULL) {
-		return true;
+		*assign = false;
+		return;
 	}
 	predictor.output = fp;
-	return false;
 }
 
 void args_shape(char *option) {
@@ -103,20 +103,10 @@ void args_help(void) {
 	char *usage = "bnprdctr [arguments]";
 	fprintf(stdout, "usage:\n\t%s\n\n", usage);
 
-	char *arguments[args_arg_num][2] = {
-		{ "file", "inputs the beatmap from the file location" },
-		{ "[file]", "outputs the BananaPredictor to the file location" },
-		{ "x:time|x:time|x:time[|...]", "the points for the vector of the shape" },
-		{ "[x:y|...]", "the points for the vector of the Juice Streams" },
-		{ "[time]", "gives the distance for each Banana Shower as a double" },
-		{ "", "outputs the Banana Shower's bananas instead of the Juice Stream and Banana Shower" },
-		{ "", "records and outputs the entire map file" },
-		{ "", "gives this help message" }
-	};
 	// For the spaces
 	int space_num = 0;
 	for (int i = 0; i < args_arg_num; i++) {
-		int num = strlen(*(*(args_arg + i) + 0)) + 2 + strlen(*(*(args_arg + i) + 1)) + strlen(*(*(arguments + i) + 0));
+		int num = strlen(*(*(args_arg + i) + 0)) + 2 + strlen(*(*(args_arg + i) + 1)) + strlen(*(*(args_arg + i) + 2));
 		if (num > space_num) {
 			space_num = num;
 		}
@@ -124,24 +114,28 @@ void args_help(void) {
 	// Printing text with the spaces
 	fprintf(stdout, "arguments:\n");
 	for (int i = 0; i < args_arg_num; i++) {
-		int num = space_num - (strlen(*(*(args_arg + i) + 0)) + 2 + strlen(*(*(args_arg + i) + 1)) + strlen(*(*(arguments + i) + 0)));
-		fprintf(stdout, "\t%s, %s %s%*c%s\n", *(*(args_arg + i) + 0), *(*(args_arg + i) + 1), *(*(arguments + i) + 0), num + 1, ' ', *(*(arguments + i) + 1));
+		int num = space_num - (strlen(*(*(args_arg + i) + 0)) + 2 + strlen(*(*(args_arg + i) + 1)) + strlen(*(*(args_arg + i) + 2)));
+		fprintf(stdout, "\t%s, %s %s%*c%s\n", *(*(args_arg + i) + 0), *(*(args_arg + i) + 1), *(*(args_arg + i) + 2), num + 1, ' ', *(*(args_arg + i) + 3));
 	}
 }
 
-void args_unknown(char *option) {
+void args_unknown_argument(char *option) {
 	fprintf(stdout, "Argument not found: %s\n", option);
 }
 
-bool args_main(int argc, char **argv) {
+void args_main(bool *keep_running, int argc, char **argv) {
 	for (int i = 1; i < argc; i++) {
 		if (!strcmp(*(*(args_arg + 0) + 0), *(argv + i)) || !strcmp(*(*(args_arg + 0) + 1), *(argv + i))) {
-			if (args_beatmap(*(argv + ++i))) {
-				continue;
+			bool assign = true;
+			args_beatmap(&assign, *(argv + ++i));
+			if (!assign) {
+				fprintf(stdout, "Beatmap file not found: %s\n", *(argv + i));
 			}
 		} else if (!strcmp(*(*(args_arg + 1) + 0), *(argv + i)) || !strcmp(*(*(args_arg + 1) + 1), *(argv + i))) {
-			if (args_output(*(argv + ++i))) {
-				continue;
+			bool assign = true;
+			args_output(&assign, *(argv + ++i));
+			if (!assign) {
+				fprintf(stdout, "Output file not possible: %s - defaulting to stdout\n", *(argv + i));
 			}
 		} else if (!strcmp(*(*(args_arg + 2) + 0), *(argv + i)) || !strcmp(*(*(args_arg + 2) + 1), *(argv + i))) {
 			args_shape(*(argv + ++i));
@@ -153,12 +147,14 @@ bool args_main(int argc, char **argv) {
 			args_prefer_circles();
 		} else if (!strcmp(*(*(args_arg + 6) + 0), *(argv + i)) || !strcmp(*(*(args_arg + 6) + 1), *(argv + i))) {
 			args_record_objects();
-		} else if (!strcmp(*(*(args_arg + 7) + 0), *(argv + i)) || !strcmp(*(*(args_arg + 7) + 1), *(argv + i))) {
+		} else if (!strcmp(*(*(args_arg + args_arg_num - 1) + 0), *(argv + i)) || !strcmp(*(*(args_arg + args_arg_num - 1) + 1), *(argv + i))) {
 			args_help();
-			return false;
+			*keep_running = false;
+			return;
 		} else {
-			args_unknown(*(argv + i));
-			return false;
+			args_unknown_argument(*(argv + i));
+			*keep_running = false;
+			return;
 		}
 	}
 
@@ -167,12 +163,14 @@ bool args_main(int argc, char **argv) {
 	}
 
 	if (predictor.beatmap == NULL || predictor.shapes == NULL) {
-		return false;
+			*keep_running = false;
+			return;
 	}
 
 	for (int i = 0; i < predictor.shapes_len; i++) {
 		if ((predictor.shapes + i)->points.len < 3) {
-			return false;
+			*keep_running = false;
+			return;
 		}
 	}
 
@@ -187,10 +185,9 @@ bool args_main(int argc, char **argv) {
 	} else {
 		for (int i = 0; i < predictor.jspoints_len; i++) {
 			if ((predictor.jspoints + i)->points.len < 2) {
-				return false;
+			*keep_running = false;
+			return;
 			}
 		}
 	}
-
-	return true;
 }

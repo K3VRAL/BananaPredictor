@@ -17,7 +17,7 @@ $(TARGET): $(addsuffix .o, $(basename $(shell find include/ -type f -name "*.h" 
 # Install
 install:
 	$(uninstall)
-	$(shell cp ./bin/bnprdctr /usr/local/bin/$(TARGET))
+	$(shell cp ./bin/$(TARGET) /usr/local/bin/$(TARGET))
 	$(shell chmod 755 /usr/local/bin/$(TARGET))
 	$(shell ln -s /usr/local/bin/$(TARGET) /usr/bin/)
 

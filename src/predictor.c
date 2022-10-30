@@ -18,110 +18,7 @@ Predictor predictor = {
 	.distance = 1,
 };
 
-void predictor_main(void) {
-	// Evaluate Objects and RNG from the Beatmap
-	if (predictor.beatmap == NULL) {
-		return;
-	}
-	Beatmap beatmap = {0};
-	of_beatmap_init(&beatmap);
-	of_beatmap_set(&beatmap, predictor.beatmap);
-
-	// We need the RNG of the beatmap until the point that we start
-	LegacyRandom rng;
-	ou_legacyrandom_init(&rng, ooc_processor_RNGSEED);
-
-	// Get time where we should start and stop the loops
-	int shapes_start, shapes_end;
-	predictor_shapes(&shapes_start, &shapes_end);
-	
-	int i = 0;
-	double j = shapes_start;
-	while (i < beatmap.num_ho || j < shapes_end) {
-		// Update Progress Bar
-		if (predictor.output != stdout) {
-			double beatmap_objects = beatmap.num_ho > 0 ? ((double) i / beatmap.num_ho) : 1;
-			double shapes_objects = j < shapes_end ? (j - shapes_start) / (shapes_end - shapes_start) : 1;
-			predictor_progressbar((beatmap_objects * shapes_objects) * 100);
-		}
-		
-		// Getting current time
-		bool is_shape = false;
-		int time = INT_MAX;
-		if (beatmap.num_ho > i && beatmap.hit_objects != NULL) {
-			time = (beatmap.hit_objects + i)->time;
-			is_shape = false;
-		}
-		if (time > (int) j) {
-			time = (int) j;
-			is_shape = true;
-		}
-		
-		// Evaluating BananaPredictor
-		if (is_shape && time >= shapes_start && time < shapes_end) {
-			// Recording the areas of the x-axis at the current time which can place the bananas
-			XLine lines = {0};
-			predictor_areas(&lines, time);
-
-			// Make a variable to store the new objects and house the Banana Shower
-			unsigned int bnpd_len = 0;
-			CatchHitObject *bnpd = calloc(++bnpd_len, sizeof(*bnpd));
-			HitObject *bnpd_shower = calloc(1, sizeof(*bnpd_shower));
-			bnpd_shower->x = 256;
-			bnpd_shower->y = 192;
-			bnpd_shower->time = (int) j;
-			bnpd_shower->type = spinner;
-			bnpd_shower->hit_sound = 0;
-			bnpd_shower->ho.spinner.end_time = (int) j + 1;
-			bnpd_shower->hit_sample.normal_set = 0;
-			bnpd_shower->hit_sample.addition_set = 0;
-			bnpd_shower->hit_sample.index = 0;
-			bnpd_shower->hit_sample.volume = 0;
-			bnpd_shower->hit_sample.filename = NULL;
-			ooc_bananashower_init((bnpd + 0), bnpd_shower);
-			ooc_bananashower_createnestedbananas((bnpd + 0));
-
-			while (true) {
-				// Apply the RNG to the new objects
-				LegacyRandom test_rng = rng;
-				ooc_processor_applypositionoffsetrng(bnpd, bnpd_len, &test_rng, false);
-
-				// Check if they are within the areas we wanted them to be in; if not, we generate the Juice Stream and repeat the loop
-				if (!predictor_breakout(lines, bnpd, bnpd_len)) {
-					// Create new Juice Stream or, if previous object is a Juice Stream, expand on said Juice Stream
-					predictor_generatejs(&bnpd, &bnpd_len, (int) j, shapes_end, beatmap);
-					continue;
-				}
-
-				// Saves the rng and outputs the current saved data
-				predictor_saverng(&rng, bnpd, bnpd_len, test_rng);
-				break;
-			}
-
-			if (bnpd != NULL) {
-				ooc_hitobject_freebulk(bnpd, bnpd_len);
-			}
-			if (lines.areas != NULL) {
-				free(lines.areas);
-			}
-			j += predictor.distance;
-			continue;
-		}
-
-		// Processes next object in beatmap
-		predictor_beatmap(&rng, &beatmap, i);
-		i++;
-	}
-	if (predictor.output != stdout) {
-		predictor_progressbar(100);
-		fprintf(stdout, "\n");
-	}
-
-
-	// Free
-	of_beatmap_free(beatmap);
-}
-
+/* Sets the values for the points to start and stop the main loop */
 void predictor_shapes(int *shapes_start, int *shapes_end) {
 	*shapes_start = INT_MAX;
 	*shapes_end = INT_MIN;
@@ -146,6 +43,7 @@ void predictor_shapes(int *shapes_start, int *shapes_end) {
 	}
 }
 
+/* Prints out the progress bar in the terminal. Resizing the terminal will also resize the output */
 void predictor_progressbar(unsigned int percent) {
 	struct winsize w;
 	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
@@ -163,6 +61,36 @@ void predictor_progressbar(unsigned int percent) {
 	fflush(stdout);
 }
 
+// Basing below functions off of https://stackoverflow.com/a/20679579 because I suck at math
+typedef struct XLine {
+	unsigned short *areas;
+	unsigned int len;
+} XLine;
+
+typedef struct Coefficient {
+	double a;
+	double b;
+	double c;
+} Coefficient;
+
+/* Calculating the Line using Cramer's Rule */
+void predictor_line(Coefficient *coefficient, Vector p1, Vector p2) {
+	coefficient->a = p1.ty - p2.ty;
+	coefficient->b = p2.x - p1.x;
+	coefficient->c = -((p1.x * p2.ty) - (p2.x * p1.ty));
+}
+
+/* Calculating the Line of Intersection with Determinants */
+void predictor_intersection(Vector **r, Coefficient c1, Coefficient c2) {
+	double d = c1.a * c2.b - c1.b * c2.a;
+	if (d != 0) {
+		*r = calloc(1, sizeof(**r));
+		(*r)->x = (c1.c * c2.b - c1.b * c2.c) / d;
+		(*r)->ty = (c1.a * c2.c - c1.c * c2.a) / d;
+	}
+}
+
+/* Calculate the intersections of each line and whether they should be used for calculation */
 void predictor_areas(XLine *lines, int time) {
 	lines->areas = calloc(++lines->len, sizeof(*lines->areas));
 	*(lines->areas + lines->len - 1) = 0;
@@ -212,22 +140,9 @@ void predictor_areas(XLine *lines, int time) {
 		exit(1);
 	}
 }
+// End of stackoverflow
 
-void predictor_line(Coefficient *coefficient, Vector p1, Vector p2) {
-	coefficient->a = p1.ty - p2.ty;
-	coefficient->b = p2.x - p1.x;
-	coefficient->c = -((p1.x * p2.ty) - (p2.x * p1.ty));
-}
-
-void predictor_intersection(Vector **r, Coefficient c1, Coefficient c2) {
-	double d = c1.a * c2.b - c1.b * c2.a;
-	if (d != 0) {
-		*r = calloc(1, sizeof(**r));
-		(*r)->x = (c1.c * c2.b - c1.b * c2.c) / d;
-		(*r)->ty = (c1.a * c2.c - c1.c * c2.a) / d;
-	}
-}
-
+/* Either we create a new Juice Stream and have a minimum of 3 nested objects; or if the previously created Juice Stream is not long enough then we can keep expanding it */
 void predictor_generatejs(CatchHitObject **bnpd, unsigned int *bnpd_len, int start_time, int end_time, Beatmap beatmap) {
 	// TODO fix issue where Juice Stream is over the end time
 	// TODO Figure out how to make optimisations/allow for the best of both worlds for the current optimisations
@@ -336,6 +251,7 @@ void predictor_generatejs(CatchHitObject **bnpd, unsigned int *bnpd_len, int sta
 	oos_uninheritedpoint_free(uninherited);
 }
 
+/* Returns if we need to retry or store the current positions of the objects */
 bool predictor_breakout(XLine lines, CatchHitObject *bnpd, unsigned int bnpd_len) {
 	// Look at bananas currently generated
 	for (int i = 0; i < (bnpd + bnpd_len - 1)->cho.bs.num_banana; i++) {
@@ -359,6 +275,24 @@ bool predictor_breakout(XLine lines, CatchHitObject *bnpd, unsigned int bnpd_len
 	return true;
 }
 
+/* Outputs data */
+void predictor_output(CatchHitObject object) {
+	if (!predictor.prefer_circles) {
+		char *output = NULL;
+		ofb_hitobject_catchtostring(&output, object);
+		fprintf(predictor.output, "%s", output);
+		free(output);
+	} else {
+		if (object.type == catchhitobject_bananashower) {
+			for (int j = 0; j < object.cho.bs.num_banana; j++) {
+				int banana_x = (int) ((object.cho.bs.bananas + j)->x + (object.cho.bs.bananas + j)->x_offset);
+				fprintf(predictor.output, "%d,192,%d,5,0\n", banana_x, (int) (object.cho.bs.bananas + j)->start_time);
+			}
+		}
+	}
+}
+
+/* Output the object generated and saves the rng */
 void predictor_saverng(LegacyRandom *rng, CatchHitObject *bnpd, unsigned int bnpd_len, LegacyRandom test_rng) {
 	*rng = test_rng;
 	for (int i = 0; i < bnpd_len; i++) {
@@ -366,6 +300,7 @@ void predictor_saverng(LegacyRandom *rng, CatchHitObject *bnpd, unsigned int bnp
 	}
 }
 
+/* Gets the values of the beatmap and svaes rng based on the converted catch object */
 void predictor_beatmap(LegacyRandom *rng, Beatmap *beatmap, int index) {
 	CatchHitObject object = {0};
 	switch ((beatmap->hit_objects + index)->type) {
@@ -398,18 +333,106 @@ void predictor_beatmap(LegacyRandom *rng, Beatmap *beatmap, int index) {
 	}
 }
 
-void predictor_output(CatchHitObject object) {
-	if (!predictor.prefer_circles) {
-		char *output = NULL;
-		ofb_hitobject_catchtostring(&output, object);
-		fprintf(predictor.output, "%s", output);
-		free(output);
-	} else {
-		if (object.type == catchhitobject_bananashower) {
-			for (int j = 0; j < object.cho.bs.num_banana; j++) {
-				int banana_x = (int) ((object.cho.bs.bananas + j)->x + (object.cho.bs.bananas + j)->x_offset);
-				fprintf(predictor.output, "%d,192,%d,5,0\n", banana_x, (int) (object.cho.bs.bananas + j)->start_time);
-			}
-		}
+void predictor_main(void) {
+	// Evaluate Objects and RNG from the Beatmap
+	if (predictor.beatmap == NULL) {
+		return;
 	}
+	Beatmap beatmap = {0};
+	of_beatmap_init(&beatmap);
+	of_beatmap_set(&beatmap, predictor.beatmap);
+
+	// We need the RNG of the beatmap until the point that we start
+	LegacyRandom rng;
+	ou_legacyrandom_init(&rng, ooc_processor_RNGSEED);
+
+	// Get time where we should start and stop the loops
+	int shapes_start, shapes_end;
+	predictor_shapes(&shapes_start, &shapes_end);
+	
+	int i = 0;
+	double j = shapes_start;
+	while (i < beatmap.num_ho || j < shapes_end) {
+		// Update Progress Bar
+		if (predictor.output != stdout) {
+			double beatmap_objects = beatmap.num_ho > 0 ? ((double) i / beatmap.num_ho) : 1;
+			double shapes_objects = j < shapes_end ? (j - shapes_start) / (shapes_end - shapes_start) : 1;
+			predictor_progressbar((beatmap_objects * shapes_objects) * 100);
+		}
+		
+		// Getting current time
+		bool is_shape = false;
+		int time = INT_MAX;
+		if (beatmap.num_ho > i && beatmap.hit_objects != NULL) {
+			time = (beatmap.hit_objects + i)->time;
+			is_shape = false;
+		}
+		if (time > (int) j) {
+			time = (int) j;
+			is_shape = true;
+		}
+		
+		// Evaluating BananaPredictor
+		if (is_shape && time >= shapes_start && time < shapes_end) {
+			// Recording the areas of the x-axis at the current time which can place the bananas
+			XLine lines = {0};
+			predictor_areas(&lines, time);
+
+			// Make a variable to store the new objects and house the Banana Shower
+			unsigned int bnpd_len = 0;
+			CatchHitObject *bnpd = calloc(++bnpd_len, sizeof(*bnpd));
+			HitObject *bnpd_shower = calloc(1, sizeof(*bnpd_shower));
+			bnpd_shower->x = 256;
+			bnpd_shower->y = 192;
+			bnpd_shower->time = (int) j;
+			bnpd_shower->type = spinner;
+			bnpd_shower->hit_sound = 0;
+			bnpd_shower->ho.spinner.end_time = (int) j + 1;
+			bnpd_shower->hit_sample.normal_set = 0;
+			bnpd_shower->hit_sample.addition_set = 0;
+			bnpd_shower->hit_sample.index = 0;
+			bnpd_shower->hit_sample.volume = 0;
+			bnpd_shower->hit_sample.filename = NULL;
+			ooc_bananashower_init((bnpd + 0), bnpd_shower);
+			ooc_bananashower_createnestedbananas((bnpd + 0));
+
+			while (true) {
+				// Apply the RNG to the new objects
+				LegacyRandom test_rng = rng;
+				ooc_processor_applypositionoffsetrng(bnpd, bnpd_len, &test_rng, false);
+
+				// Check if they are within the areas we wanted them to be in; if not, we generate the Juice Stream and repeat the loop
+				if (!predictor_breakout(lines, bnpd, bnpd_len)) {
+					// Create new Juice Stream or, if previous object is a Juice Stream, expand on said Juice Stream
+					predictor_generatejs(&bnpd, &bnpd_len, (int) j, shapes_end, beatmap);
+					continue;
+				}
+
+				// Saves the rng and outputs the current saved data
+				predictor_saverng(&rng, bnpd, bnpd_len, test_rng);
+				break;
+			}
+
+			if (bnpd != NULL) {
+				ooc_hitobject_freebulk(bnpd, bnpd_len);
+			}
+			if (lines.areas != NULL) {
+				free(lines.areas);
+			}
+			j += predictor.distance;
+			continue;
+		}
+
+		// Processes next object in beatmap
+		predictor_beatmap(&rng, &beatmap, i);
+		i++;
+	}
+	if (predictor.output != stdout) {
+		predictor_progressbar(100);
+		fprintf(stdout, "\n");
+	}
+
+
+	// Free
+	of_beatmap_free(beatmap);
 }

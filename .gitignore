@@ -2,3 +2,4 @@ bin/
 *.o
 bnprdctr
 vgcore.*
+compile_flags.txt
