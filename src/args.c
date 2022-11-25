@@ -180,6 +180,16 @@ Args args_arg[args_num] = {
 			.cp = args_juice_point
 		}
 	},
+	// { // TODO
+	// 	.i = "-f",
+	// 	.item = "--juice-follow",
+	// 	.argument = "[x:y|x:y[|...]]",
+	// 	.description = ,
+	// 	.e_function = cp,
+	// 	.function = {
+	// 		.cp = 
+	// 	}
+	// },
 	{
 		.i = "-d",
 		.item = "--distance",
@@ -220,16 +230,6 @@ Args args_arg[args_num] = {
 			.v = args_record_objects
 		}
 	},
-	// { // TODO
-	// 	.i = "-f",
-	// 	.item = "--juice-follow",
-	// 	.argument = "[x:y|x:y[|...]]",
-	// 	.description = ,
-	// 	.e_function = cp,
-	// 	.function = {
-	// 		.cp = 
-	// 	}
-	// },
 	{
 		.i = "-h",
 		.item = "--help",

@@ -50,13 +50,19 @@ Allows for the distance for each Banana Shower. Since Banana Showers and Juice S
 
 If argument is not used, it will be defaulted to `1`.
 
-## Prefer Circles (`--prefer-circles`) - Boolean
+## Unoptimised (`-t` or `--unoptimised`) - Boolean
+
+While generating the Juice Streams, the application will not extend the length of the slider in order to optimise the placement amount.
+
+If argument is not used, it will be defaulted to `false`.
+
+## Prefer Circles (`-p` or `--prefer-circles`) - Boolean
 
 Outputs the given Banana Shower's bananas to circles (ignores Juice Streams). This can be used for debugging if the application is not giving the proper output; whether it be an error on the user's part or an error on the application's part.
 
 If argument is not used, it will be defaulted to `false`.
 
-## Record Objects (`--record-objects`) - Boolean
+## Record Objects (`-r` or `--record-objects`) - Boolean
 
 Outputs enitre beatmap's objects as well.
 
