@@ -1,6 +1,11 @@
 #include "predictor.h"
 
-// TODO fix errors with generated with valgrind in libosu `slider.c:462`
+#include <osu.h>
+#include <stdio.h>
+#include <stdbool.h>
+#include <limits.h>
+#include <sys/ioctl.h>
+#include <unistd.h>
 
 Predictor predictor = {
 	.output = NULL,
@@ -144,11 +149,6 @@ void predictor_areas(XLine *lines, int time) {
 
 /* Either we create a new Juice Stream and have a minimum of 3 nested objects; or if the previously created Juice Stream is not long enough then we can keep expanding it */
 void predictor_generatejs(CatchHitObject **bnpd, unsigned int *bnpd_len, int start_time, int end_time, Beatmap beatmap) {
-	// TODO fix issue where Juice Stream is over the end time
-	// TODO Figure out how to make optimisations/allow for the best of both worlds for the current optimisations
-	// 1 - smallest being 3 nested objects  (easier load but more population)
-	// 2 - biggest hitting the end time     (less population but load at end of bnprdctr)
-
 	static unsigned int index = 0;
 	HitObject *slider_hit_object = calloc(1, sizeof(*slider_hit_object));
 	slider_hit_object->x = ((predictor.jspoints + index)->points.vectors + 0)->x;
@@ -160,8 +160,7 @@ void predictor_generatejs(CatchHitObject **bnpd, unsigned int *bnpd_len, int sta
 	slider_hit_object->ho.slider.curves = NULL;
 	slider_hit_object->ho.slider.num_curve = 0;
 	slider_hit_object->ho.slider.slides = 1;
-	// We can keep increasing the length until we get the amount of droplets/tiny droplets needed            
-	slider_hit_object->ho.slider.length = 1;
+	slider_hit_object->ho.slider.length = 1;	// We can keep increasing the length until we get the amount of droplets/tiny droplets needed
 	slider_hit_object->hit_sample.normal_set = 0;
 	slider_hit_object->hit_sample.addition_set = 0;
 	slider_hit_object->hit_sample.index = 0;
@@ -431,7 +430,6 @@ void predictor_main(void) {
 		predictor_progressbar(100);
 		fprintf(stdout, "\n");
 	}
-
 
 	// Free
 	of_beatmap_free(beatmap);

@@ -2,13 +2,7 @@
 #define PREDICTOR_H
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <stdbool.h>
-#include <limits.h>
-#include <unistd.h>
-#include <sys/ioctl.h>
-
-#include <osu.h>
 
 typedef struct Vector {
 	float x;

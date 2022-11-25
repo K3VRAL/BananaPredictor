@@ -1,0 +1,5 @@
+While generating; show output image
+Make a new flag that follows a slider path
+Fix errors with generated with valgrind in libosu `slider.c:462`
+Make a new flag that only outputs small sliders over optimised ones
+Make a new flag that outputs the entire beatmap file

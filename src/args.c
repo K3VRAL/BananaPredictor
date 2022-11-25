@@ -1,4 +1,10 @@
 #include "args.h"
+#include "predictor.h"
+
+#include <stdbool.h>
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #define args_arg_num 8
 char *args_arg[args_arg_num][4] = {
@@ -12,10 +18,9 @@ char *args_arg[args_arg_num][4] = {
 	{ "-h", "--help", "", "gives this help message" }
 };
 
-void args_beatmap(bool *assign, char *option) {
+void args_beatmap(char *option) {
 	FILE *fp = fopen(option, "r");
 	if (fp == NULL) {
-		*assign = false;
 		return;
 	}
 	predictor.beatmap = fp;
@@ -119,23 +124,15 @@ void args_help(void) {
 	}
 }
 
-void args_unknown_argument(char *option) {
-	fprintf(stdout, "Argument not found: %s\n", option);
-}
-
 void args_main(bool *keep_running, int argc, char **argv) {
 	for (int i = 1; i < argc; i++) {
 		if (!strcmp(*(*(args_arg + 0) + 0), *(argv + i)) || !strcmp(*(*(args_arg + 0) + 1), *(argv + i))) {
-			bool assign = true;
-			args_beatmap(&assign, *(argv + ++i));
-			if (!assign) {
-				fprintf(stdout, "Beatmap file not found: %s\n", *(argv + i));
-			}
+			args_beatmap(*(argv + ++i));
 		} else if (!strcmp(*(*(args_arg + 1) + 0), *(argv + i)) || !strcmp(*(*(args_arg + 1) + 1), *(argv + i))) {
 			bool assign = true;
 			args_output(&assign, *(argv + ++i));
 			if (!assign) {
-				fprintf(stdout, "Output file not possible: %s - defaulting to stdout\n", *(argv + i));
+				fprintf(stdout, "Error: Output file is not writable\n");
 			}
 		} else if (!strcmp(*(*(args_arg + 2) + 0), *(argv + i)) || !strcmp(*(*(args_arg + 2) + 1), *(argv + i))) {
 			args_shape(*(argv + ++i));
@@ -152,7 +149,7 @@ void args_main(bool *keep_running, int argc, char **argv) {
 			*keep_running = false;
 			return;
 		} else {
-			args_unknown_argument(*(argv + i));
+			fprintf(stdout, "Error: Argument not found: %s\n", *(argv + i));
 			*keep_running = false;
 			return;
 		}
@@ -162,13 +159,21 @@ void args_main(bool *keep_running, int argc, char **argv) {
 		predictor.output = stdout;
 	}
 
-	if (predictor.beatmap == NULL || predictor.shapes == NULL) {
-			*keep_running = false;
-			return;
+	if (predictor.beatmap == NULL) {
+		fprintf(stdout, "Error: Input beatmap file not set\n");
+		*keep_running = false;
+		return;
+	}
+
+	if (predictor.shapes == NULL) {
+		fprintf(stdout, "Error: Shapes not set\n");
+		*keep_running = false;
+		return;
 	}
 
 	for (int i = 0; i < predictor.shapes_len; i++) {
 		if ((predictor.shapes + i)->points.len < 3) {
+			fprintf(stdout, "Error: Shape has points less 3\n");
 			*keep_running = false;
 			return;
 		}
@@ -185,8 +190,9 @@ void args_main(bool *keep_running, int argc, char **argv) {
 	} else {
 		for (int i = 0; i < predictor.jspoints_len; i++) {
 			if ((predictor.jspoints + i)->points.len < 2) {
-			*keep_running = false;
-			return;
+				fprintf(stdout, "Error: JuiceStream has points less than 2\n");
+				*keep_running = false;
+				return;
 			}
 		}
 	}
