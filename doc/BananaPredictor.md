@@ -4,7 +4,7 @@ BananaPredictor - An application to predict where bananas will be placed
 
 # Synopsis
 
-bnprdctr [-b file] [-o [file]] [-s x:time|x:time|x:time[|...]] [-j [x:y|x:y[|...]] [-d [distance]] [--prefer-circles] [--record-objects]
+bnprdctr [-b file] [-o [file]] [-O [file]] [-s x:time|x:time|x:time[|...]] [-j [x:y|x:y[|...]] [-d [distance]] [--prefer-circles] [--record-objects]
 
 # Description
 
@@ -23,6 +23,12 @@ If argument is not used, it will be defaulted to `NULL` and prevent the applicat
 ## Output (`-o` or `--output`) - String (file location)
 
 Uses the output file as output all the stored objects that were identified to modify the Banana Shower's bananas.
+
+If argument is not used, it will be defaulted to the terminal's output.
+
+## Output (`-O` or `--output-beatmap`) - String (file location)
+
+Uses the output file as output all the stored objects that were identified to modify the Banana Shower's bananas with the osu format.
 
 If argument is not used, it will be defaulted to the terminal's output.
 

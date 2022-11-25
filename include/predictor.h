@@ -28,6 +28,7 @@ typedef struct Predictor {
 	FILE *beatmap;
 	
 	FILE *output;
+	bool output_beatmap;
 
 	ShapePoints *shapes;
 	unsigned int shapes_len;

@@ -8,12 +8,11 @@
 #include <unistd.h>
 
 Predictor predictor = {
-	.output = NULL,
-	.prefer_circles = false,
-	.record_objects = false,
-
 	.beatmap = NULL,
 
+	.output = NULL,
+	.output_beatmap = false,
+	
 	.shapes = NULL,
 	.shapes_len = 0,
 
@@ -21,6 +20,9 @@ Predictor predictor = {
 	.jspoints_len = 0,
 
 	.distance = 1,
+
+	.prefer_circles = false,
+	.record_objects = false
 };
 
 /* Sets the values for the points to start and stop the main loop */
@@ -340,6 +342,17 @@ void predictor_main(void) {
 	Beatmap beatmap = {0};
 	of_beatmap_init(&beatmap);
 	of_beatmap_set(&beatmap, predictor.beatmap);
+
+	// If output with beatmap osu format; removing then putting back HitObjects so we can save beatmap settings without saving the HitObjects (we do that while processing)
+	if (predictor.output_beatmap) {
+		HitObject *objects = beatmap.hit_objects;
+		unsigned int objects_num = beatmap.num_ho;
+		beatmap.hit_objects = NULL;
+		beatmap.num_ho = 0;
+		of_beatmap_tofile(predictor.beatmap, beatmap);
+		beatmap.hit_objects = objects;
+		beatmap.num_ho = objects_num;
+	}
 
 	// We need the RNG of the beatmap until the point that we start
 	LegacyRandom rng;

@@ -6,115 +6,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void args_beatmap(char *);
-void args_output(char *);
-void args_shape(char *);
-void args_juice_point(char *);
-void args_distance(char *);
-void args_prefer_circles(void);
-void args_record_objects(void);
-void args_help(void);
-
-#define args_num 8
-typedef struct Args {
-	char *i;
-	char *item;
-	char *argument;
-	char *description;
-	enum {
-		cp,
-		v,
-		rv
-	} e_function;
-	union {
-		void (*cp)(char *);
-		void (*v)(void);
-	} function;
-} Args;
-Args args_arg[args_num] = {
-	{
-		.i = "-b",
-		.item = "--beatmap",
-		.argument = "file",
-		.description = "inputs the beatmap from the file location",
-		.e_function = cp,
-		.function = {
-			.cp = args_beatmap
-		}
-	},
-	{
-		.i = "-o",
-		.item = "--output",
-		.argument = "[file]",
-		.description = "outputs the BananaPredictor to the file location",
-		.e_function = cp,
-		.function = {
-			.cp = args_output
-		}
-	},
-	{
-		.i = "-s",
-		.item = "--shapes",
-		.argument = "x:time|x:time|x:time[|...]",
-		.description = "the points for the vector of the shape",
-		.e_function = cp,
-		.function = {
-			.cp = args_shape
-		}
-	},
-	{
-		.i = "-j",
-		.item = "--juice-points",
-		.argument = "[x:y|x:y[|...]]",
-		.description = "the points for the vector of the Juice Streams",
-		.e_function = cp,
-		.function = {
-			.cp = args_juice_point
-		}
-	},
-	{
-		.i = "-d",
-		.item = "--distance",
-		.argument = "[time]",
-		.description = "gives the distance for each Banana Shower as a double",
-		.e_function = cp,
-		.function = {
-			.cp = args_distance
-		}
-	},
-	{
-		.i = "-p",
-		.item = "--prefer-circles",
-		.argument = "",
-		.description = "outputs the Banana Shower's bananas instead of the Juice Stream and Banana Shower",
-		.e_function = v,
-		.function = {
-			.v = args_prefer_circles
-		}
-	},
-	{
-		.i = "-r",
-		.item = "--record-objects",
-		.argument = "",
-		.description = "records and outputs the entire map file",
-		.e_function = v,
-		.function = {
-			.v = args_record_objects
-		}
-	},
-	{
-		.i = "-h",
-		.item = "--help",
-		.argument = "",
-		.description = "gives this help message",
-		.e_function = rv,
-		.function = {
-			.v = args_help
-		}
-	}
-};
-
 void args_beatmap(char *option) {
+	if (predictor.beatmap != NULL) {
+		fprintf(stdout, "Error: Output file has already been inputted\n");
+		return;
+	}
 	FILE *fp = fopen(option, "r");
 	if (fp == NULL) {
 		return;
@@ -123,12 +19,26 @@ void args_beatmap(char *option) {
 }
 
 void args_output(char *option) {
+	if (predictor.output != NULL) {
+		fprintf(stdout, "Error: Output file has already been inputted\n");
+		return;
+	}
 	FILE *fp = fopen(option, "w");
 	if (fp == NULL) {
 		fprintf(stdout, "Error: Output file is not writable\n");
 		return;
 	}
 	predictor.output = fp;
+	predictor.output_beatmap = false;
+}
+
+void args_output_beatmap(char *option) {
+	if (predictor.output != NULL) {
+		fprintf(stdout, "Error: Output file has already been inputted\n");
+		return;
+	}
+	args_output(option);
+	predictor.output_beatmap = true;
 }
 
 void args_shape(char *option) {
@@ -196,6 +106,137 @@ void args_prefer_circles(void) {
 void args_record_objects(void) {
 	predictor.record_objects = true;
 }
+
+void args_help(void);
+
+typedef struct Args {
+	char *i;
+	char *item;
+	char *argument;
+	char *description;
+	enum {
+		cp,
+		v,
+		rv
+	} e_function;
+	union {
+		void (*cp)(char *);
+		void (*v)(void);
+	} function;
+} Args;
+#define args_num 9
+Args args_arg[args_num] = {
+	{
+		.i = "-b",
+		.item = "--beatmap",
+		.argument = "file",
+		.description = "inputs the beatmap from the file location",
+		.e_function = cp,
+		.function = {
+			.cp = args_beatmap
+		}
+	},
+	{
+		.i = "-o",
+		.item = "--output",
+		.argument = "[file]",
+		.description = "outputs the BananaPredictor to the file location",
+		.e_function = cp,
+		.function = {
+			.cp = args_output
+		}
+	},
+	{
+		.i = "-O",
+		.item = "--output-beatmap",
+		.argument = "[file]",
+		.description = "outputs the BananaPredictor to the file location with the osu format",
+		.e_function = cp,
+		.function = {
+			.cp = args_output_beatmap
+		}
+	},
+	{
+		.i = "-s",
+		.item = "--shapes",
+		.argument = "x:time|x:time|x:time[|...]",
+		.description = "the points for the vector of the shape",
+		.e_function = cp,
+		.function = {
+			.cp = args_shape
+		}
+	},
+	{
+		.i = "-j",
+		.item = "--juice-points",
+		.argument = "[x:y|x:y[|...]]",
+		.description = "the points for the vector of the Juice Streams",
+		.e_function = cp,
+		.function = {
+			.cp = args_juice_point
+		}
+	},
+	{
+		.i = "-d",
+		.item = "--distance",
+		.argument = "[time]",
+		.description = "gives the distance for each Banana Shower as a double",
+		.e_function = cp,
+		.function = {
+			.cp = args_distance
+		}
+	},
+	{
+		.i = "-p",
+		.item = "--prefer-circles",
+		.argument = "",
+		.description = "outputs the Banana Shower's bananas instead of the Juice Stream and Banana Shower",
+		.e_function = v,
+		.function = {
+			.v = args_prefer_circles
+		}
+	},
+	{
+		.i = "-r",
+		.item = "--record-objects",
+		.argument = "",
+		.description = "records and outputs the entire map file",
+		.e_function = v,
+		.function = {
+			.v = args_record_objects
+		}
+	},
+	// { // TODO
+	// 	.i = "-f",
+	// 	.item = "--juice-follow",
+	// 	.argument = "[x:y|x:y[|...]]",
+	// 	.description = ,
+	// 	.e_function = cp,
+	// 	.function = {
+	// 		.cp = 
+	// 	}
+	// },
+	// { // TODO
+	// 	.i = "-t",
+	// 	.item = "--optimised",
+	// 	.argument = "",
+	// 	.description = ,
+	// 	.e_function = v,
+	// 	.function = {
+	// 		.v = 
+	// 	}
+	// },
+	{
+		.i = "-h",
+		.item = "--help",
+		.argument = "",
+		.description = "gives this help message",
+		.e_function = rv,
+		.function = {
+			.v = args_help
+		}
+	}
+};
 
 void args_help(void) {
 	char *title = "BananaPredictor";
