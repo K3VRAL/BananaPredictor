@@ -99,6 +99,10 @@ void args_distance(char *option) {
 	predictor.distance = strtod(option, NULL);
 }
 
+void args_unoptimised(void) {
+	predictor.unoptimised = true;
+}
+
 void args_prefer_circles(void) {
 	predictor.prefer_circles = true;
 }
@@ -124,7 +128,7 @@ typedef struct Args {
 		void (*v)(void);
 	} function;
 } Args;
-#define args_num 9
+#define args_num 10
 Args args_arg[args_num] = {
 	{
 		.i = "-b",
@@ -187,6 +191,16 @@ Args args_arg[args_num] = {
 		}
 	},
 	{
+		.i = "-t",
+		.item = "--unoptimised",
+		.argument = "",
+		.description = "generate Juice Streams that doesn't extend the length",
+		.e_function = v,
+		.function = {
+			.v = args_unoptimised
+		}
+	},
+	{
 		.i = "-p",
 		.item = "--prefer-circles",
 		.argument = "",
@@ -214,16 +228,6 @@ Args args_arg[args_num] = {
 	// 	.e_function = cp,
 	// 	.function = {
 	// 		.cp = 
-	// 	}
-	// },
-	// { // TODO
-	// 	.i = "-t",
-	// 	.item = "--optimised",
-	// 	.argument = "",
-	// 	.description = ,
-	// 	.e_function = v,
-	// 	.function = {
-	// 		.v = 
 	// 	}
 	// },
 	{

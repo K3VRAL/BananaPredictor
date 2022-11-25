@@ -38,6 +38,8 @@ typedef struct Predictor {
 
 	double distance;
 
+	bool unoptimised;
+
 	bool prefer_circles;
 	bool record_objects;
 } Predictor;
