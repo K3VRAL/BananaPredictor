@@ -6,16 +6,112 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define args_arg_num 8
-char *args_arg[args_arg_num][4] = {
-	{ "-b", "--beatmap", "file", "inputs the beatmap from the file location" },
-	{ "-o", "--output", "[file]", "outputs the BananaPredictor to the file location" },
-	{ "-s", "--shapes", "x:time|x:time|x:time[|...]", "the points for the vector of the shape" },
-	{ "-j", "--juice-points", "[x:y|x:y[|...]]", "the points for the vector of the Juice Streams" },
-	{ "-d", "--distance", "[time]", "gives the distance for each Banana Shower as a double" },
-	{ "-p", "--prefer-circles", "", "outputs the Banana Shower's bananas instead of the Juice Stream and Banana Shower" },
-	{ "-r", "--record-objects", "", "records and outputs the entire map file" },
-	{ "-h", "--help", "", "gives this help message" }
+void args_beatmap(char *);
+void args_output(char *);
+void args_shape(char *);
+void args_juice_point(char *);
+void args_distance(char *);
+void args_prefer_circles(void);
+void args_record_objects(void);
+void args_help(void);
+
+#define args_num 8
+typedef struct Args {
+	char *i;
+	char *item;
+	char *argument;
+	char *description;
+	enum {
+		cp,
+		v,
+		rv
+	} e_function;
+	union {
+		void (*cp)(char *);
+		void (*v)(void);
+	} function;
+} Args;
+Args args_arg[args_num] = {
+	{
+		.i = "-b",
+		.item = "--beatmap",
+		.argument = "file",
+		.description = "inputs the beatmap from the file location",
+		.e_function = cp,
+		.function = {
+			.cp = args_beatmap
+		}
+	},
+	{
+		.i = "-o",
+		.item = "--output",
+		.argument = "[file]",
+		.description = "outputs the BananaPredictor to the file location",
+		.e_function = cp,
+		.function = {
+			.cp = args_output
+		}
+	},
+	{
+		.i = "-s",
+		.item = "--shapes",
+		.argument = "x:time|x:time|x:time[|...]",
+		.description = "the points for the vector of the shape",
+		.e_function = cp,
+		.function = {
+			.cp = args_shape
+		}
+	},
+	{
+		.i = "-j",
+		.item = "--juice-points",
+		.argument = "[x:y|x:y[|...]]",
+		.description = "the points for the vector of the Juice Streams",
+		.e_function = cp,
+		.function = {
+			.cp = args_juice_point
+		}
+	},
+	{
+		.i = "-d",
+		.item = "--distance",
+		.argument = "[time]",
+		.description = "gives the distance for each Banana Shower as a double",
+		.e_function = cp,
+		.function = {
+			.cp = args_distance
+		}
+	},
+	{
+		.i = "-p",
+		.item = "--prefer-circles",
+		.argument = "",
+		.description = "outputs the Banana Shower's bananas instead of the Juice Stream and Banana Shower",
+		.e_function = v,
+		.function = {
+			.v = args_prefer_circles
+		}
+	},
+	{
+		.i = "-r",
+		.item = "--record-objects",
+		.argument = "",
+		.description = "records and outputs the entire map file",
+		.e_function = v,
+		.function = {
+			.v = args_record_objects
+		}
+	},
+	{
+		.i = "-h",
+		.item = "--help",
+		.argument = "",
+		.description = "gives this help message",
+		.e_function = rv,
+		.function = {
+			.v = args_help
+		}
+	}
 };
 
 void args_beatmap(char *option) {
@@ -26,10 +122,10 @@ void args_beatmap(char *option) {
 	predictor.beatmap = fp;
 }
 
-void args_output(bool *assign, char *option) {
+void args_output(char *option) {
 	FILE *fp = fopen(option, "w");
 	if (fp == NULL) {
-		*assign = false;
+		fprintf(stdout, "Error: Output file is not writable\n");
 		return;
 	}
 	predictor.output = fp;
@@ -110,48 +206,40 @@ void args_help(void) {
 
 	// For the spaces
 	int space_num = 0;
-	for (int i = 0; i < args_arg_num; i++) {
-		int num = strlen(*(*(args_arg + i) + 0)) + 2 + strlen(*(*(args_arg + i) + 1)) + strlen(*(*(args_arg + i) + 2));
+	for (int i = 0; i < args_num; i++) {
+		int num = strlen((args_arg + i)->i) + 2 + strlen((args_arg + i)->item) + strlen((args_arg + i)->argument);
 		if (num > space_num) {
 			space_num = num;
 		}
 	}
 	// Printing text with the spaces
 	fprintf(stdout, "arguments:\n");
-	for (int i = 0; i < args_arg_num; i++) {
-		int num = space_num - (strlen(*(*(args_arg + i) + 0)) + 2 + strlen(*(*(args_arg + i) + 1)) + strlen(*(*(args_arg + i) + 2)));
-		fprintf(stdout, "\t%s, %s %s%*c%s\n", *(*(args_arg + i) + 0), *(*(args_arg + i) + 1), *(*(args_arg + i) + 2), num + 1, ' ', *(*(args_arg + i) + 3));
+	for (int i = 0; i < args_num; i++) {
+		int num = space_num - (strlen((args_arg + i)->i) + 2 + strlen((args_arg + i)->item) + strlen((args_arg + i)->argument));
+		fprintf(stdout, "\t%s, %s %s%*c%s\n", (args_arg + i)->i, (args_arg + i)->item, (args_arg + i)->argument, num + 1, ' ', (args_arg + i)->description);
 	}
 }
 
 void args_main(bool *keep_running, int argc, char **argv) {
 	for (int i = 1; i < argc; i++) {
-		if (!strcmp(*(*(args_arg + 0) + 0), *(argv + i)) || !strcmp(*(*(args_arg + 0) + 1), *(argv + i))) {
-			args_beatmap(*(argv + ++i));
-		} else if (!strcmp(*(*(args_arg + 1) + 0), *(argv + i)) || !strcmp(*(*(args_arg + 1) + 1), *(argv + i))) {
-			bool assign = true;
-			args_output(&assign, *(argv + ++i));
-			if (!assign) {
-				fprintf(stdout, "Error: Output file is not writable\n");
+		for (int j = 0; j < args_num; j++) {
+			if (!strcmp((args_arg + j)->i, *(argv + i)) || !strcmp((args_arg + j)->item, *(argv + i))) {
+				if ((args_arg + j)->e_function == cp) {
+					(args_arg + j)->function.cp(*(argv + ++i));
+				} else if ((args_arg + j)->e_function == v) {
+					(args_arg + j)->function.v();
+				} else if ((args_arg + j)->e_function == rv) {
+					(args_arg + j)->function.v();
+					*keep_running = false;
+					return;
+				}
+				break;
 			}
-		} else if (!strcmp(*(*(args_arg + 2) + 0), *(argv + i)) || !strcmp(*(*(args_arg + 2) + 1), *(argv + i))) {
-			args_shape(*(argv + ++i));
-		} else if (!strcmp(*(*(args_arg + 3) + 0), *(argv + i)) || !strcmp(*(*(args_arg + 3) + 1), *(argv + i))) {
-			args_juice_point(*(argv + ++i));
-		} else if (!strcmp(*(*(args_arg + 4) + 0), *(argv + i)) || !strcmp(*(*(args_arg + 4) + 1), *(argv + i))) {
-			args_distance(*(argv + ++i));
-		} else if (!strcmp(*(*(args_arg + 5) + 0), *(argv + i)) || !strcmp(*(*(args_arg + 5) + 1), *(argv + i))) {
-			args_prefer_circles();
-		} else if (!strcmp(*(*(args_arg + 6) + 0), *(argv + i)) || !strcmp(*(*(args_arg + 6) + 1), *(argv + i))) {
-			args_record_objects();
-		} else if (!strcmp(*(*(args_arg + args_arg_num - 1) + 0), *(argv + i)) || !strcmp(*(*(args_arg + args_arg_num - 1) + 1), *(argv + i))) {
-			args_help();
-			*keep_running = false;
-			return;
-		} else {
-			fprintf(stdout, "Error: Argument not found: %s\n", *(argv + i));
-			*keep_running = false;
-			return;
+			if (j == args_num) {
+				fprintf(stdout, "Error: Argument not found: %s\n", *(argv + i));
+				*keep_running = false;
+				return;
+			}
 		}
 	}
 
