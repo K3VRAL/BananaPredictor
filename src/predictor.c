@@ -351,7 +351,7 @@ void predictor_main(void) {
 		unsigned int objects_num = beatmap.num_ho;
 		beatmap.hit_objects = NULL;
 		beatmap.num_ho = 0;
-		of_beatmap_tofile(predictor.beatmap, beatmap);
+		of_beatmap_tofile(predictor.output, beatmap);
 		beatmap.hit_objects = objects;
 		beatmap.num_ho = objects_num;
 	}
