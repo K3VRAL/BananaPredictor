@@ -4,7 +4,7 @@ BananaPredictor - An application to predict where bananas will be placed
 
 # Synopsis
 
-bnprdctr [-b file] [-o [file]] [-O [file]] [-s x:time|x:time|x:time[|...]] [-j [x:y|x:y[|...]] [-d [distance]] [--prefer-circles] [--record-objects]
+bnprdctr [-b file] [-o [file]] [-O [file]] [-s x:time|x:time|x:time[|...]] [-j [[f|]x:y|x:y[|...]] [-d [distance]] [--prefer-circles] [--record-objects]
 
 # Description
 
@@ -32,29 +32,27 @@ Uses the output file as output all the stored objects that were identified to mo
 
 If argument is not used, it will be defaulted to the terminal's output.
 
-## Shapes (`-s` or `--shapes`) - String (formatted as `x:time|...`)
+## Shapes (`-s` or `--shapes`) - String (formatted as `x:time|x:time|x:time[|...]`)
 
-The format for a point is `x:time|...`. It is mandatory that there is at least three points. The final point will always go back to the first point.
+The format for a point is `x:time|x:time|x:time[|...]`. It is mandatory that there is at least three points. The final point will always go back to the first point.
 
-If argument is not used, it will be defaulted to `NULL` and prevent the application from running. You also can stack the argument multiple times, allowing you to have multiple shapes.
+If argument is not used, it will be defaulted to `NULL` and prevent the application from running.
 
-## Juice Points (`-j` or `--juice-points`) - String (formatted as `x:y|...`)
+You also can stack the argument multiple times, allowing you to have multiple shapes; each shape works independantly.
 
-The format for a point is `x:y|...`. It is mandatory that there is at least two points. The first point will always be the x and y coordinates for Juice Stream whereas the rest will be it's curve.
+## Juice Points (`-j` or `--juice-points`) - String (formatted as `[f|]x:y|x:y[|...]`)
 
-If argument is not used, it will be defaulted to `NULL` and the default format will be used instead. You also can stack the argument multiple times, allowing you to have multiple Juice Streams.
+The format for a point is `[f|]x:y|x:y[|...]`. It is mandatory that there is at least two points. The first point will always be the x and y coordinates for Juice Stream whereas the rest will be it's curve.
+
+If argument is not used, it will be defaulted to `NULL` and the default format will be used instead.
+
+You also can stack the argument multiple times, allowing you to have multiple Juice Streams; each Juice Stream works dependantly on each other where the ordering of each Juice Stream placed matters.
 
 ## Distance (`-d` or `--distance`) - Double
 
 Allows for the distance for each Banana Shower. Since Banana Showers and Juice Streams requires a lot of load, this can be reduced by spreading the them out.
 
 If argument is not used, it will be defaulted to `1`.
-
-## Unoptimised (`-t` or `--unoptimised`) - Boolean
-
-While generating the Juice Streams, the application will not extend the length of the slider in order to optimise the placement amount.
-
-If argument is not used, it will be defaulted to `false`.
 
 ## Prefer Circles (`-p` or `--prefer-circles`) - Boolean
 
@@ -73,6 +71,10 @@ If argument is not used, it will be defaulted to `false`.
 Gives all the commands to the terminal's output
 
 ## Points format
+
+### f - Boolean
+
+Thir is used if the Juice Streams generated should follow the master given it's current time.
 
 ### x - Integer
 

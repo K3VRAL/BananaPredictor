@@ -21,8 +21,6 @@ Predictor predictor = {
 
 	.distance = 1,
 
-	.unoptimised = false,
-
 	.prefer_circles = false,
 	.record_objects = false
 };
@@ -184,7 +182,7 @@ void predictor_generatejs(CatchHitObject **bnpd, unsigned int *bnpd_len, int sta
 	bool make_new = true;
 
 	// Extend current slider to optimise slider amount placed
-	if (!predictor.unoptimised && (*bnpd + 0)->type == catchhitobject_juicestream && (*bnpd + 0)->cho.js.slider_data.end_time < end_time) {
+	if ((*bnpd + 0)->type == catchhitobject_juicestream && (*bnpd + 0)->cho.js.slider_data.end_time < end_time) {
 		unsigned int nested_num = (*bnpd + 0)->cho.js.num_nested;
 		slider_hit_object->x = (*bnpd + 0)->cho.js.slider_data.start_position.x;
 		slider_hit_object->time = (*bnpd + 0)->cho.js.slider_data.start_time;

@@ -75,6 +75,7 @@ void args_juice_point(char *option) {
 	predictor.jspoints = realloc(predictor.jspoints, (++predictor.jspoints_len) * sizeof(*predictor.jspoints));
 	(predictor.jspoints + predictor.jspoints_len - 1)->points.vectors = NULL;
 	(predictor.jspoints + predictor.jspoints_len - 1)->points.len = 0;
+	(predictor.jspoints + predictor.jspoints_len - 1)->follow = false;
 	while (token != NULL) {
 		if (used_delim == '|' || (predictor.jspoints + predictor.jspoints_len - 1)->points.len == 0) {
 			(predictor.jspoints + predictor.jspoints_len - 1)->points.vectors = realloc((predictor.jspoints + predictor.jspoints_len - 1)->points.vectors, ++(predictor.jspoints + predictor.jspoints_len - 1)->points.len * sizeof(*(predictor.jspoints + predictor.jspoints_len - 1)->points.vectors));
@@ -82,6 +83,10 @@ void args_juice_point(char *option) {
 		switch (used_delim) {
 			case '\0':
 			case '|':
+				if (!strcmp("f", token)) {
+					(predictor.jspoints + predictor.jspoints_len - 1)->follow = true;
+					break;
+				}
 				((predictor.jspoints + predictor.jspoints_len - 1)->points.vectors + (predictor.jspoints + predictor.jspoints_len - 1)->points.len - 1)->x = strtol(token, NULL, 10);
 				break;
 
@@ -97,10 +102,6 @@ void args_juice_point(char *option) {
 
 void args_distance(char *option) {
 	predictor.distance = strtod(option, NULL);
-}
-
-void args_unoptimised(void) {
-	predictor.unoptimised = true;
 }
 
 void args_prefer_circles(void) {
@@ -128,7 +129,7 @@ typedef struct Args {
 		void (*v)(void);
 	} function;
 } Args;
-#define args_num 10
+#define args_num 9
 Args args_arg[args_num] = {
 	{
 		.i = "-b",
@@ -180,16 +181,6 @@ Args args_arg[args_num] = {
 			.cp = args_juice_point
 		}
 	},
-	// { // TODO
-	// 	.i = "-f",
-	// 	.item = "--juice-follow",
-	// 	.argument = "[x:y|x:y[|...]]",
-	// 	.description = ,
-	// 	.e_function = cp,
-	// 	.function = {
-	// 		.cp = 
-	// 	}
-	// },
 	{
 		.i = "-d",
 		.item = "--distance",
@@ -198,16 +189,6 @@ Args args_arg[args_num] = {
 		.e_function = cp,
 		.function = {
 			.cp = args_distance
-		}
-	},
-	{
-		.i = "-t",
-		.item = "--unoptimised",
-		.argument = "",
-		.description = "generate Juice Streams that doesn't extend the length",
-		.e_function = v,
-		.function = {
-			.v = args_unoptimised
 		}
 	},
 	{
@@ -267,6 +248,7 @@ void args_help(void) {
 
 void args_main(bool *keep_running, int argc, char **argv) {
 	for (int i = 1; i < argc; i++) {
+		bool not_found = true;
 		for (int j = 0; j < args_num; j++) {
 			if (!strcmp((args_arg + j)->i, *(argv + i)) || !strcmp((args_arg + j)->item, *(argv + i))) {
 				if ((args_arg + j)->e_function == cp) {
@@ -278,13 +260,14 @@ void args_main(bool *keep_running, int argc, char **argv) {
 					*keep_running = false;
 					return;
 				}
+				not_found = false;
 				break;
 			}
-			if (j == args_num) {
-				fprintf(stdout, "Error: Argument not found: %s\n", *(argv + i));
-				*keep_running = false;
-				return;
-			}
+		}
+		if (not_found) {
+			fprintf(stdout, "Error: Argument not found: %s\n", *(argv + i));
+			*keep_running = false;
+			return;
 		}
 	}
 
@@ -313,13 +296,7 @@ void args_main(bool *keep_running, int argc, char **argv) {
 	}
 
 	if (predictor.jspoints == NULL) {
-		predictor.jspoints = calloc(++predictor.jspoints_len, sizeof(*predictor.jspoints));
-		(predictor.jspoints + 0)->points.len = 2;
-		(predictor.jspoints + 0)->points.vectors = calloc((predictor.jspoints + 0)->points.len, sizeof(*(predictor.jspoints + 0)->points.vectors));
-		((predictor.jspoints + 0)->points.vectors + 0)->x = 256;
-		((predictor.jspoints + 0)->points.vectors + 0)->ty = 384;
-		((predictor.jspoints + 0)->points.vectors + 1)->x = 256;
-		((predictor.jspoints + 0)->points.vectors + 1)->ty = 0;
+		args_juice_point("256:384|256:0");
 	} else {
 		for (int i = 0; i < predictor.jspoints_len; i++) {
 			if ((predictor.jspoints + i)->points.len < 2) {

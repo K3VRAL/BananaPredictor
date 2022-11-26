@@ -22,6 +22,7 @@ typedef struct ShapePoints {
 
 typedef struct JuiceStreamPoints {
 	Point points;
+	bool follow;
 } JuiceStreamPoints;
 
 typedef struct Predictor {
@@ -37,8 +38,6 @@ typedef struct Predictor {
 	unsigned int jspoints_len;
 
 	double distance;
-
-	bool unoptimised;
 
 	bool prefer_circles;
 	bool record_objects;
