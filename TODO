@@ -1,3 +1,2 @@
-While generating; show output image
 Fix errors with generated with valgrind in libosu `slider.c:462`
 Make a new flag that follows a slider path

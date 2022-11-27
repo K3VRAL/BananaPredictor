@@ -174,7 +174,7 @@ Args args_arg[args_num] = {
 	{
 		.i = "-j",
 		.item = "--juice-points",
-		.argument = "[x:y|x:y[|...]]",
+		.argument = "[[f|]x:y|x:y[|...]]",
 		.description = "the points for the vector of the Juice Streams",
 		.e_function = cp,
 		.function = {
