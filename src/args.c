@@ -6,39 +6,43 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void args_beatmap(char *option) {
+bool args_beatmap(char *option) {
 	if (predictor.beatmap != NULL) {
 		fprintf(stdout, "Error: Output file has already been inputted\n");
-		return;
+		return false;
 	}
 	FILE *fp = fopen(option, "r");
 	if (fp == NULL) {
-		return;
+		return false;
 	}
 	predictor.beatmap = fp;
+	return true;
 }
 
-void args_output(char *option) {
+bool args_output(char *option) {
 	if (predictor.output != NULL) {
 		fprintf(stdout, "Error: Output file has already been inputted\n");
-		return;
+		return false;
 	}
 	FILE *fp = fopen(option, "w");
 	if (fp == NULL) {
 		fprintf(stdout, "Error: Output file is not writable\n");
-		return;
+		return false;
 	}
 	predictor.output = fp;
 	predictor.output_beatmap = false;
+	return true;
 }
 
-void args_output_beatmap(char *option) {
+bool args_output_beatmap(char *option) {
 	if (predictor.output != NULL) {
 		fprintf(stdout, "Error: Output file has already been inputted\n");
-		return;
+		return false;
 	}
 	args_output(option);
 	predictor.output_beatmap = true;
+	predictor.record_objects = !predictor.record_objects;
+	return true;
 }
 
 void args_shape(char *option) {
@@ -109,6 +113,10 @@ void args_prefer_circles(void) {
 }
 
 void args_record_objects(void) {
+	if (predictor.output_beatmap) {
+		predictor.record_objects = false;
+		return;
+	}
 	predictor.record_objects = true;
 }
 
@@ -120,11 +128,13 @@ typedef struct Args {
 	char *argument;
 	char *description;
 	enum {
+		bcp,
 		cp,
 		v,
 		rv
 	} e_function;
 	union {
+		bool (*bcp)(char *);
 		void (*cp)(char *);
 		void (*v)(void);
 	} function;
@@ -136,9 +146,9 @@ Args args_arg[args_num] = {
 		.item = "--beatmap",
 		.argument = "file",
 		.description = "inputs the beatmap from the file location",
-		.e_function = cp,
+		.e_function = bcp,
 		.function = {
-			.cp = args_beatmap
+			.bcp = args_beatmap
 		}
 	},
 	{
@@ -146,9 +156,9 @@ Args args_arg[args_num] = {
 		.item = "--output",
 		.argument = "[file]",
 		.description = "outputs the BananaPredictor to the file location",
-		.e_function = cp,
+		.e_function = bcp,
 		.function = {
-			.cp = args_output
+			.bcp = args_output
 		}
 	},
 	{
@@ -156,9 +166,9 @@ Args args_arg[args_num] = {
 		.item = "--output-beatmap",
 		.argument = "[file]",
 		.description = "outputs the BananaPredictor to the file location with the osu format",
-		.e_function = cp,
+		.e_function = bcp,
 		.function = {
-			.cp = args_output_beatmap
+			.bcp = args_output_beatmap
 		}
 	},
 	{
@@ -246,19 +256,22 @@ void args_help(void) {
 	}
 }
 
-void args_main(bool *keep_running, int argc, char **argv) {
+bool args_main(int argc, char **argv) {
 	for (int i = 1; i < argc; i++) {
 		bool not_found = true;
 		for (int j = 0; j < args_num; j++) {
 			if (!strcmp((args_arg + j)->i, *(argv + i)) || !strcmp((args_arg + j)->item, *(argv + i))) {
-				if ((args_arg + j)->e_function == cp) {
+				if ((args_arg + j)->e_function == bcp) {
+					if (!(args_arg + j)->function.bcp(*(argv + ++i))) {
+						return false;
+					}
+				} else if ((args_arg + j)->e_function == cp) {
 					(args_arg + j)->function.cp(*(argv + ++i));
 				} else if ((args_arg + j)->e_function == v) {
 					(args_arg + j)->function.v();
 				} else if ((args_arg + j)->e_function == rv) {
 					(args_arg + j)->function.v();
-					*keep_running = false;
-					return;
+					return false;
 				}
 				not_found = false;
 				break;
@@ -266,8 +279,7 @@ void args_main(bool *keep_running, int argc, char **argv) {
 		}
 		if (not_found) {
 			fprintf(stdout, "Error: Argument not found: %s\n", *(argv + i));
-			*keep_running = false;
-			return;
+			return false;
 		}
 	}
 
@@ -277,33 +289,33 @@ void args_main(bool *keep_running, int argc, char **argv) {
 
 	if (predictor.beatmap == NULL) {
 		fprintf(stdout, "Error: Input beatmap file not set\n");
-		*keep_running = false;
-		return;
+		return false;
 	}
 
 	if (predictor.shapes == NULL) {
 		fprintf(stdout, "Error: Shapes not set\n");
-		*keep_running = false;
-		return;
+		return false;
 	}
 
 	for (int i = 0; i < predictor.shapes_len; i++) {
 		if ((predictor.shapes + i)->points.len < 3) {
 			fprintf(stdout, "Error: Shape has points less 3\n");
-			*keep_running = false;
-			return;
+			return false;
 		}
 	}
 
 	if (predictor.jspoints == NULL) {
-		args_juice_point("256:384|256:0");
+		char *slider = strdup("256:384|256:0");
+		args_juice_point(slider);
+		free(slider);
 	} else {
 		for (int i = 0; i < predictor.jspoints_len; i++) {
 			if ((predictor.jspoints + i)->points.len < 2) {
 				fprintf(stdout, "Error: JuiceStream has points less than 2\n");
-				*keep_running = false;
-				return;
+				return false;
 			}
 		}
 	}
+
+	return true;
 }

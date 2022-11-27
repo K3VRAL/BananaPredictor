@@ -26,9 +26,9 @@ Uses the output file as output all the stored objects that were identified to mo
 
 If argument is not used, it will be defaulted to the terminal's output.
 
-## Output (`-O` or `--output-beatmap`) - String (file location)
+## Output Beatmap (`-O` or `--output-beatmap`) - String (file location)
 
-Uses the output file as output all the stored objects that were identified to modify the Banana Shower's bananas with the osu format.
+Uses the output file as output all the stored objects that were identified to modify the Banana Shower's bananas with the osu format. Record Objects (`-r` or `--record-objects`) will be defaulted to `true`. 
 
 If argument is not used, it will be defaulted to the terminal's output.
 
@@ -65,6 +65,8 @@ If argument is not used, it will be defaulted to `false`.
 Outputs enitre beatmap's objects as well.
 
 If argument is not used, it will be defaulted to `false`.
+
+If the Output Beatmap (`-O` or `--output-beatmap`) argument is used, it will be defaulted to `true`. If this argument is then later used; it will not record the beatmap.
 
 ## Help (`-h` or `--help`) - Boolean
 

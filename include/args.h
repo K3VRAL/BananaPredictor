@@ -4,6 +4,6 @@
 #include <stdbool.h>
 
 /* Handling the arguments given from the input of the terminal */
-void args_main(bool *, int, char **);
+bool args_main(int, char **);
 
 #endif

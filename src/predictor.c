@@ -81,26 +81,33 @@ typedef struct Coefficient {
 } Coefficient;
 
 /* Calculating the Line using Cramer's Rule */
-void predictor_line(Coefficient *coefficient, Vector p1, Vector p2) {
-	coefficient->a = p1.ty - p2.ty;
-	coefficient->b = p2.x - p1.x;
-	coefficient->c = -((p1.x * p2.ty) - (p2.x * p1.ty));
+Coefficient predictor_line(Vector p1, Vector p2) {
+	Coefficient coefficient = {
+		.a = p1.ty - p2.ty,
+		.b = p2.x - p1.x,
+		.c = -((p1.x * p2.ty) - (p2.x * p1.ty))
+	};
+	return coefficient;
 }
 
 /* Calculating the Line of Intersection with Determinants */
-void predictor_intersection(Vector **r, Coefficient c1, Coefficient c2) {
+Vector *predictor_intersection(Coefficient c1, Coefficient c2) {
+	Vector *r = NULL;
 	double d = c1.a * c2.b - c1.b * c2.a;
 	if (d != 0) {
-		*r = calloc(1, sizeof(**r));
-		(*r)->x = (c1.c * c2.b - c1.b * c2.c) / d;
-		(*r)->ty = (c1.a * c2.c - c1.c * c2.a) / d;
+		r = calloc(1, sizeof(*r));
+		r->x = (c1.c * c2.b - c1.b * c2.c) / d;
+		r->ty = (c1.a * c2.c - c1.c * c2.a) / d;
 	}
+	return r;
 }
 
 /* Calculate the intersections of each line and whether they should be used for calculation */
-void predictor_areas(XLine *lines, int time) {
-	lines->areas = calloc(++lines->len, sizeof(*lines->areas));
-	*(lines->areas + lines->len - 1) = 0;
+XLine predictor_areas(int time) {
+	XLine lines = {0};
+	lines.len = 0;
+	lines.areas = calloc(++lines.len, sizeof(*lines.areas));
+	*(lines.areas + lines.len - 1) = 0;
 	for (int i = 0; i < predictor.shapes_len; i++) {
 		if (!(time >= (predictor.shapes + i)->start && time < (predictor.shapes + i)->end)) {
 			continue;
@@ -112,40 +119,38 @@ void predictor_areas(XLine *lines, int time) {
 				continue;
 			}
 
-			Coefficient c1;
-			predictor_line(&c1, p1_l1, p2_l1);
+			Coefficient c1 = predictor_line(p1_l1, p2_l1);
 
 			Vector p1_l2 = { .x = -1, .ty = time };
 			Vector p2_l2 = { .x = 1, .ty = time };
-			Coefficient c2;
-			predictor_line(&c2, p1_l2, p2_l2);
+			Coefficient c2 = predictor_line(p1_l2, p2_l2);
 
-			Vector *r = NULL;
-			predictor_intersection(&r, c1, c2);
+			Vector *r = predictor_intersection(c1, c2);
 			if (r == NULL) {
 				continue;
 			}
 			if (r->x >= 0 && r->x <= 512) {
-				lines->areas = realloc(lines->areas, ++lines->len * sizeof(*lines->areas));
-				*(lines->areas + lines->len - 1) = r->x;
+				lines.areas = realloc(lines.areas, ++lines.len * sizeof(*lines.areas));
+				*(lines.areas + lines.len - 1) = r->x;
 			}
 			free(r);
 		}
 	}
-	for (int i = 0; i < lines->len - 1; i++) {
-		for (int j = 0; j < lines->len - i - 1; j++) {
-			if (*(lines->areas + j) > *(lines->areas + j + 1)) {
-				unsigned short temp = *(lines->areas + j + 1);
-				*(lines->areas + j + 1) = *(lines->areas + j);
-				*(lines->areas + j) = temp;
+	for (int i = 0; i < lines.len - 1; i++) {
+		for (int j = 0; j < lines.len - i - 1; j++) {
+			if (*(lines.areas + j) > *(lines.areas + j + 1)) {
+				unsigned short temp = *(lines.areas + j + 1);
+				*(lines.areas + j + 1) = *(lines.areas + j);
+				*(lines.areas + j) = temp;
 			}
 		}
 	}
-	lines->areas = realloc(lines->areas, ++lines->len * sizeof(*lines->areas));
-	*(lines->areas + lines->len - 1) = 512;
-	if (lines->len == 2) {
+	lines.areas = realloc(lines.areas, ++lines.len * sizeof(*lines.areas));
+	*(lines.areas + lines.len - 1) = 512;
+	if (lines.len == 2) {
 		exit(1);
 	}
+	return lines;
 }
 // End of stackoverflow
 
@@ -232,7 +237,10 @@ void predictor_generatejs(CatchHitObject **bnpd, unsigned int *bnpd_len, int sta
 			*(*bnpd + i) = *(*bnpd + i - 1);
 		}
 		ooc_juicestream_initwsliderspecific((*bnpd + 0), *beatmap.difficulty, tp_inherited, tp_uninherited, slider_hit_object);
-
+		static int length = 0;
+		if (length != 0) {
+			slider_hit_object->ho.slider.length = length;
+		}
 		while (true) {
 			ooc_juicestream_createnestedjuice((*bnpd + 0));
 			if ((*bnpd + 0)->cho.js.num_nested > 3) {
@@ -243,6 +251,9 @@ void predictor_generatejs(CatchHitObject **bnpd, unsigned int *bnpd_len, int sta
 			(*bnpd + 0)->cho.js.nested = NULL;
 			(*bnpd + 0)->cho.js.num_nested = 0;
 			oos_slider_calculateslider(&(*bnpd + 0)->cho.js.slider_data, *beatmap.difficulty, tp_inherited, tp_uninherited, *slider_hit_object);
+		}
+		if (length == 0) {
+			length = slider_hit_object->ho.slider.length;
 		}
 
 		index = (index + 1) % predictor.jspoints_len;
@@ -293,36 +304,28 @@ void predictor_output(CatchHitObject object) {
 	}
 }
 
-/* Output the object generated and saves the rng */
-void predictor_saverng(LegacyRandom *rng, CatchHitObject *bnpd, unsigned int bnpd_len, LegacyRandom test_rng) {
-	*rng = test_rng;
-	for (int i = 0; i < bnpd_len; i++) {
-		predictor_output(*(bnpd + i));
-	}
-}
-
 /* Gets the values of the beatmap and svaes rng based on the converted catch object */
-void predictor_beatmap(LegacyRandom *rng, Beatmap *beatmap, int index) {
+void predictor_beatmap(LegacyRandom *rng, Beatmap beatmap, int index) {
 	CatchHitObject object = {0};
-	switch ((beatmap->hit_objects + index)->type) {
+	switch ((beatmap.hit_objects + index)->type) {
 		case circle:
 		case nc_circle:
-			ooc_fruit_init(&object, (beatmap->hit_objects + index));
+			ooc_fruit_init(&object, (beatmap.hit_objects + index));
 			break;
 
 		case slider:
 		case nc_slider:
-			ooc_juicestream_initwslidertp(&object, *beatmap->difficulty, beatmap->timing_points, beatmap->num_tp, (beatmap->hit_objects + index));
+			ooc_juicestream_initwslidertp(&object, *beatmap.difficulty, beatmap.timing_points, beatmap.num_tp, (beatmap.hit_objects + index));
 			ooc_juicestream_createnestedjuice(&object);
 			break;
 		
 		case spinner:
 		case nc_spinner:
-			ooc_bananashower_init(&object, (beatmap->hit_objects + index));
+			ooc_bananashower_init(&object, (beatmap.hit_objects + index));
 			ooc_bananashower_createnestedbananas(&object);
 			break;
 	}
-	ooc_processor_applypositionoffsetrngstarttime(&object, index, index + 1, rng, false);
+	ooc_processor_applypositionoffsetrng(&object, 1, rng, false);
 	if (predictor.record_objects) {
 		predictor_output(object);
 	}
@@ -387,8 +390,7 @@ void predictor_main(void) {
 		// Evaluating BananaPredictor
 		if (is_shape && time >= shapes_start && time < shapes_end) {
 			// Recording the areas of the x-axis at the current time which can place the bananas
-			XLine lines = {0};
-			predictor_areas(&lines, time);
+			XLine lines = predictor_areas(time);
 
 			// Make a variable to store the new objects and house the Banana Shower
 			unsigned int bnpd_len = 0;
@@ -421,7 +423,10 @@ void predictor_main(void) {
 				}
 
 				// Saves the rng and outputs the current saved data
-				predictor_saverng(&rng, bnpd, bnpd_len, test_rng);
+				rng = test_rng;
+				for (int i = 0; i < bnpd_len; i++) {
+					predictor_output(*(bnpd + i));
+				}
 				break;
 			}
 
@@ -436,7 +441,7 @@ void predictor_main(void) {
 		}
 
 		// Processes next object in beatmap
-		predictor_beatmap(&rng, &beatmap, i);
+		predictor_beatmap(&rng, beatmap, i);
 		i++;
 	}
 	if (predictor.output != stdout) {
