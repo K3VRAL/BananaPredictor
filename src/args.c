@@ -8,11 +8,12 @@
 
 bool args_beatmap(char *option) {
 	if (predictor.beatmap != NULL) {
-		fprintf(stdout, "Error: Output file has already been inputted\n");
+		fprintf(stdout, "Error: Input file has already been inputted\n");
 		return false;
 	}
 	FILE *fp = fopen(option, "r");
 	if (fp == NULL) {
+		fprintf(stdout, "Error: Input file returned an error\n");
 		return false;
 	}
 	predictor.beatmap = fp;
@@ -26,20 +27,17 @@ bool args_output(char *option) {
 	}
 	FILE *fp = fopen(option, "w");
 	if (fp == NULL) {
-		fprintf(stdout, "Error: Output file is not writable\n");
+		fprintf(stdout, "Error: Output file is returned an error\n");
 		return false;
 	}
 	predictor.output = fp;
-	predictor.output_beatmap = false;
 	return true;
 }
 
 bool args_output_beatmap(char *option) {
-	if (predictor.output != NULL) {
-		fprintf(stdout, "Error: Output file has already been inputted\n");
+	if (!args_output(option)) {
 		return false;
 	}
-	args_output(option);
 	predictor.output_beatmap = true;
 	predictor.record_objects = !predictor.record_objects;
 	return true;
