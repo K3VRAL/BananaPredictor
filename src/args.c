@@ -8,12 +8,12 @@
 
 bool args_beatmap(char *option) {
 	if (predictor.beatmap != NULL) {
-		fprintf(stdout, "Error: Input file has already been inputted\n");
+		fprintf(stdout, "Error: Input file has already been inputted despite attempting to input [%s]\n", option);
 		return false;
 	}
 	FILE *fp = fopen(option, "r");
 	if (fp == NULL) {
-		fprintf(stdout, "Error: Input file returned an error\n");
+		fprintf(stdout, "Error: Input file [%s] has not been found\n", option);
 		return false;
 	}
 	predictor.beatmap = fp;
@@ -22,12 +22,12 @@ bool args_beatmap(char *option) {
 
 bool args_output(char *option) {
 	if (predictor.output != NULL) {
-		fprintf(stdout, "Error: Output file has already been inputted\n");
+		fprintf(stdout, "Error: Output file has already been inputted despite attempting to input [%s]\n", option);
 		return false;
 	}
 	FILE *fp = fopen(option, "w");
 	if (fp == NULL) {
-		fprintf(stdout, "Error: Output file is returned an error\n");
+		fprintf(stdout, "Error: Output file [%s] was not possible\n", option);
 		return false;
 	}
 	predictor.output = fp;
