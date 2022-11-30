@@ -255,6 +255,10 @@ void args_help(void) {
 }
 
 bool args_main(int argc, char **argv) {
+	if (argc < 2) {
+		fprintf(stdout, "No input was made (use `-h` if you need help)\n");
+		return false;
+	}
 	for (int i = 1; i < argc; i++) {
 		bool not_found = true;
 		for (int j = 0; j < args_num; j++) {
