@@ -187,31 +187,31 @@ void predictor_generatejs(CatchHitObject **bnpd, unsigned int *bnpd_len, int sta
 	bool make_new = true;
 
 	// Extend current slider to optimise slider amount placed
-	if ((*bnpd + 0)->type == catchhitobject_juicestream && (*bnpd + 0)->cho.js->slider_data.end_time < end_time) {
+	if ((*bnpd + 0)->type == catchhitobject_juicestream && (*bnpd + 0)->cho.js->slider_data->end_time < end_time) {
 		unsigned int nested_num = (*bnpd + 0)->cho.js->num_nested;
-		slider_hit_object->x = (*bnpd + 0)->cho.js->slider_data.start_position.x;
-		slider_hit_object->time = (*bnpd + 0)->cho.js->slider_data.start_time;
-		slider_hit_object->ho.slider.curve_type = (*bnpd + 0)->cho.js->slider_data.ho_data->curve_type;
-		slider_hit_object->ho.slider.num_curve = (*bnpd + 0)->cho.js->slider_data.ho_data->num_curve;
+		slider_hit_object->x = (*bnpd + 0)->cho.js->slider_data->start_position.x;
+		slider_hit_object->time = (*bnpd + 0)->cho.js->slider_data->start_time;
+		slider_hit_object->ho.slider.curve_type = (*bnpd + 0)->cho.js->slider_data->ho_data->curve_type;
+		slider_hit_object->ho.slider.num_curve = (*bnpd + 0)->cho.js->slider_data->ho_data->num_curve;
 		slider_hit_object->ho.slider.curves = calloc(slider_hit_object->ho.slider.num_curve, sizeof(*slider_hit_object->ho.slider.curves));
 		for (int i = 0; i < slider_hit_object->ho.slider.num_curve; i++) {
-			(slider_hit_object->ho.slider.curves + i)->x = ((*bnpd + 0)->cho.js->slider_data.ho_data->curves + i)->x;
-			(slider_hit_object->ho.slider.curves + i)->y = ((*bnpd + 0)->cho.js->slider_data.ho_data->curves + i)->y;
+			(slider_hit_object->ho.slider.curves + i)->x = ((*bnpd + 0)->cho.js->slider_data->ho_data->curves + i)->x;
+			(slider_hit_object->ho.slider.curves + i)->y = ((*bnpd + 0)->cho.js->slider_data->ho_data->curves + i)->y;
 		}
-		slider_hit_object->ho.slider.slides = (*bnpd + 0)->cho.js->slider_data.span_count;
-		slider_hit_object->ho.slider.length = (*bnpd + 0)->cho.js->slider_data.path.distance;
+		slider_hit_object->ho.slider.slides = (*bnpd + 0)->cho.js->slider_data->span_count;
+		slider_hit_object->ho.slider.length = (*bnpd + 0)->cho.js->slider_data->path.distance;
 
 		while (true) {
 			free((*bnpd + 0)->cho.js->nested);
 			(*bnpd + 0)->cho.js->nested = NULL;
 			(*bnpd + 0)->cho.js->num_nested = 0;
-			oos_slider_calculateslider(&(*bnpd + 0)->cho.js->slider_data, *beatmap.difficulty, tp_inherited, tp_uninherited, *slider_hit_object);
+			oos_slider_calculateslider((*bnpd + 0)->cho.js->slider_data, *beatmap.difficulty, tp_inherited, tp_uninherited, *slider_hit_object);
 			ooc_juicestream_createnestedjuice((*bnpd + 0));
 			if ((*bnpd + 0)->cho.js->num_nested > nested_num) {
 				make_new = false;
 				oos_hitobject_freebulk(slider_hit_object, 1);
 				break;
-			} else if ((*bnpd + 0)->cho.js->slider_data.end_time >= end_time) {
+			} else if ((*bnpd + 0)->cho.js->slider_data->end_time >= end_time) {
 				// If unable to extend slider anymore
 				break;
 			}
@@ -250,7 +250,7 @@ void predictor_generatejs(CatchHitObject **bnpd, unsigned int *bnpd_len, int sta
 			free((*bnpd + 0)->cho.js->nested);
 			(*bnpd + 0)->cho.js->nested = NULL;
 			(*bnpd + 0)->cho.js->num_nested = 0;
-			oos_slider_calculateslider(&(*bnpd + 0)->cho.js->slider_data, *beatmap.difficulty, tp_inherited, tp_uninherited, *slider_hit_object);
+			oos_slider_calculateslider((*bnpd + 0)->cho.js->slider_data, *beatmap.difficulty, tp_inherited, tp_uninherited, *slider_hit_object);
 		}
 		if (length == 0) {
 			length = slider_hit_object->ho.slider.length;
@@ -325,16 +325,12 @@ void predictor_beatmap(LegacyRandom *rng, Beatmap beatmap, int index) {
 			ooc_bananashower_createnestedbananas(&object);
 			break;
 	}
-	ooc_processor_applypositionoffsetrng(&object, 1, rng, false);
+	ooc_processor_applypositionoffsetrngwo(&object, 1, rng, false);
 	if (predictor.record_objects) {
 		predictor_output(object);
 	}
 
-	if (object.type == catchhitobject_juicestream) {
-		ooc_juicestream_free(*object.cho.js);
-	} else if (object.type == catchhitobject_bananashower) {
-		ooc_bananashower_free(*object.cho.bs);
-	}
+	ooc_hitobject_free(object);
 }
 
 void predictor_main(void) {
@@ -413,7 +409,7 @@ void predictor_main(void) {
 			while (true) {
 				// Apply the RNG to the new objects
 				LegacyRandom test_rng = rng;
-				ooc_processor_applypositionoffsetrng(bnpd, bnpd_len, &test_rng, false);
+				ooc_processor_applypositionoffsetrngwo(bnpd, bnpd_len, &test_rng, false);
 
 				// Check if they are within the areas we wanted them to be in; if not, we generate the Juice Stream and repeat the loop
 				if (!predictor_breakout(lines, bnpd, bnpd_len)) {
@@ -431,6 +427,7 @@ void predictor_main(void) {
 			}
 
 			if (bnpd != NULL) {
+				ooc_hitobject_freebulkrefer(bnpd, bnpd_len);
 				ooc_hitobject_freebulk(bnpd, bnpd_len);
 			}
 			if (lines.areas != NULL) {
