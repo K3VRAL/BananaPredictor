@@ -8,9 +8,9 @@ bnprdctr [-b file] [-o [file]] [-O [file]] [-s x:time|x:time|x:time[|...]] [-j [
 
 # Description
 
-BananaPredictor is an application made to allow for the user to predict and place Banana Shower's bananas in areas which alone couldn't be done without the utilisation of Juice Streams as they help allow the bananas to change it's RNG seed to be placed in different areas. When each Banana Shower's bananas are being evaluated on their x-axis, they modify the RNG values for the rest of the map.
+BananaPredictor is an application made to allow the user to predict and place Banana Shower's bananas in areas which alone couldn't be done without the utilisation of Juice Streams as they help allow the bananas to change their RNG seed to be placed in different areas. When each Banana Shower's bananas are being evaluated on their x-axis, they modify the RNG values for the rest of the map.
 
-Unlike Banana Showers; Juice Streams are highly controlable in their placement, high count of nested objects, and ability to easily influence the RNG factor; the nested objects in which we can effect the RNG are the Droplets and TinyDroplets. The porocess in which Juice Streams follows; the new placement of the Juice Stream is to be as small as possible while reaching at least 3 nested objects which much have a Droplet or TinyDroplet. Once the Juice Stream has been placed, we evaluate the RNG and see if the Banana Shower's bananas are in the areas given by the user. If so, go to the next point to be evaluated. If not, make the Juice Stream as long as possible before it hits the BananaShower end time; if this case is hit then we start over by placing a new Juice Streams then repeat.
+Unlike Banana Showers; Juice Streams are highly controllable in their placement, high count of nested objects, and ability to easily influence the RNG factor; the nested objects in which we can affect the RNG are the Droplets and TinyDroplets. The process in which Juice Streams follows; the new placement of the Juice Stream is to be as small as possible while reaching at least 3 nested objects which much have a Droplet or TinyDroplet. Once the Juice Stream has been placed, we evaluate the RNG and see if the Banana Shower's bananas are in the areas given by the user. If so, go to the next point to be evaluated. If not, make the Juice Stream as long as possible before it hits the BananaShower end time; if this case is hit then we start over by placing a new Juice Stream, then repeat.
 
 # Resources
 
@@ -18,55 +18,55 @@ Unlike Banana Showers; Juice Streams are highly controlable in their placement, 
 
 Uses the beatmap file as input for difficulty, timing point, and hit object values to reference from.
 
-If argument is not used, it will be defaulted to `NULL` and prevent the application from running.
+If the argument is not used, it will default to `NULL` and prevent the application from running.
 
 ## Output (`-o` or `--output`) - File Location
 
-Uses the output file as output all the stored objects that were identified to modify the Banana Shower's bananas.
+Uses the output file as output for all the stored objects that were identified to modify the Banana Shower's bananas.
 
-If argument is not used, it will be defaulted to the terminal's output.
+If the argument is not used, it will default to the terminal's output.
 
 ## Output Beatmap (`-O` or `--output-beatmap`) - File Location
 
-Uses the output file as output all the stored objects that were identified to modify the Banana Shower's bananas with the osu format. Record Objects (`-r` or `--record-objects`) will be defaulted to `true`. 
+Uses the output file as output for all the stored objects that were identified to modify the Banana Shower's bananas with the osu! format. Record Objects (`-r` or `--record-objects`) will default to `true`. 
 
-If argument is not used, it will be defaulted to the terminal's output.
+If the argument is not used, it will default to the terminal's output.
 
 ## Shapes (`-s` or `--shapes`) - String formatted as `int:int|int:int|int:int[|...]`
 
-The format for a point is `x:time|x:time|x:time[|...]`. It is mandatory that there is at least three points. The final point will always go back to the first point.
+The format for a point is `x:time|x:time|x:time[|...]`. There must be at least three points. The final point will always go back to the first point.
 
-If argument is not used, it will be defaulted to `NULL` and prevent the application from running.
+If the argument is not used, it will default to `NULL` and prevent the application from running.
 
-You also can stack the argument multiple times, allowing you to have multiple shapes; each shape works independantly.
+You also can stack the argument multiple times, allowing you to have multiple shapes; each shape works independently.
 
 ## Juice Points (`-j` or `--juice-points`) - String formatted as `[f|]int:int|int:int[|...]`
 
-The format for a point is `[f|]x:y|x:y[|...]`. It is mandatory that there is at least two points. The first point will always be the x and y coordinates for Juice Stream whereas the rest will be it's curve.
+The format for a point is `[f|]x:y|x:y[|...]`. There must be at least two points. The first point will always be the x and y coordinates for Juice Stream whereas the rest will be its curve.
 
-If argument is not used, it will be defaulted to `NULL` and the default format will be used instead.
+If the argument is not used, it will default to `NULL` and the default format will be used instead.
 
-You also can stack the argument multiple times, allowing you to have multiple Juice Streams; each Juice Stream works dependantly on each other where the ordering of each Juice Stream placed matters.
+You also can stack the argument multiple times, allowing you to have multiple Juice Streams; each Juice Stream works dependently on each other and the ordering of each Juice Stream placed matters.
 
 ## Distance (`-d` or `--distance`) - Double
 
-Allows for the distance for each Banana Shower. Since Banana Showers and Juice Streams requires a lot of load, this can be reduced by spreading the them out.
+Allows for the distance for each Banana Shower. Since Banana Showers and Juice Streams require a lot of loads, this can be reduced by spreading them out.
 
-If argument is not used, it will be defaulted to `1`.
+If the argument is not used, it will default to `1`.
 
 ## Prefer Circles (`-p` or `--prefer-circles`) - Boolean
 
 Outputs the given Banana Shower's bananas to circles (ignores Juice Streams). This can be used for debugging if the application is not giving the proper output; whether it be an error on the user's part or an error on the application's part.
 
-If argument is not used, it will be defaulted to `false`.
+If the argument is not used, it will default to `false`.
 
 ## Record Objects (`-r` or `--record-objects`) - Boolean
 
-Outputs enitre beatmap's objects as well.
+Outputs and includes input map objects.
 
-If argument is not used, it will be defaulted to `false`.
+If the argument is not used, it will default to `false`.
 
-If the Output Beatmap (`-O` or `--output-beatmap`) argument is used, it will be defaulted to `true`. If this argument is then later used; it will not record the beatmap.
+If the Output Beatmap (`-O` or `--output-beatmap`) argument is used, it will default to `true`. If this argument is then later used; it will not record the beatmap.
 
 ## Help (`-h` or `--help`) - Boolean
 
@@ -76,23 +76,23 @@ Gives all the commands to the terminal's output
 
 ### f - Boolean
 
-Thir is used if the Juice Streams generated should follow the master given it's current time.
+This is used if the Juice Streams generated should follow the master given its current time.
 
 ### x - Integer
 
-Is the x-axis for the point. It can go from 0 to 256 as that's how wide osu maps can be.
+It is the x-axis for the point. It can go from 0 to 256 as that's how wide osu! maps can be.
 
 ### time or y - Integer
 
-Is the time for the point relative to the spinner predictor's start time. If the point's time is bigger than the length of the spinner predictor, then the point's time will override it.
+It is the time for the point relative to the spinner predictor's start time. If the point's time is bigger than the length of the spinner predictor, then the point's time will override it.
 
 ### : - Character
 
-Is a point specific seperator such that after we are done filling out one property of the point, we can fill out the next property.
+It is a point-specific separator such that after we are done filling out one property of the point, we can fill out the next property.
 
 ### | - Character
 
-Is a point seperator such that after we are done filling out one point, we can fill out the next point.
+It is a point separator such that after we are done filling out one point, we can fill out the next point.
 
 # Authors
 
