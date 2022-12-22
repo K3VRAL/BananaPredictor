@@ -4,7 +4,7 @@ BananaPredictor - An application to predict where bananas will be placed
 
 # Synopsis
 
-bnprdctr [-b file] [-o [file]] [-O [file]] [-s x:time|x:time|x:time[|...]] [-j [[f|]x:y|x:y[|...]] [-d [distance]] [--prefer-circles] [--record-objects]
+bnprdctr [-b file] [-o [file]] [-O [file]] [-s x:time|x:time|x:time[|...]] [-j [[f|]x:y|x:y[|...]] [-d [distance]] [-p] [-r] [-h]
 
 # Description
 
@@ -14,25 +14,25 @@ Unlike Banana Showers; Juice Streams are highly controlable in their placement, 
 
 # Resources
 
-## Beatmap (`-b` or `--beatmap`) - String (file location)
+## Beatmap (`-b` or `--beatmap`) - File Location
 
 Uses the beatmap file as input for difficulty, timing point, and hit object values to reference from.
 
 If argument is not used, it will be defaulted to `NULL` and prevent the application from running.
 
-## Output (`-o` or `--output`) - String (file location)
+## Output (`-o` or `--output`) - File Location
 
 Uses the output file as output all the stored objects that were identified to modify the Banana Shower's bananas.
 
 If argument is not used, it will be defaulted to the terminal's output.
 
-## Output Beatmap (`-O` or `--output-beatmap`) - String (file location)
+## Output Beatmap (`-O` or `--output-beatmap`) - File Location
 
 Uses the output file as output all the stored objects that were identified to modify the Banana Shower's bananas with the osu format. Record Objects (`-r` or `--record-objects`) will be defaulted to `true`. 
 
 If argument is not used, it will be defaulted to the terminal's output.
 
-## Shapes (`-s` or `--shapes`) - String (formatted as `x:time|x:time|x:time[|...]`)
+## Shapes (`-s` or `--shapes`) - String formatted as `int:int|int:int|int:int[|...]`
 
 The format for a point is `x:time|x:time|x:time[|...]`. It is mandatory that there is at least three points. The final point will always go back to the first point.
 
@@ -40,7 +40,7 @@ If argument is not used, it will be defaulted to `NULL` and prevent the applicat
 
 You also can stack the argument multiple times, allowing you to have multiple shapes; each shape works independantly.
 
-## Juice Points (`-j` or `--juice-points`) - String (formatted as `[f|]x:y|x:y[|...]`)
+## Juice Points (`-j` or `--juice-points`) - String formatted as `[f|]int:int|int:int[|...]`
 
 The format for a point is `[f|]x:y|x:y[|...]`. It is mandatory that there is at least two points. The first point will always be the x and y coordinates for Juice Stream whereas the rest will be it's curve.
 
@@ -86,11 +86,11 @@ Is the x-axis for the point. It can go from 0 to 256 as that's how wide osu maps
 
 Is the time for the point relative to the spinner predictor's start time. If the point's time is bigger than the length of the spinner predictor, then the point's time will override it.
 
-### :
+### : - Character
 
 Is a point specific seperator such that after we are done filling out one property of the point, we can fill out the next property.
 
-### |
+### | - Character
 
 Is a point seperator such that after we are done filling out one point, we can fill out the next point.
 
