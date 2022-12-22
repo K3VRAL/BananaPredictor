@@ -32,7 +32,7 @@ Uses the output file as output for all the stored objects that were identified t
 
 If the argument is not used, it will default to the terminal's output.
 
-## Shapes (`-s` or `--shapes`) - String formatted as `int:int|int:int|int:int[|...]`
+## Shapes (`-s` or `--shapes`) - Formatted as `int:int|int:int|int:int[|...]`
 
 The format for a point is `x:time|x:time|x:time[|...]`. There must be at least three points. The final point will always go back to the first point.
 
@@ -40,7 +40,7 @@ If the argument is not used, it will default to `NULL` and prevent the applicati
 
 You also can stack the argument multiple times, allowing you to have multiple shapes; each shape works independently.
 
-## Juice Points (`-j` or `--juice-points`) - String formatted as `[f|]int:int|int:int[|...]`
+## Juice Points (`-j` or `--juice-points`) - Formatted as `[f|]int:int|int:int[|...]`
 
 The format for a point is `[f|]x:y|x:y[|...]`. There must be at least two points. The first point will always be the x and y coordinates for Juice Stream whereas the rest will be its curve.
 
