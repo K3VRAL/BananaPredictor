@@ -48,6 +48,11 @@ void predictor_shapes(int *shapes_start, int *shapes_end) {
 			}
 		}
 	}
+	for (int i = 0; i < predictor.jspoints_len; i++) {
+		if ((predictor.jspoints + i)->end_time == 0) {
+			(predictor.jspoints + i)->end_time = *shapes_end;
+		}
+	}
 }
 
 /* Prints out the progress bar in the terminal. Resizing the terminal will also resize the output */
@@ -155,7 +160,7 @@ XLine predictor_areas(int time) {
 // End of stackoverflow
 
 /* Either we create a new Juice Stream and have a minimum of 3 nested objects; or if the previously created Juice Stream is not long enough then we can keep expanding it */
-void predictor_generatejs(CatchHitObject **bnpd, unsigned int *bnpd_len, int start_time, int end_time, Beatmap beatmap) {
+void predictor_generatejs(CatchHitObject **bnpd, unsigned int *bnpd_len, int start_time, Beatmap beatmap) {
 	static unsigned int index = 0;
 	HitObject *slider_hit_object = calloc(1, sizeof(*slider_hit_object));
 	slider_hit_object->x = ((predictor.jspoints + index)->points.vectors + 0)->x;
@@ -187,7 +192,7 @@ void predictor_generatejs(CatchHitObject **bnpd, unsigned int *bnpd_len, int sta
 	bool make_new = true;
 
 	// Extend current slider to optimise slider amount placed
-	if ((*bnpd + 0)->type == catchhitobject_juicestream && (*bnpd + 0)->cho.js->slider_data->end_time < end_time) {
+	if ((*bnpd + 0)->type == catchhitobject_juicestream && (*bnpd + 0)->cho.js->slider_data->end_time < (predictor.jspoints + index)->end_time) {
 		unsigned int nested_num = (*bnpd + 0)->cho.js->num_nested;
 		slider_hit_object->x = (*bnpd + 0)->cho.js->slider_data->start_position.x;
 		slider_hit_object->time = (*bnpd + 0)->cho.js->slider_data->start_time;
@@ -211,7 +216,7 @@ void predictor_generatejs(CatchHitObject **bnpd, unsigned int *bnpd_len, int sta
 				make_new = false;
 				oos_hitobject_freebulk(slider_hit_object, 1);
 				break;
-			} else if ((*bnpd + 0)->cho.js->slider_data->end_time >= end_time) {
+			} else if ((*bnpd + 0)->cho.js->slider_data->end_time >= (predictor.jspoints + index)->end_time) {
 				// If unable to extend slider anymore
 				break;
 			}
@@ -414,7 +419,7 @@ void predictor_main(void) {
 				// Check if they are within the areas we wanted them to be in; if not, we generate the Juice Stream and repeat the loop
 				if (!predictor_breakout(lines, bnpd, bnpd_len)) {
 					// Create new Juice Stream or, if previous object is a Juice Stream, expand on said Juice Stream
-					predictor_generatejs(&bnpd, &bnpd_len, (int) j, shapes_end, beatmap);
+					predictor_generatejs(&bnpd, &bnpd_len, (int) j, beatmap);
 					continue;
 				}
 

@@ -78,6 +78,7 @@ void args_juice_point(char *option) {
 	(predictor.jspoints + predictor.jspoints_len - 1)->points.vectors = NULL;
 	(predictor.jspoints + predictor.jspoints_len - 1)->points.len = 0;
 	(predictor.jspoints + predictor.jspoints_len - 1)->follow = false;
+	(predictor.jspoints + predictor.jspoints_len - 1)->end_time = 0;
 	while (token != NULL) {
 		if (used_delim == '|' || (predictor.jspoints + predictor.jspoints_len - 1)->points.len == 0) {
 			(predictor.jspoints + predictor.jspoints_len - 1)->points.vectors = realloc((predictor.jspoints + predictor.jspoints_len - 1)->points.vectors, ++(predictor.jspoints + predictor.jspoints_len - 1)->points.len * sizeof(*(predictor.jspoints + predictor.jspoints_len - 1)->points.vectors));
@@ -87,6 +88,14 @@ void args_juice_point(char *option) {
 			case '|':
 				if (!strcmp("f", token)) {
 					(predictor.jspoints + predictor.jspoints_len - 1)->follow = true;
+					break;
+				}
+				if (!strcmp("l", token)) {
+					used_delim = *(copy + (token - option + strlen(token)));
+					token = strtok(NULL, ":|\0");
+					if (used_delim == ':') {
+						(predictor.jspoints + predictor.jspoints_len - 1)->end_time = strtol(token, NULL, 10);
+					}
 					break;
 				}
 				((predictor.jspoints + predictor.jspoints_len - 1)->points.vectors + (predictor.jspoints + predictor.jspoints_len - 1)->points.len - 1)->x = strtol(token, NULL, 10);
@@ -182,7 +191,7 @@ Args args_arg[args_num] = {
 	{
 		.i = "-j",
 		.item = "--juice-points",
-		.argument = "[[f|]x:y|x:y[|...]]",
+		.argument = "[[f|][l:len|]x:y|x:y[|...]]",
 		.description = "the points for the vector of the Juice Streams",
 		.e_function = cp,
 		.function = {

@@ -4,7 +4,7 @@ BananaPredictor - An application to predict where bananas will be placed
 
 # Synopsis
 
-bnprdctr [-b file] [-o [file]] [-O [file]] [-s x:time|x:time|x:time[|...]] [-j [[f|]x:y|x:y[|...]] [-d [distance]] [-p] [-r] [-h]
+bnprdctr [-b file] [-o [file]] [-O [file]] [-s x:time|x:time|x:time[|...]] [-j [[f|][l:len|]x:y|x:y[|...]] [-d [distance]] [-p] [-r] [-h]
 
 # Description
 
@@ -40,19 +40,25 @@ If the argument is not used, it will default to `NULL` and prevent the applicati
 
 You also can stack the argument multiple times, allowing you to have multiple shapes; each shape works independently.
 
-## Juice Points (`-j` or `--juice-points`) - Formatted as `[f|]int:int|int:int[|...]`
+## Juice Points (`-j` or `--juice-points`) - Formatted as `[f|][l:int|]int:int|int:int[|...]`
 
-The format for a point is `[f|]x:y|x:y[|...]`. There must be at least two points. The first point will always be the x and y coordinates for Juice Stream whereas the rest will be its curve.
+The format for a point is `[f|][l:len|]x:y|x:y[|...]`. There must be at least two points. The first point will always be the x and y coordinates for Juice Stream whereas the rest will be its curve.
 
 If the argument is not used, it will default to `NULL` and the default format will be used instead.
 
 You also can stack the argument multiple times, allowing you to have multiple Juice Streams; each Juice Stream works dependently on each other and the ordering of each Juice Stream placed matters.
+
+If the `f` item (Boolean as argument) is used, it means that the Juice Stream blueprint will be followed on each new Juice Stream placement.
+
+If the `l` item (Integer as argument) is used, it means that the Juice Stream length is changed to the new value provided. If this is not used, it will be defaulted to the end time of the BananaPredictor.
 
 ## Distance (`-d` or `--distance`) - Double
 
 Allows for the distance for each Banana Shower. Since Banana Showers and Juice Streams require a lot of loads, this can be reduced by spreading them out.
 
 If the argument is not used, it will default to `1`.
+
+The value does not have to only be an interger as it can also be expressed as a float.
 
 ## Prefer Circles (`-p` or `--prefer-circles`) - Boolean
 

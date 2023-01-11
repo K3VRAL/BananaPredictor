@@ -23,6 +23,7 @@ typedef struct ShapePoints {
 typedef struct JuiceStreamPoints {
 	Point points;
 	bool follow;
+	int end_time;
 } JuiceStreamPoints;
 
 typedef struct Predictor {
