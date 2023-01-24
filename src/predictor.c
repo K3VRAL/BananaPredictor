@@ -49,8 +49,8 @@ void predictor_shapes(int *shapes_start, int *shapes_end) {
 		}
 	}
 	for (int i = 0; i < predictor.jspoints_len; i++) {
-		if ((predictor.jspoints + i)->end_time == 0) {
-			(predictor.jspoints + i)->end_time = *shapes_end;
+		if ((predictor.jspoints + i)->length == 0) {
+			(predictor.jspoints + i)->length = *shapes_end;
 		}
 	}
 }
@@ -168,7 +168,7 @@ void predictor_generatejs(CatchHitObject **bnpd, unsigned int *bnpd_len, int sta
 	slider_hit_object->time = start_time;
 	slider_hit_object->type = nc_slider;
 	slider_hit_object->hit_sound = 0;
-	slider_hit_object->ho.slider.curve_type = slidertype_linear;
+	slider_hit_object->ho.slider.curve_type = (predictor.jspoints + index)->type;
 	slider_hit_object->ho.slider.curves = NULL;
 	slider_hit_object->ho.slider.num_curve = 0;
 	slider_hit_object->ho.slider.slides = 1;
@@ -192,7 +192,7 @@ void predictor_generatejs(CatchHitObject **bnpd, unsigned int *bnpd_len, int sta
 	bool make_new = true;
 
 	// Extend current slider to optimise slider amount placed
-	if ((*bnpd + 0)->type == catchhitobject_juicestream && (*bnpd + 0)->cho.js->slider_data->end_time < (predictor.jspoints + index)->end_time) {
+	if ((*bnpd + 0)->type == catchhitobject_juicestream && (*bnpd + 0)->cho.js->slider_data->end_time < (predictor.jspoints + index)->length) {
 		unsigned int nested_num = (*bnpd + 0)->cho.js->num_nested;
 		slider_hit_object->x = (*bnpd + 0)->cho.js->slider_data->start_position.x;
 		slider_hit_object->time = (*bnpd + 0)->cho.js->slider_data->start_time;
@@ -216,7 +216,7 @@ void predictor_generatejs(CatchHitObject **bnpd, unsigned int *bnpd_len, int sta
 				make_new = false;
 				oos_hitobject_freebulk(slider_hit_object, 1);
 				break;
-			} else if ((*bnpd + 0)->cho.js->slider_data->end_time >= (predictor.jspoints + index)->end_time) {
+			} else if ((*bnpd + 0)->cho.js->slider_data->end_time >= (predictor.jspoints + index)->length) {
 				// If unable to extend slider anymore
 				break;
 			}

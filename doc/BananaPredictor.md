@@ -4,7 +4,7 @@ BananaPredictor - An application to predict where bananas will be placed
 
 # Synopsis
 
-bnprdctr [-b file] [-o [file]] [-O [file]] [-s x:time|x:time|x:time[|...]] [-j [[f|][l:len|]x:y|x:y[|...]] [-d [distance]] [-p] [-r] [-h]
+bnprdctr [-b file] [-o [file]] [-O [file]] [-s x:time|x:time|x:time[|...]] [-j [[f|][l=len|]x:y|x:y[|...]] [-d [distance]] [-p] [-r] [-h]
 
 # Description
 
@@ -40,9 +40,9 @@ If the argument is not used, it will default to `NULL` and prevent the applicati
 
 You also can stack the argument multiple times, allowing you to have multiple shapes; each shape works independently.
 
-## Juice Points (`-j` or `--juice-points`) - Formatted as `[f|][l:int|]int:int|int:int[|...]`
+## Juice Points (`-j` or `--juice-points`) - Formatted as `[f|][l=int|]int:int|int:int[|...]`
 
-The format for a point is `[f|][l:len|]x:y|x:y[|...]`. There must be at least two points. The first point will always be the x and y coordinates for Juice Stream whereas the rest will be its curve.
+The format for a point is `[f|][l=len|]x:y|x:y[|...]`. There must be at least two points. The first point will always be the x and y coordinates for Juice Stream whereas the rest will be its curve.
 
 If the argument is not used, it will default to `NULL` and the default format will be used instead.
 

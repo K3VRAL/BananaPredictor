@@ -78,9 +78,11 @@ void args_juice_point(char *option) {
 	(predictor.jspoints + predictor.jspoints_len - 1)->points.vectors = NULL;
 	(predictor.jspoints + predictor.jspoints_len - 1)->points.len = 0;
 	(predictor.jspoints + predictor.jspoints_len - 1)->follow = false;
-	(predictor.jspoints + predictor.jspoints_len - 1)->end_time = 0;
+	(predictor.jspoints + predictor.jspoints_len - 1)->type = slidertype_linear;
+	(predictor.jspoints + predictor.jspoints_len - 1)->length = 0;
+	bool skip = false;
 	while (token != NULL) {
-		if (used_delim == '|' || (predictor.jspoints + predictor.jspoints_len - 1)->points.len == 0) {
+		if (!skip && (used_delim == '|' || (predictor.jspoints + predictor.jspoints_len - 1)->points.len == 0)) {
 			(predictor.jspoints + predictor.jspoints_len - 1)->points.vectors = realloc((predictor.jspoints + predictor.jspoints_len - 1)->points.vectors, ++(predictor.jspoints + predictor.jspoints_len - 1)->points.len * sizeof(*(predictor.jspoints + predictor.jspoints_len - 1)->points.vectors));
 		}
 		switch (used_delim) {
@@ -88,21 +90,28 @@ void args_juice_point(char *option) {
 			case '|':
 				if (!strcmp("f", token)) {
 					(predictor.jspoints + predictor.jspoints_len - 1)->follow = true;
+					skip = true;
+					break;
+				}
+				if (!strcmp("t", token)) {
+					token = strtok(NULL, ":|\0");
+					(predictor.jspoints + predictor.jspoints_len - 1)->type = *(token + 0);
+					skip = true;
 					break;
 				}
 				if (!strcmp("l", token)) {
-					used_delim = *(copy + (token - option + strlen(token)));
 					token = strtok(NULL, ":|\0");
-					if (used_delim == ':') {
-						(predictor.jspoints + predictor.jspoints_len - 1)->end_time = strtol(token, NULL, 10);
-					}
+					(predictor.jspoints + predictor.jspoints_len - 1)->length = strtol(token, NULL, 10);
+					skip = true;
 					break;
 				}
 				((predictor.jspoints + predictor.jspoints_len - 1)->points.vectors + (predictor.jspoints + predictor.jspoints_len - 1)->points.len - 1)->x = strtol(token, NULL, 10);
+				skip = false;
 				break;
 
 			case ':':
 				((predictor.jspoints + predictor.jspoints_len - 1)->points.vectors + (predictor.jspoints + predictor.jspoints_len - 1)->points.len - 1)->ty = strtol(token, NULL, 10);
+				skip = false;
 				break;
 		}
 		used_delim = *(copy + (token - option + strlen(token)));
@@ -136,13 +145,13 @@ typedef struct Args {
 	char *description;
 	enum {
 		bcp,
-		cp,
+		vcp,
 		v,
 		rv
 	} e_function;
 	union {
 		bool (*bcp)(char *);
-		void (*cp)(char *);
+		void (*vcp)(char *);
 		void (*v)(void);
 	} function;
 } Args;
@@ -162,7 +171,7 @@ Args args_arg[args_num] = {
 		.i = "-o",
 		.item = "--output",
 		.argument = "[file]",
-		.description = "outputs the BananaPredictor to the file location",
+		.description = "outputs the data to the file location",
 		.e_function = bcp,
 		.function = {
 			.bcp = args_output
@@ -172,7 +181,7 @@ Args args_arg[args_num] = {
 		.i = "-O",
 		.item = "--output-beatmap",
 		.argument = "[file]",
-		.description = "outputs the BananaPredictor to the file location with the osu format",
+		.description = "outputs the data to the file location with the osu format",
 		.e_function = bcp,
 		.function = {
 			.bcp = args_output_beatmap
@@ -183,19 +192,19 @@ Args args_arg[args_num] = {
 		.item = "--shapes",
 		.argument = "x:time|x:time|x:time[|...]",
 		.description = "the points for the vector of the shape",
-		.e_function = cp,
+		.e_function = vcp,
 		.function = {
-			.cp = args_shape
+			.vcp = args_shape
 		}
 	},
 	{
 		.i = "-j",
 		.item = "--juice-points",
-		.argument = "[[f|][l:len|]x:y|x:y[|...]]",
+		.argument = "[[f|][l=len|]x:y|x:y[|...]]",
 		.description = "the points for the vector of the Juice Streams",
-		.e_function = cp,
+		.e_function = vcp,
 		.function = {
-			.cp = args_juice_point
+			.vcp = args_juice_point
 		}
 	},
 	{
@@ -203,16 +212,16 @@ Args args_arg[args_num] = {
 		.item = "--distance",
 		.argument = "[time]",
 		.description = "gives the distance for each Banana Shower as a double",
-		.e_function = cp,
+		.e_function = vcp,
 		.function = {
-			.cp = args_distance
+			.vcp = args_distance
 		}
 	},
 	{
 		.i = "-p",
 		.item = "--prefer-circles",
 		.argument = "",
-		.description = "outputs the Banana Shower's bananas instead of the Juice Stream and Banana Shower",
+		.description = "outputs Fruits instead of Bananas and removes Juice Streams and Banana Showers",
 		.e_function = v,
 		.function = {
 			.v = args_prefer_circles
@@ -268,6 +277,7 @@ bool args_main(int argc, char **argv) {
 		fprintf(stdout, "No input was made (use `-h` if you need help)\n");
 		return false;
 	}
+
 	for (int i = 1; i < argc; i++) {
 		bool not_found = true;
 		for (int j = 0; j < args_num; j++) {
@@ -276,8 +286,8 @@ bool args_main(int argc, char **argv) {
 					if (!(args_arg + j)->function.bcp(*(argv + ++i))) {
 						return false;
 					}
-				} else if ((args_arg + j)->e_function == cp) {
-					(args_arg + j)->function.cp(*(argv + ++i));
+				} else if ((args_arg + j)->e_function == vcp) {
+					(args_arg + j)->function.vcp(*(argv + ++i));
 				} else if ((args_arg + j)->e_function == v) {
 					(args_arg + j)->function.v();
 				} else if ((args_arg + j)->e_function == rv) {

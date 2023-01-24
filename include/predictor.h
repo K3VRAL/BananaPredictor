@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdbool.h>
+#include <osu.h>
 
 typedef struct Vector {
 	float x;
@@ -23,7 +24,8 @@ typedef struct ShapePoints {
 typedef struct JuiceStreamPoints {
 	Point points;
 	bool follow;
-	int end_time;
+	int length;
+	SliderType type;
 } JuiceStreamPoints;
 
 typedef struct Predictor {
