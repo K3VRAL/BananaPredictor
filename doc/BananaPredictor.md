@@ -4,7 +4,7 @@ BananaPredictor - An application to predict where bananas will be placed
 
 # Synopsis
 
-bnprdctr [-b file] [-o [file]] [-O [file]] [-s x:time|x:time|x:time[|...]] [-j [[f|][l=len|]x:y|x:y[|...]] [-d [distance]] [-p] [-r] [-h]
+bnprdctr [-b file] [-o [file]] [-O [file]] [-s x:time|x:time|x:time[|...]] [-j [[f|][l:len|][t:type|]x:y|x:y[|...]] [-d [distance]] [-p] [-r] [-h]
 
 # Description
 
@@ -40,9 +40,9 @@ If the argument is not used, it will default to `NULL` and prevent the applicati
 
 You also can stack the argument multiple times, allowing you to have multiple shapes; each shape works independently.
 
-## Juice Points (`-j` or `--juice-points`) - Formatted as `[f|][l=int|]int:int|int:int[|...]`
+## Juice Points (`-j` or `--juice-points`) - Formatted as `[f|][l:int|][t:[CBLP]|]int:int|int:int[|...]`
 
-The format for a point is `[f|][l=len|]x:y|x:y[|...]`. There must be at least two points. The first point will always be the x and y coordinates for Juice Stream whereas the rest will be its curve.
+The format for a point is `[f|][l:len|][t:type|]x:y|x:y[|...]`. There must be at least two points. The first point will always be the x and y coordinates for Juice Stream whereas the rest will be its curve.
 
 If the argument is not used, it will default to `NULL` and the default format will be used instead.
 
@@ -51,6 +51,8 @@ You also can stack the argument multiple times, allowing you to have multiple Ju
 If the `f` item (Boolean as argument) is used, it means that the Juice Stream blueprint will be followed on each new Juice Stream placement.
 
 If the `l` item (Integer as argument) is used, it means that the Juice Stream length is changed to the new value provided. If this is not used, it will be defaulted to the end time of the BananaPredictor.
+
+If the `t` item (Slider's Type (`C`, `B`, `L`, `P`) as argument) is used, it means that the Juice Stream type will be changed to the new value provided. If this is not used, it will be defaulted to `L` or Linear.
 
 ## Distance (`-d` or `--distance`) - Double
 
@@ -79,18 +81,6 @@ If the Output Beatmap (`-O` or `--output-beatmap`) argument is used, it will def
 Gives all the commands to the terminal's output
 
 ## Points format
-
-### f - Boolean
-
-This is used if the Juice Streams generated should follow the master given its current time.
-
-### x - Integer
-
-It is the x-axis for the point. It can go from 0 to 256 as that's how wide osu! maps can be.
-
-### time or y - Integer
-
-It is the time for the point relative to the spinner predictor's start time. If the point's time is bigger than the length of the spinner predictor, then the point's time will override it.
 
 ### : - Character
 
