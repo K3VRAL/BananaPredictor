@@ -35,4 +35,4 @@ $(BINFLR):
 
 # Clean up
 clean:
-	rm $(BINFLR)$(TARGET)* $(BINFLR)*.o
+	rm -rf $(BINFLR)
