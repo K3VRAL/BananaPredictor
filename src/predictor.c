@@ -4,7 +4,9 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <limits.h>
+#ifdef __unix__
 #include <sys/ioctl.h>
+#endif
 #include <unistd.h>
 
 Predictor predictor = {
@@ -55,6 +57,7 @@ void predictor_shapes(int *shapes_start, int *shapes_end) {
 	}
 }
 
+#ifdef __unix__
 /* Prints out the progress bar in the terminal. Resizing the terminal will also resize the output */
 void predictor_progressbar(unsigned int percent) {
 	struct winsize w;
@@ -72,6 +75,7 @@ void predictor_progressbar(unsigned int percent) {
 	fprintf(stdout, "] %d%%", percent);
 	fflush(stdout);
 }
+#endif
 
 // Basing below functions off of https://stackoverflow.com/a/20679579 because I suck at math
 typedef struct XLine {
@@ -369,12 +373,14 @@ void predictor_main(void) {
 	int i = 0;
 	double j = shapes_start;
 	while (i < beatmap.num_ho || j < shapes_end) {
+#ifdef __unix__
 		// Update Progress Bar
 		if (predictor.output != stdout) {
 			double beatmap_objects = beatmap.num_ho > 0 ? ((double) i / beatmap.num_ho) : 1;
 			double shapes_objects = j < shapes_end ? (j - shapes_start) / (shapes_end - shapes_start) : 1;
 			predictor_progressbar((beatmap_objects * shapes_objects) * 100);
 		}
+#endif
 		
 		// Getting current time
 		bool is_shape = false;
@@ -446,10 +452,12 @@ void predictor_main(void) {
 		predictor_beatmap(&rng, beatmap, i);
 		i++;
 	}
+#ifdef __unix__
 	if (predictor.output != stdout) {
 		predictor_progressbar(100);
 		fprintf(stdout, "\n");
 	}
+#endif
 
 	// Free
 	of_beatmap_free(beatmap);

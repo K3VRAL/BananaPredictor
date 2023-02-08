@@ -6,6 +6,10 @@ BINFLR	= bin/
 
 all:	$(TARGET)
 
+win:	CC = x86_64-w64-mingw32-gcc
+win:	LFLAGS += -L.
+win:	$(TARGET)
+
 # Compiling specific object
 %.o: %.c | $(BINFLR)
 	$(CC) $(CFLAGS) -o $(BINFLR)$(notdir $@) $<
