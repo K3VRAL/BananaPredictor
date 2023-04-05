@@ -34,17 +34,27 @@ If the argument is not used, it will default to the terminal's output.
 
 ## Shapes (`-s` or `--shapes`) - Formatted as `int:int|int:int|int:int[|...]`
 
-The format for a point is `x:time|x:time|x:time[|...]`. There must be at least three points. The final point will always go back to the first point.
+The format for a point is `x:time`. There must be at least three points for each shape. The final point will always go back to the first point.
+
+Before you shapes can be generated, you much choose only one an object to allow for generating the bananas position. You can either choose; `-c` the hit object (hardrock will need to be eneabled to see the changes in effect), `-j` the juice stream, or `-w` the banana shower.
 
 If the argument is not used, it will default to `NULL` and prevent the application from running.
 
 You also can stack the argument multiple times, allowing you to have multiple shapes; each shape works independently.
 
-## Juice Points (`-j` or `--juice-points`) - Formatted as `[f|][l:int|][t:[CBLP]|]int:int|int:int[|...]`
+## HitObject Points (`-c` or `--hitobject-points`) - Formatted as `int:int`
+
+The format for a point is `x:y`.
+
+If the argument is not used, it will default to `NULL`, and the object that was selected will be used instead.
+
+You also can stack the argument multiple times, allowing you to have multiple HitObjects; each HitObject is sorted dependently on each other and the ordering of each HitObject placed matters.
+
+## JuiceStream Points (`-j` or `--juicestream-points`) - Formatted as `[f|][l:int|][t:(C|B|L|P)|]int:int|int:int[|...]`
 
 The format for a point is `[f|][l:len|][t:type|]x:y|x:y[|...]`. There must be at least two points. The first point will always be the x and y coordinates for Juice Stream whereas the rest will be its curve.
 
-If the argument is not used, it will default to `NULL` and the default format will be used instead.
+If the argument is not used, it will default to `NULL`, and the object that was selected will be used instead.
 
 You also can stack the argument multiple times, allowing you to have multiple Juice Streams; each Juice Stream works dependently on each other and the ordering of each Juice Stream placed matters.
 
@@ -53,6 +63,14 @@ If the `f` item (Boolean as argument) is used, it means that the Juice Stream bl
 If the `l` item (Integer as argument) is used, it means that the Juice Stream length is changed to the new value provided. If this is not used, it will be defaulted to the end time of the BananaPredictor.
 
 If the `t` item (Slider's Type (`C`, `B`, `L`, `P`) as argument) is used, it means that the Juice Stream type will be changed to the new value provided. If this is not used, it will be defaulted to `L` or Linear.
+
+## BananaShower Points (`-w` or `--bananashower-points`) - Formatted as `int`
+
+The format for a point is `length`. WARNING; if you attempt to modify this to anything higher than the default value, the application may not make any progress.
+
+If the argument is not used, it will default to `NULL`, and the object that was selected will be used instead.
+
+You also can stack the argument multiple times, allowing you to have multiple shapes; each shape works independently.
 
 ## Distance (`-d` or `--distance`) - Double
 

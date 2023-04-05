@@ -70,47 +70,76 @@ void args_shape(char *option) {
 	free(copy);
 }
 
-void args_juice_point(char *option) {
+void args_hitobject_point(char *option) {
+	if (predictor.points_type != '\0' || predictor.points_type != hit_object) {
+		fprintf(stdout, "Error: It seems that you are trying to choose many different banana generation objects. Only choose one.\n");
+		exit(1);
+	}
+	char *copy = strdup(option);
+	char *token = strtok(option, ":\0");
+	char used_delim = '\0';
+	predictor.points.ho = realloc(predictor.points.ho, (++predictor.points_len) * sizeof(*predictor.points.ho));
+	(predictor.points.ho + predictor.points_len - 1)->x = 0;
+	(predictor.points.ho + predictor.points_len - 1)->y = 0;
+	while (token != NULL) {
+		switch (used_delim) {
+			case '\0':
+				(predictor.points.ho + predictor.points_len - 1)->x = strtol(token, NULL, 10);
+				break;
+
+			case ':':
+				(predictor.points.ho + predictor.points_len - 1)->y = strtol(token, NULL, 10);
+				break;
+		}
+	}
+	free(copy);
+}
+
+void args_juicestream_point(char *option) {
+	if (predictor.points_type != '\0' || predictor.points_type != juice_stream) {
+		fprintf(stdout, "Error: It seems that you are trying to choose many different banana generation objects. Only choose one.\n");
+		exit(1);
+	}
 	char *copy = strdup(option);
 	char *token = strtok(option, ":|\0");
 	char used_delim = '\0';
-	predictor.jspoints = realloc(predictor.jspoints, (++predictor.jspoints_len) * sizeof(*predictor.jspoints));
-	(predictor.jspoints + predictor.jspoints_len - 1)->points.vectors = NULL;
-	(predictor.jspoints + predictor.jspoints_len - 1)->points.len = 0;
-	(predictor.jspoints + predictor.jspoints_len - 1)->follow = false;
-	(predictor.jspoints + predictor.jspoints_len - 1)->type = slidertype_linear;
-	(predictor.jspoints + predictor.jspoints_len - 1)->length = 0;
+	predictor.points.js = realloc(predictor.points.js, (++predictor.points_len) * sizeof(*predictor.points.js));
+	(predictor.points.js + predictor.points_len - 1)->points.vectors = NULL;
+	(predictor.points.js + predictor.points_len - 1)->points.len = 0;
+	(predictor.points.js + predictor.points_len - 1)->follow = false;
+	(predictor.points.js + predictor.points_len - 1)->type = slidertype_linear;
+	(predictor.points.js + predictor.points_len - 1)->length = 0;
 	bool skip = false;
 	while (token != NULL) {
-		if (!skip && (used_delim == '|' || (predictor.jspoints + predictor.jspoints_len - 1)->points.len == 0)) {
-			(predictor.jspoints + predictor.jspoints_len - 1)->points.vectors = realloc((predictor.jspoints + predictor.jspoints_len - 1)->points.vectors, ++(predictor.jspoints + predictor.jspoints_len - 1)->points.len * sizeof(*(predictor.jspoints + predictor.jspoints_len - 1)->points.vectors));
+		if (!skip && (used_delim == '|' || (predictor.points.js + predictor.points_len - 1)->points.len == 0)) {
+			(predictor.points.js + predictor.points_len - 1)->points.vectors = realloc((predictor.points.js + predictor.points_len - 1)->points.vectors, ++(predictor.points.js + predictor.points_len - 1)->points.len * sizeof(*(predictor.points.js + predictor.points_len - 1)->points.vectors));
 		}
 		skip = false;
 		switch (used_delim) {
 			case '\0':
 			case '|':
 				if (!strcmp("f", token)) {
-					(predictor.jspoints + predictor.jspoints_len - 1)->follow = true;
+					(predictor.points.js + predictor.points_len - 1)->follow = true;
 					skip = true;
 					break;
 				}
 				if (!strcmp("l", token)) {
 					token = strtok(NULL, ":|\0");
-					(predictor.jspoints + predictor.jspoints_len - 1)->length = strtol(token, NULL, 10);
+					(predictor.points.js + predictor.points_len - 1)->length = strtol(token, NULL, 10);
 					skip = true;
 					break;
 				}
 				if (!strcmp("t", token)) {
 					token = strtok(NULL, ":|\0");
-					(predictor.jspoints + predictor.jspoints_len - 1)->type = *(token + 0);
+					(predictor.points.js + predictor.points_len - 1)->type = *(token + 0);
 					skip = true;
 					break;
 				}
-				((predictor.jspoints + predictor.jspoints_len - 1)->points.vectors + (predictor.jspoints + predictor.jspoints_len - 1)->points.len - 1)->x = strtol(token, NULL, 10);
+				((predictor.points.js + predictor.points_len - 1)->points.vectors + (predictor.points.js + predictor.points_len - 1)->points.len - 1)->x = strtol(token, NULL, 10);
 				break;
 
 			case ':':
-				((predictor.jspoints + predictor.jspoints_len - 1)->points.vectors + (predictor.jspoints + predictor.jspoints_len - 1)->points.len - 1)->ty = strtol(token, NULL, 10);
+				((predictor.points.js + predictor.points_len - 1)->points.vectors + (predictor.points.js + predictor.points_len - 1)->points.len - 1)->ty = strtol(token, NULL, 10);
 				break;
 		}
 		used_delim = *(copy + (token - option + strlen(token)));
@@ -118,6 +147,16 @@ void args_juice_point(char *option) {
 	}
 	free(copy);
 }
+
+void args_bananashower_point(char *option) {
+	if (predictor.points_type != '\0' || predictor.points_type != banana_shower) {
+		fprintf(stdout, "Error: It seems that you are trying to choose many different banana generation objects. Only choose one.\n");
+		exit(1);
+	}
+	predictor.points.bs = realloc(predictor.points.bs, (++predictor.points_len) * sizeof(*predictor.points.bs));
+	(predictor.points.bs + predictor.points_len - 1)->length = strtol(option, NULL, 10);
+}
+
 
 void args_distance(char *option) {
 	predictor.distance = strtod(option, NULL);
@@ -154,7 +193,7 @@ typedef struct Args {
 		void (*v)(void);
 	} function;
 } Args;
-#define args_num 9
+#define args_num 11
 Args args_arg[args_num] = {
 	{
 		.i = "-b",
@@ -162,9 +201,7 @@ Args args_arg[args_num] = {
 		.argument = "file",
 		.description = "inputs the beatmap from the file location",
 		.e_function = bcp,
-		.function = {
-			.bcp = args_beatmap
-		}
+		.function.bcp = args_beatmap
 	},
 	{
 		.i = "-o",
@@ -172,9 +209,7 @@ Args args_arg[args_num] = {
 		.argument = "[file]",
 		.description = "outputs the data to the file location",
 		.e_function = bcp,
-		.function = {
-			.bcp = args_output
-		}
+		.function.bcp = args_output
 	},
 	{
 		.i = "-O",
@@ -182,9 +217,7 @@ Args args_arg[args_num] = {
 		.argument = "[file]",
 		.description = "outputs the data to the file location with the osu format",
 		.e_function = bcp,
-		.function = {
-			.bcp = args_output_beatmap
-		}
+		.function.bcp = args_output_beatmap
 	},
 	{
 		.i = "-s",
@@ -192,19 +225,31 @@ Args args_arg[args_num] = {
 		.argument = "x:time|x:time|x:time[|...]",
 		.description = "the points for the vector of the shape",
 		.e_function = vcp,
-		.function = {
-			.vcp = args_shape
-		}
+		.function.vcp = args_shape
+	},
+	{
+		.i = "-c",
+		.item = "--hitobject-points",
+		.argument = "[x:y]",
+		.description = "the points for the vector of the HitObject",
+		.e_function = vcp,
+		.function.vcp = args_hitobject_point
 	},
 	{
 		.i = "-j",
-		.item = "--juice-points",
+		.item = "--juicestream-points",
 		.argument = "[[f|][l:length|][t:type|]x:y|x:y[|...]]",
 		.description = "the points for the vector of the Juice Streams",
 		.e_function = vcp,
-		.function = {
-			.vcp = args_juice_point
-		}
+		.function.vcp = args_juicestream_point
+	},
+	{
+		.i = "-w",
+		.item = "--bananashower-points",
+		.argument = "[length]",
+		.description = "the points for the vector of the BananaShower",
+		.e_function = vcp,
+		.function.vcp = args_bananashower_point
 	},
 	{
 		.i = "-d",
@@ -212,9 +257,7 @@ Args args_arg[args_num] = {
 		.argument = "[time]",
 		.description = "gives the distance for each Banana Shower as a double",
 		.e_function = vcp,
-		.function = {
-			.vcp = args_distance
-		}
+		.function.vcp = args_distance
 	},
 	{
 		.i = "-p",
@@ -222,9 +265,7 @@ Args args_arg[args_num] = {
 		.argument = "",
 		.description = "outputs Fruits instead of Bananas and removes Juice Streams and Banana Showers",
 		.e_function = v,
-		.function = {
-			.v = args_prefer_circles
-		}
+		.function.v = args_prefer_circles
 	},
 	{
 		.i = "-r",
@@ -232,9 +273,7 @@ Args args_arg[args_num] = {
 		.argument = "",
 		.description = "records and outputs the entire map file",
 		.e_function = v,
-		.function = {
-			.v = args_record_objects
-		}
+		.function.v = args_record_objects
 	},
 	{
 		.i = "-h",
@@ -242,9 +281,7 @@ Args args_arg[args_num] = {
 		.argument = "",
 		.description = "gives this help message",
 		.e_function = rv,
-		.function = {
-			.v = args_help
-		}
+		.function.v = args_help
 	}
 };
 
@@ -321,19 +358,6 @@ bool args_main(int argc, char **argv) {
 		if ((predictor.shapes + i)->points.len < 3) {
 			fprintf(stdout, "Error: Shape has points less 3\n");
 			return false;
-		}
-	}
-
-	if (predictor.jspoints == NULL) {
-		char *slider = strdup("256:384|256:0");
-		args_juice_point(slider);
-		free(slider);
-	} else {
-		for (int i = 0; i < predictor.jspoints_len; i++) {
-			if ((predictor.jspoints + i)->points.len < 2) {
-				fprintf(stdout, "Error: JuiceStream has points less than 2\n");
-				return false;
-			}
 		}
 	}
 

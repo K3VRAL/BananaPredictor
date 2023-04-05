@@ -28,13 +28,29 @@ int main(int argc, char **argv) {
 		}
 		free(predictor.shapes);
 	}
-	if (predictor.jspoints != NULL) {
-		for (int i = 0; i < predictor.jspoints_len; i++) {
-			if ((predictor.jspoints + i)->points.vectors != NULL) {
-				free((predictor.jspoints + i)->points.vectors);
+	switch (predictor.points_type) {
+		case hit_object:
+			if (predictor.points.ho != NULL) {
+				free(predictor.points.ho);
 			}
-		}
-		free(predictor.jspoints);
+			break;
+
+		case juice_stream:
+			if (predictor.points.js != NULL) {
+				for (int i = 0; i < predictor.points_len; i++) {
+					if ((predictor.points.js + i)->points.vectors != NULL) {
+						free((predictor.points.js + i)->points.vectors);
+					}
+				}
+				free(predictor.points.js);
+			}
+			break;
+
+		case banana_shower:
+			if (predictor.points.bs != NULL) {
+				free(predictor.points.bs);
+			}
+			break;
 	}
 
 	return !keep_running;

@@ -1,14 +1,27 @@
 CC	= gcc
-CFLAGS	= -Wall -c -Iinclude/ -g $(shell pkg-config --cflags libosu)
+CFLAGS	= -Wall -c -Iinclude/ $(shell pkg-config --cflags libosu)
 LFLAGS	= $(shell pkg-config --libs libosu)
 TARGET	= bnprdctr
 BINFLR	= bin/
 
+all:	CFLAGS += -g
 all:	$(TARGET)
 
-win:	CC = x86_64-w64-mingw32-gcc
-win:	LFLAGS += -L.
-win:	$(TARGET)
+unix64:	CFLAGS += -m64
+unix64:	LFLAGS += -m64
+unix64:	$(TARGET)
+
+unix32:	CFLAGS += -m32
+unix32: LFLAGS += -m32
+unix32:	$(TARGET)
+
+win64:	CC = x86_64-w64-mingw32-gcc
+win64:	LFLAGS += -static-libgcc -L.
+win64:	$(TARGET)
+
+win32:	CC = i686-w64-mingw32-gcc
+win32:	LFLAGS += -static-libgcc -static-libstdc++ -L.
+win32:	$(TARGET)
 
 # Compiling specific object
 %.o: %.c | $(BINFLR)
@@ -31,8 +44,8 @@ uninstall:
 
 # Make bin/ folder
 $(BINFLR):
-	[ -d $(BINFLR) ] || mkdir -p $(BINFLR)
+	$(shell mkdir -p $@)
 
 # Clean up
 clean:
-	rm -rf $(BINFLR)
+	$(shell rm -rf $(BINFLR))
