@@ -71,7 +71,7 @@ void args_shape(char *option) {
 }
 
 void args_hitobject_point(char *option) {
-	if (predictor.points_type != '\0' || predictor.points_type != hit_object) {
+	if (!(predictor.points_type == '\0' || predictor.points_type == hit_object)) {
 		fprintf(stdout, "Error: It seems that you are trying to choose many different banana generation objects. Only choose one.\n");
 		exit(1);
 	}
@@ -96,7 +96,7 @@ void args_hitobject_point(char *option) {
 }
 
 void args_juicestream_point(char *option) {
-	if (predictor.points_type != '\0' || predictor.points_type != juice_stream) {
+	if (!(predictor.points_type == '\0' || predictor.points_type == juice_stream)) {
 		fprintf(stdout, "Error: It seems that you are trying to choose many different banana generation objects. Only choose one.\n");
 		exit(1);
 	}
@@ -149,7 +149,7 @@ void args_juicestream_point(char *option) {
 }
 
 void args_bananashower_point(char *option) {
-	if (predictor.points_type != '\0' || predictor.points_type != banana_shower) {
+	if (!(predictor.points_type == '\0' || predictor.points_type == banana_shower)) {
 		fprintf(stdout, "Error: It seems that you are trying to choose many different banana generation objects. Only choose one.\n");
 		exit(1);
 	}

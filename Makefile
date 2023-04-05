@@ -39,8 +39,8 @@ install:
 
 # Uninstall
 uninstall:
-	$(shell unlink /usr/bin/$(TARGET))
-	$(shell rm -rf /usr/local/bin/$(TARGET))
+	$(shell test -L /usr/bin/$(TARGET) && unlink /usr/bin/$(TARGET))
+	$(shell test -f /usr/local/bin/$(TARGET) && rm -rf /usr/local/bin/$(TARGET))
 
 # Make bin/ folder
 $(BINFLR):
