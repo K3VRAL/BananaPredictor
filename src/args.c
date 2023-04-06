@@ -75,6 +75,7 @@ void args_hitobject_point(char *option) {
 		fprintf(stdout, "Error: It seems that you are trying to choose many different banana generation objects. Only choose one.\n");
 		exit(1);
 	}
+	predictor.points_type = hit_object;
 	char *copy = strdup(option);
 	char *token = strtok(option, ":\0");
 	char used_delim = '\0';
@@ -91,6 +92,8 @@ void args_hitobject_point(char *option) {
 				(predictor.points.ho + predictor.points_len - 1)->y = strtol(token, NULL, 10);
 				break;
 		}
+		used_delim = *(copy + (token - option + strlen(token)));
+		token = strtok(NULL, ":|\0");
 	}
 	free(copy);
 }
@@ -100,6 +103,7 @@ void args_juicestream_point(char *option) {
 		fprintf(stdout, "Error: It seems that you are trying to choose many different banana generation objects. Only choose one.\n");
 		exit(1);
 	}
+	predictor.points_type = juice_stream;
 	char *copy = strdup(option);
 	char *token = strtok(option, ":|\0");
 	char used_delim = '\0';
@@ -153,10 +157,28 @@ void args_bananashower_point(char *option) {
 		fprintf(stdout, "Error: It seems that you are trying to choose many different banana generation objects. Only choose one.\n");
 		exit(1);
 	}
+	char *copy = strdup(option);
+	char *token = strtok(option, ":\0");
+	char used_delim = '\0';
+	predictor.points_type = banana_shower;
 	predictor.points.bs = realloc(predictor.points.bs, (++predictor.points_len) * sizeof(*predictor.points.bs));
-	(predictor.points.bs + predictor.points_len - 1)->length = strtol(option, NULL, 10);
-}
+	(predictor.points.bs + predictor.points_len - 1)->offset = 0;
+	(predictor.points.bs + predictor.points_len - 1)->length = 0;
+	while (token != NULL) {
+		switch (used_delim) {
+			case '\0':
+				(predictor.points.bs + predictor.points_len - 1)->offset = strtol(token, NULL, 10);
+				break;
 
+			case ':':
+				(predictor.points.bs + predictor.points_len - 1)->length = strtol(token, NULL, 10);
+				break;
+		}
+		used_delim = *(copy + (token - option + strlen(token)));
+		token = strtok(NULL, ":|\0");
+	}
+	free(copy);
+}
 
 void args_distance(char *option) {
 	predictor.distance = strtod(option, NULL);
@@ -246,7 +268,7 @@ Args args_arg[args_num] = {
 	{
 		.i = "-w",
 		.item = "--bananashower-points",
-		.argument = "[length]",
+		.argument = "[offset:length]",
 		.description = "the points for the vector of the BananaShower",
 		.e_function = vcp,
 		.function.vcp = args_bananashower_point
@@ -359,6 +381,11 @@ bool args_main(int argc, char **argv) {
 			fprintf(stdout, "Error: Shape has points less 3\n");
 			return false;
 		}
+	}
+
+	if (!(predictor.points_type == hit_object || predictor.points_type == juice_stream || predictor.points_type == banana_shower)) {
+		fprintf(stdout, "Error: No generation object used\n");
+		return false;
 	}
 
 	return true;

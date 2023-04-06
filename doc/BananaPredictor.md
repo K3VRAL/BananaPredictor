@@ -64,9 +64,9 @@ If the `l` item (Integer as argument) is used, it means that the Juice Stream le
 
 If the `t` item (Slider's Type (`C`, `B`, `L`, `P`) as argument) is used, it means that the Juice Stream type will be changed to the new value provided. If this is not used, it will be defaulted to `L` or Linear.
 
-## BananaShower Points (`-w` or `--bananashower-points`) - Formatted as `int`
+## BananaShower Points (`-w` or `--bananashower-points`) - Formatted as `int:int`
 
-The format for a point is `length`. WARNING; if you attempt to modify this to anything higher than the default value, the application may not make any progress.
+The format for a point is `offset:length`.
 
 If the argument is not used, it will default to `NULL`, and the object that was selected will be used instead.
 
