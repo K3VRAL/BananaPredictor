@@ -1,4 +1,3 @@
-// TODO Figure out what went wrong
 #include "predictor.h"
 
 #include <osu.h>
@@ -294,8 +293,6 @@ void predictor_generatebs(CatchHitObject **bnpd, unsigned int *bnpd_len, int sta
 	spinner_hit_object->type = nc_spinner;
 	spinner_hit_object->ho.spinner.end_time = start_time + 1;
 
-	// TODO fill up entire row of bananas
-
 	*bnpd = realloc(*bnpd, ++*bnpd_len * sizeof(**bnpd));
 	for (int i = *bnpd_len - 1; i > 0; i--) {
 		*(*bnpd + i) = *(*bnpd + i - 1);
@@ -406,9 +403,9 @@ void predictor_main(void) {
 	int shapes_start, shapes_end;
 	predictor_shapes(&shapes_start, &shapes_end);
 	
-	int i = 0;
+	unsigned int i = 0;
 	double j = shapes_start;
-	unsigned int index = 0;
+	unsigned int obj_generation_index = 0;
 	while (i < beatmap.num_ho || j < shapes_end) {
 #ifdef __unix__
 		// Update Progress Bar
@@ -442,10 +439,10 @@ void predictor_main(void) {
 			HitObject *bnpd_shower = calloc(1, sizeof(*bnpd_shower));
 			bnpd_shower->x = 256;
 			bnpd_shower->y = 192;
-			bnpd_shower->time = (int) j + (predictor.points_type == banana_shower ? (predictor.points.bs + index)->offset : 0);
+			bnpd_shower->time = (int) j + (predictor.points_type == banana_shower ? (predictor.points.bs + obj_generation_index)->offset : 0);
 			bnpd_shower->type = nc_spinner;
 			bnpd_shower->hit_sound = 0;
-			bnpd_shower->ho.spinner.end_time = (int) j + (predictor.points_type == banana_shower ? (predictor.points.bs + index)->offset + (predictor.points.bs + index)->length : 1);
+			bnpd_shower->ho.spinner.end_time = (int) j + (predictor.points_type == banana_shower ? (predictor.points.bs + obj_generation_index)->offset + (predictor.points.bs + obj_generation_index)->length : 1);
 			ooc_bananashower_init((bnpd + 0), bnpd_shower);
 			ooc_bananashower_createnestedbananas((bnpd + 0));
 
@@ -464,12 +461,12 @@ void predictor_main(void) {
 				if (!predictor_breakout(lines, bnpd, bnpd_len)) {
 					switch (predictor.points_type) {
 						case hit_object:
-							predictor_generateho(&bnpd, &bnpd_len, (int) j, &index);
+							predictor_generateho(&bnpd, &bnpd_len, (int) j, &obj_generation_index);
 							break;
 
 						case juice_stream:
 							// If previous object is a Juice Stream, expand on said Juice Stream, else create new Juice Stream
-							predictor_generatejs(&bnpd, &bnpd_len, (int) j, beatmap, &index);
+							predictor_generatejs(&bnpd, &bnpd_len, (int) j, beatmap, &obj_generation_index);
 							break;
 
 						case banana_shower:
@@ -505,7 +502,7 @@ void predictor_main(void) {
 				free(lines.areas);
 			}
 			if (predictor.points_type == banana_shower) {
-				index = (index + 1) % predictor.points_len;
+				obj_generation_index = (obj_generation_index + 1) % predictor.points_len;
 			}
 			j += predictor.distance;
 			continue;
