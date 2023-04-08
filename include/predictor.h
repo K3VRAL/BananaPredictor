@@ -67,6 +67,7 @@ typedef struct Predictor {
 
 	bool prefer_circles;
 	bool record_objects;
+	unsigned int read_until;
 } Predictor;
 
 extern Predictor predictor;

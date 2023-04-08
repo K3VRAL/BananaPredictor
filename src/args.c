@@ -196,6 +196,10 @@ void args_record_objects(void) {
 	predictor.record_objects = true;
 }
 
+void args_read_until(char *option) {
+	predictor.read_until = strtol(option, NULL, 10);
+}
+
 void args_help(void);
 
 typedef struct Args {
@@ -215,7 +219,7 @@ typedef struct Args {
 		void (*v)(void);
 	} function;
 } Args;
-#define args_num 11
+#define args_num 12
 Args args_arg[args_num] = {
 	{
 		.i = "-b",
@@ -296,6 +300,14 @@ Args args_arg[args_num] = {
 		.description = "records and outputs the entire map file",
 		.e_function = v,
 		.function.v = args_record_objects
+	},
+	{
+		.i = "-u",
+		.item = "--read-until",
+		.argument = "[object]",
+		.description = "only reads all objects and their RNG until object number in beatmap",
+		.e_function = vcp,
+		.function.vcp = args_read_until
 	},
 	{
 		.i = "-h",

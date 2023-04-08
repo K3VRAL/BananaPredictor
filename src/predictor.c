@@ -25,7 +25,8 @@ Predictor predictor = {
 	.distance = 1,
 
 	.prefer_circles = false,
-	.record_objects = false
+	.record_objects = false,
+	.read_until = 0,
 };
 
 /* Sets the values for the points to start and stop the main loop */
@@ -381,6 +382,11 @@ void predictor_main(void) {
 	of_beatmap_init(&beatmap);
 	of_beatmap_set(&beatmap, predictor.beatmap);
 
+	if (beatmap.hit_objects == NULL) {
+		of_beatmap_free(beatmap);
+		return;
+	}
+
 	// If output with beatmap osu format; removing then putting back HitObjects so we can save beatmap settings without saving the HitObjects (we do that while processing)
 	if (predictor.output_beatmap) {
 		HitObject *objects = beatmap.hit_objects;
@@ -406,7 +412,9 @@ void predictor_main(void) {
 	unsigned int i = 0;
 	double j = shapes_start;
 	unsigned int obj_generation_index = 0;
+
 	while (i < beatmap.num_ho || j < shapes_end) {
+
 #ifdef __unix__
 		// Update Progress Bar
 		if (predictor.output != stdout) {
@@ -415,14 +423,19 @@ void predictor_main(void) {
 			predictor_progressbar((beatmap_objects * shapes_objects) * 100);
 		}
 #endif
+
+		while (predictor.read_until != 0 && i < predictor.read_until) {
+			// Processes next object in beatmap
+			predictor_beatmap(&rng, beatmap, i);
+			i++;
+		}
 		
 		// Getting current time
-		bool is_shape = false;
 		int time = INT_MAX;
-		if (beatmap.num_ho > i && beatmap.hit_objects != NULL) {
+		if (beatmap.num_ho > i) {
 			time = (beatmap.hit_objects + i)->time;
-			is_shape = false;
 		}
+		bool is_shape = false;
 		if (time > (int) j) {
 			time = (int) j;
 			is_shape = true;

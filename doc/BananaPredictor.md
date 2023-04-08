@@ -66,7 +66,7 @@ If the `t` item (Slider's Type (`C`, `B`, `L`, `P`) as argument) is used, it mea
 
 ## BananaShower Points (`-w` or `--bananashower-points`) - Formatted as `int:int`
 
-The format for a point is `offset:length`.
+The format for a point is `offset:length`. The `offset` is targets the BananaPredictor Banana Shower, and is offsetted relative to the object generation.
 
 If the argument is not used, it will default to `NULL`, and the object that was selected will be used instead.
 
@@ -92,7 +92,13 @@ Outputs and includes input map objects.
 
 If the argument is not used, it will default to `false`.
 
-If the Output Beatmap (`-O` or `--output-beatmap`) argument is used, it will default to `true`. If this argument is then later used; it will not record the beatmap.
+If the Output Beatmap (`-O` or `--output-beatmap`) argument is used, it will automatically be to `true`, however, if this argument is used; it will be `false`.
+
+## Until Read (`-u` or `--until-read`) - Integer
+
+Only records objects RNG until hits specific object in beatmap.
+
+If the argument is not used, it will default to `0`.
 
 ## Help (`-h` or `--help`) - Boolean
 
