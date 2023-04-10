@@ -286,13 +286,14 @@ void predictor_generatejs(CatchHitObject **bnpd, unsigned int *bnpd_len, int sta
 	oos_uninheritedpoint_free(uninherited);
 }
 
-void predictor_generatebs(CatchHitObject **bnpd, unsigned int *bnpd_len, int start_time) {
+void predictor_generatebs(CatchHitObject **bnpd, unsigned int *bnpd_len, int start_time, unsigned int *index) {
 	HitObject *spinner_hit_object = calloc(1, sizeof(*spinner_hit_object));
 	spinner_hit_object->x = 256;
 	spinner_hit_object->y = 192;
-	spinner_hit_object->time = start_time;
+	spinner_hit_object->time = start_time + (predictor.points.bs + *index)->offset;
 	spinner_hit_object->type = nc_spinner;
-	spinner_hit_object->ho.spinner.end_time = start_time + 1;
+	spinner_hit_object->ho.spinner.end_time = start_time + (predictor.points.bs + *index)->offset;
+       	spinner_hit_object->ho.spinner.end_time += (predictor.points.bs + *index)->length;
 
 	*bnpd = realloc(*bnpd, ++*bnpd_len * sizeof(**bnpd));
 	for (int i = *bnpd_len - 1; i > 0; i--) {
@@ -301,6 +302,8 @@ void predictor_generatebs(CatchHitObject **bnpd, unsigned int *bnpd_len, int sta
 
 	ooc_bananashower_init((*bnpd + 0), spinner_hit_object);
 	ooc_bananashower_createnestedbananas((*bnpd + 0));
+
+	*index = (*index + 1) % predictor.points_len;
 }
 
 /* Returns if we need to retry or store the current positions of the objects */
@@ -345,7 +348,7 @@ void predictor_output(CatchHitObject object) {
 }
 
 /* Gets the values of the beatmap and svaes rng based on the converted catch object */
-void predictor_beatmap(LegacyRandom *rng, Beatmap beatmap, int index) {
+void predictor_beatmap(LegacyRandom *rng, Beatmap beatmap, int index, float **last_position, double *last_start_time) {
 	CatchHitObject object = {0};
 	switch ((beatmap.hit_objects + index)->type) {
 		case circle:
@@ -365,7 +368,7 @@ void predictor_beatmap(LegacyRandom *rng, Beatmap beatmap, int index) {
 			ooc_bananashower_createnestedbananas(&object);
 			break;
 	}
-	ooc_processor_applypositionoffsetrngwo(&object, 1, rng, predictor.points_type == hit_object);
+	ooc_processor_applypositionoffsetrng(&object, 1, rng, predictor.points_type == hit_object, last_position, last_start_time);
 	if (predictor.record_objects) {
 		predictor_output(object);
 	}
@@ -381,11 +384,6 @@ void predictor_main(void) {
 	Beatmap beatmap = {0};
 	of_beatmap_init(&beatmap);
 	of_beatmap_set(&beatmap, predictor.beatmap);
-
-	if (beatmap.hit_objects == NULL) {
-		of_beatmap_free(beatmap);
-		return;
-	}
 
 	// If output with beatmap osu format; removing then putting back HitObjects so we can save beatmap settings without saving the HitObjects (we do that while processing)
 	if (predictor.output_beatmap) {
@@ -424,15 +422,15 @@ void predictor_main(void) {
 		}
 #endif
 
-		while (predictor.read_until != 0 && i < predictor.read_until) {
+		while (i < predictor.read_until) {
 			// Processes next object in beatmap
-			predictor_beatmap(&rng, beatmap, i);
+			predictor_beatmap(&rng, beatmap, i, &last_position, &last_start_time);
 			i++;
 		}
 		
 		// Getting current time
 		int time = INT_MAX;
-		if (beatmap.num_ho > i) {
+		if (beatmap.num_ho > i && beatmap.hit_objects != NULL) {
 			time = (beatmap.hit_objects + i)->time;
 		}
 		bool is_shape = false;
@@ -452,10 +450,10 @@ void predictor_main(void) {
 			HitObject *bnpd_shower = calloc(1, sizeof(*bnpd_shower));
 			bnpd_shower->x = 256;
 			bnpd_shower->y = 192;
-			bnpd_shower->time = (int) j + (predictor.points_type == banana_shower ? (predictor.points.bs + obj_generation_index)->offset : 0);
+			bnpd_shower->time = (int) j;
 			bnpd_shower->type = nc_spinner;
 			bnpd_shower->hit_sound = 0;
-			bnpd_shower->ho.spinner.end_time = (int) j + (predictor.points_type == banana_shower ? (predictor.points.bs + obj_generation_index)->offset + (predictor.points.bs + obj_generation_index)->length : 1);
+			bnpd_shower->ho.spinner.end_time = (int) j + 1;
 			ooc_bananashower_init((bnpd + 0), bnpd_shower);
 			ooc_bananashower_createnestedbananas((bnpd + 0));
 
@@ -483,7 +481,7 @@ void predictor_main(void) {
 							break;
 
 						case banana_shower:
-							predictor_generatebs(&bnpd, &bnpd_len, (int) j);
+							predictor_generatebs(&bnpd, &bnpd_len, (int) j, &obj_generation_index);
 							break;
 					}
 					if (test_last_position != NULL) {
@@ -514,15 +512,12 @@ void predictor_main(void) {
 			if (lines.areas != NULL) {
 				free(lines.areas);
 			}
-			if (predictor.points_type == banana_shower) {
-				obj_generation_index = (obj_generation_index + 1) % predictor.points_len;
-			}
 			j += predictor.distance;
 			continue;
 		}
 
 		// Processes next object in beatmap
-		predictor_beatmap(&rng, beatmap, i);
+		predictor_beatmap(&rng, beatmap, i, &last_position, &last_start_time);
 		i++;
 	}
 #ifdef __unix__

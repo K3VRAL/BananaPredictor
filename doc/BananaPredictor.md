@@ -66,7 +66,7 @@ If the `t` item (Slider's Type (`C`, `B`, `L`, `P`) as argument) is used, it mea
 
 ## BananaShower Points (`-w` or `--bananashower-points`) - Formatted as `int:int`
 
-The format for a point is `offset:length`. The `offset` is targets the BananaPredictor Banana Shower, and is offsetted relative to the object generation.
+The format for a point is `offset:length`. The `offset` is relative to the BananaPredictor.
 
 If the argument is not used, it will default to `NULL`, and the object that was selected will be used instead.
 
