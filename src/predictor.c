@@ -411,6 +411,12 @@ void predictor_main(void) {
 	double j = shapes_start;
 	unsigned int obj_generation_index = 0;
 
+	while (i < predictor.read_until) {
+		// Processes next object in beatmap
+		predictor_beatmap(&rng, beatmap, i, &last_position, &last_start_time);
+		i++;
+	}
+
 	while (i < beatmap.num_ho || j < shapes_end) {
 
 #ifdef __unix__
@@ -421,12 +427,6 @@ void predictor_main(void) {
 			predictor_progressbar((beatmap_objects * shapes_objects) * 100);
 		}
 #endif
-
-		while (i < predictor.read_until) {
-			// Processes next object in beatmap
-			predictor_beatmap(&rng, beatmap, i, &last_position, &last_start_time);
-			i++;
-		}
 		
 		// Getting current time
 		int time = INT_MAX;
