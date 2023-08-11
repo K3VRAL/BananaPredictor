@@ -8,6 +8,7 @@
 #include <sys/ioctl.h>
 #endif
 #include <unistd.h>
+#include <math.h>
 
 Predictor predictor = {
 	.beatmap = NULL,
@@ -110,7 +111,7 @@ Vector *predictor_intersection(Coefficient c1, Coefficient c2) {
 	double d = c1.a * c2.b - c1.b * c2.a;
 	if (d != 0) {
 		r = calloc(1, sizeof(*r));
-		r->x = (c1.c * c2.b - c1.b * c2.c) / d;
+		r->x = round((c1.c * c2.b - c1.b * c2.c) / d);
 		r->ty = (c1.a * c2.c - c1.c * c2.a) / d;
 	}
 	return r;
@@ -194,8 +195,7 @@ XLine predictor_areas(int time) {
 				unsigned short *final_s = (final.areas + k);
 				unsigned short *final_e = (final.areas + k + 1);
 
-				// TODO Make check if both objects are out of range
-				if ((lines_s >= *final_s && lines_s >= *final_e) || (lines_e <= *final_s && lines_e <= *final_e)) {
+				if (((lines_s >= *final_s && lines_s >= *final_e) || (lines_e <= *final_s && lines_e <= *final_e))) {
 					if (lines_s == *final_s || lines_e == *final_e) {
 						found = true;
 					}
@@ -488,6 +488,10 @@ void predictor_main(void) {
 	double j = shapes_start;
 	unsigned int obj_generation_index = 0;
 
+	if (predictor.read_until > beatmap.num_ho) {
+		fprintf(stdout, "ERROR: 'read_until' flag was passed with a higher number then can be processed; %u %u\n", beatmap.num_ho, predictor.read_until);
+		return;
+	}
 	while (i < predictor.read_until) {
 		// Processes next object in beatmap
 		predictor_beatmap(&rng, beatmap, i, &last_position, &last_start_time);

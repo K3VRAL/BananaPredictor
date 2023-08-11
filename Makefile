@@ -1,6 +1,6 @@
 CC	= gcc
 CFLAGS	= -Wall -c -Iinclude/ $(shell pkg-config --cflags libosu)
-LFLAGS	= $(shell pkg-config --libs libosu)
+LFLAGS	= $(shell pkg-config --libs libosu) -lm
 TARGET	= bnprdctr
 BINFLR	= bin/
 
