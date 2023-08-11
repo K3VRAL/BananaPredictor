@@ -34,7 +34,7 @@ typedef struct JuiceStreamPoints {
 } JuiceStreamPoints;
 
 typedef struct BananaShowerPoints {
-	int offset;
+	int time;
 	unsigned int length;
 } BananaShowerPoints;
 

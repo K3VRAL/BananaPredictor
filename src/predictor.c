@@ -61,9 +61,9 @@ void predictor_shapes(int *shapes_start, int *shapes_end) {
 	}
 }
 
-#ifdef __unix__
 /* Prints out the progress bar in the terminal. Resizing the terminal will also resize the output */
 void predictor_progressbar(unsigned int percent) {
+#ifdef __unix__
 	struct winsize w;
 	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 
@@ -76,10 +76,11 @@ void predictor_progressbar(unsigned int percent) {
 	for (int i = 0; i < size_terminal - width; i++) {
 		fprintf(stdout, " ");
 	}
-	fprintf(stdout, "] %d%%", percent);
+	fprintf(stdout, "] ");
+#endif
+	fprintf(stdout, "%d%%", percent);
 	fflush(stdout);
 }
-#endif
 
 // Basing below functions off of https://stackoverflow.com/a/20679579 because I suck at math
 typedef struct XLine {
@@ -117,11 +118,12 @@ Vector *predictor_intersection(Coefficient c1, Coefficient c2) {
 
 /* Calculate the intersections of each line and whether they should be used for calculation */
 XLine predictor_areas(int time) {
-	XLine lines = {0};
-	lines.len = 0;
-	lines.areas = calloc(++lines.len, sizeof(*lines.areas));
-	*(lines.areas + lines.len - 1) = 0;
+	XLine *lines = NULL;
 	for (int i = 0; i < predictor.shapes_len; i++) {
+		lines = realloc(lines, (i + 1) * sizeof(*lines));
+		(lines + i)->areas = NULL;
+		(lines + i)->len = 0;
+
 		if (!(time >= (predictor.shapes + i)->start && time < (predictor.shapes + i)->end)) {
 			continue;
 		}
@@ -143,27 +145,103 @@ XLine predictor_areas(int time) {
 				continue;
 			}
 			if (r->x >= 0 && r->x <= 512) {
-				lines.areas = realloc(lines.areas, ++lines.len * sizeof(*lines.areas));
-				*(lines.areas + lines.len - 1) = r->x;
+				bool found = false;
+				for (int k = 0; k < (lines + i)->len; k++) {
+					if (r->x == *((lines + i)->areas + k)) {
+						found = true;
+						break;
+					}
+				}
+				if (found) {
+					free(r);
+					continue;
+				}
+
+				(lines + i)->areas = realloc((lines + i)->areas, ++(lines + i)->len * sizeof(*(lines + i)->areas));
+				*((lines + i)->areas + (lines + i)->len - 1) = r->x;
 			}
 			free(r);
 		}
-	}
-	for (int i = 0; i < lines.len - 1; i++) {
-		for (int j = 0; j < lines.len - i - 1; j++) {
-			if (*(lines.areas + j) > *(lines.areas + j + 1)) {
-				unsigned short temp = *(lines.areas + j + 1);
-				*(lines.areas + j + 1) = *(lines.areas + j);
-				*(lines.areas + j) = temp;
+
+		for (int j = 0; j < (lines + i)->len - 1; j++) {
+			for (int k = 0; k < (lines + i)->len - j - 1; k++) {
+				if (*((lines + i)->areas + k) > *((lines + i)->areas + k + 1)) {
+					unsigned short temp = *((lines + i)->areas + k);
+					*((lines + i)->areas + k) = *((lines + i)->areas + k + 1);
+					*((lines + i)->areas + k + 1) = temp;
+				}
 			}
 		}
 	}
-	lines.areas = realloc(lines.areas, ++lines.len * sizeof(*lines.areas));
-	*(lines.areas + lines.len - 1) = 512;
-	if (lines.len == 2) {
+
+	XLine final = {0};
+	final.len = 0;
+	final.areas = realloc(final.areas, ++final.len * sizeof(*final.areas));
+	*(final.areas + final.len - 1) = 0;
+	final.areas = realloc(final.areas, ++final.len * sizeof(*final.areas));
+	*(final.areas + final.len - 1) = 512;
+	for (int i = 0; i < predictor.shapes_len; i++) {
+		if ((lines + i)->len <= 1) {
+			continue;
+		}
+
+		bool found = false;
+		for (int j = 0; j < (lines + i)->len - 1; j += 2) {
+			unsigned short lines_s = *((lines + i)->areas + j);
+			unsigned short lines_e = *((lines + i)->areas + j + 1);
+
+			for (int k = 1; k < final.len - 1; k += 2) {
+				unsigned short *final_s = (final.areas + k);
+				unsigned short *final_e = (final.areas + k + 1);
+
+				// TODO Make check if both objects are out of range
+				if ((lines_s >= *final_s && lines_s >= *final_e) || (lines_e <= *final_s && lines_e <= *final_e)) {
+					if (lines_s == *final_s || lines_e == *final_e) {
+						found = true;
+					}
+					continue;
+				}
+
+				if (lines_s < *final_s) {
+					*final_s = lines_s;
+				}
+
+				if (lines_e > *final_e) {
+					*final_e = lines_e;
+				}
+
+				found = true;
+			}
+
+			if (!found) {
+				final.areas = realloc(final.areas, ++final.len * sizeof(*final.areas));
+				*(final.areas + final.len - 1) = lines_s;
+				final.areas = realloc(final.areas, ++final.len * sizeof(*final.areas));
+				*(final.areas + final.len - 1) = lines_e;
+
+				for (int j = 0; j < final.len - 1; j++) {
+					for (int k = 0; k < final.len - j - 1; k++) {
+						if (*(final.areas + k) > *(final.areas + k + 1)) {
+							unsigned short temp = *(final.areas + k);
+							*(final.areas + k) = *(final.areas + k + 1);
+							*(final.areas + k + 1) = temp;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	for (int i = 0; i < predictor.shapes_len; i++) {
+		free((lines + i)->areas);
+	}
+	free(lines);
+
+	if (final.len == 2) {
+		fprintf(stdout, "ERROR: Not enough lines were provided for processing.\n");
 		exit(1);
 	}
-	return lines;
+	return final;
 }
 // End of stackoverflow
 
@@ -290,10 +368,9 @@ void predictor_generatebs(CatchHitObject **bnpd, unsigned int *bnpd_len, int sta
 	HitObject *spinner_hit_object = calloc(1, sizeof(*spinner_hit_object));
 	spinner_hit_object->x = 256;
 	spinner_hit_object->y = 192;
-	spinner_hit_object->time = start_time + (predictor.points.bs + *index)->offset;
+	spinner_hit_object->time = (predictor.points.bs + *index)->time;
 	spinner_hit_object->type = nc_spinner;
-	spinner_hit_object->ho.spinner.end_time = start_time + (predictor.points.bs + *index)->offset;
-       	spinner_hit_object->ho.spinner.end_time += (predictor.points.bs + *index)->length;
+	spinner_hit_object->ho.spinner.end_time = (predictor.points.bs + *index)->time + (predictor.points.bs + *index)->length;
 
 	*bnpd = realloc(*bnpd, ++*bnpd_len * sizeof(**bnpd));
 	for (int i = *bnpd_len - 1; i > 0; i--) {
@@ -419,14 +496,12 @@ void predictor_main(void) {
 
 	while (i < beatmap.num_ho || j < shapes_end) {
 
-#ifdef __unix__
 		// Update Progress Bar
 		if (predictor.output != stdout) {
 			double beatmap_objects = beatmap.num_ho > 0 ? ((double) i / beatmap.num_ho) : 1;
 			double shapes_objects = j < shapes_end ? (j - shapes_start) / (shapes_end - shapes_start) : 1;
 			predictor_progressbar((beatmap_objects * shapes_objects) * 100);
 		}
-#endif
 		
 		// Getting current time
 		int time = INT_MAX;
@@ -520,12 +595,10 @@ void predictor_main(void) {
 		predictor_beatmap(&rng, beatmap, i, &last_position, &last_start_time);
 		i++;
 	}
-#ifdef __unix__
 	if (predictor.output != stdout) {
 		predictor_progressbar(100);
 		fprintf(stdout, "\n");
 	}
-#endif
 	if (last_position != NULL) {
 		free(last_position);
 	}

@@ -162,12 +162,12 @@ void args_bananashower_point(char *option) {
 	char used_delim = '\0';
 	predictor.points_type = banana_shower;
 	predictor.points.bs = realloc(predictor.points.bs, (++predictor.points_len) * sizeof(*predictor.points.bs));
-	(predictor.points.bs + predictor.points_len - 1)->offset = 0;
+	(predictor.points.bs + predictor.points_len - 1)->time = 0;
 	(predictor.points.bs + predictor.points_len - 1)->length = 0;
 	while (token != NULL) {
 		switch (used_delim) {
 			case '\0':
-				(predictor.points.bs + predictor.points_len - 1)->offset = strtol(token, NULL, 10);
+				(predictor.points.bs + predictor.points_len - 1)->time = strtol(token, NULL, 10);
 				break;
 
 			case ':':
@@ -257,7 +257,7 @@ Args args_arg[args_num] = {
 		.i = "-c",
 		.item = "--hitobject-points",
 		.argument = "[x:y]",
-		.description = "the points for the vector of the HitObject",
+		.description = "the points for the vector of the Hit Object",
 		.e_function = vcp,
 		.function.vcp = args_hitobject_point
 	},
@@ -273,7 +273,7 @@ Args args_arg[args_num] = {
 		.i = "-w",
 		.item = "--bananashower-points",
 		.argument = "[offset:length]",
-		.description = "the points for the vector of the BananaShower",
+		.description = "the points for the vector of the Banana Shower",
 		.e_function = vcp,
 		.function.vcp = args_bananashower_point
 	},
@@ -289,7 +289,7 @@ Args args_arg[args_num] = {
 		.i = "-p",
 		.item = "--prefer-circles",
 		.argument = "",
-		.description = "outputs Fruits instead of Bananas and removes Juice Streams and Banana Showers",
+		.description = "outputs Fruits instead of Bananas, and removes Juice Streams and Banana Showers",
 		.e_function = v,
 		.function.v = args_prefer_circles
 	},
