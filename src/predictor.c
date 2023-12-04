@@ -22,6 +22,7 @@ Predictor predictor = {
 	.points_type = '\0',
 	.points.ho = NULL,	// set to ho because then compiler starts complaining
 	.points_len = 0,
+	.nonvisual = false,
 
 	.distance = 1,
 
@@ -249,7 +250,7 @@ void predictor_generateho(CatchHitObject **bnpd, unsigned int *bnpd_len, int sta
 	HitObject *circle_hit_object = calloc(1, sizeof(*circle_hit_object));
 	circle_hit_object->x = (predictor.points.ho + *index)->x;
 	circle_hit_object->y = (predictor.points.ho + *index)->y;
-	circle_hit_object->time = start_time;
+	circle_hit_object->time = !predictor.nonvisual ? start_time : INT_MIN;
 	circle_hit_object->type = nc_circle;
 
 	*bnpd = realloc(*bnpd, ++*bnpd_len * sizeof(**bnpd));
@@ -267,13 +268,13 @@ void predictor_generatejs(CatchHitObject **bnpd, unsigned int *bnpd_len, int sta
 	HitObject *slider_hit_object = calloc(1, sizeof(*slider_hit_object));
 	slider_hit_object->x = ((predictor.points.js + *index)->points.vectors + 0)->x;
 	slider_hit_object->y = ((predictor.points.js + *index)->points.vectors + 0)->ty;
-	slider_hit_object->time = start_time;
+	slider_hit_object->time = !predictor.nonvisual ? start_time : INT_MIN;
 	slider_hit_object->type = nc_slider;
 	slider_hit_object->ho.slider.curve_type = (predictor.points.js + *index)->type;
 	slider_hit_object->ho.slider.curves = NULL;
 	slider_hit_object->ho.slider.num_curve = 0;
 	slider_hit_object->ho.slider.slides = 1;
-	slider_hit_object->ho.slider.length = 1;	// We can keep increasing the length until we get the amount of droplets/tiny droplets needed
+	slider_hit_object->ho.slider.length = (predictor.nonvisual * INT_MIN) + 1;	// We can keep increasing the length until we get the amount of droplets/tiny droplets needed
 	
 	InheritedTimingPoint inherited;
 	oos_inheritedpoint_init(&inherited, beatmap.timing_points, beatmap.num_tp);
@@ -368,19 +369,46 @@ void predictor_generatebs(CatchHitObject **bnpd, unsigned int *bnpd_len, int sta
 	HitObject *spinner_hit_object = calloc(1, sizeof(*spinner_hit_object));
 	spinner_hit_object->x = 256;
 	spinner_hit_object->y = 192;
-	spinner_hit_object->time = (predictor.points.bs + *index)->time;
+	spinner_hit_object->time = !predictor.nonvisual ? (predictor.points.bs + *index)->time : INT_MIN;
 	spinner_hit_object->type = nc_spinner;
-	spinner_hit_object->ho.spinner.end_time = (predictor.points.bs + *index)->time + (predictor.points.bs + *index)->length;
+	spinner_hit_object->ho.spinner.end_time = (!predictor.nonvisual ? (predictor.points.bs + *index)->time : INT_MIN) + 1;
 
-	*bnpd = realloc(*bnpd, ++*bnpd_len * sizeof(**bnpd));
-	for (int i = *bnpd_len - 1; i > 0; i--) {
-		*(*bnpd + i) = *(*bnpd + i - 1);
+	bool make_new = false;
+
+	// Extend current slider to optimise slider amount placed
+	if ((*bnpd + 0)->type == catchhitobject_bananashower && (*bnpd + 0)->cho.bs->end_time < (predictor.points.bs + *index)->time + (predictor.points.bs + *index)->length) {
+		unsigned int banana_num = (*bnpd + 0)->cho.bs->num_banana;
+		spinner_hit_object->ho.spinner.end_time = (*bnpd + 0)->cho.bs->end_time;
+
+		while (true) {
+			free((*bnpd + 0)->cho.bs->bananas);
+			(*bnpd + 0)->cho.bs->bananas = NULL;
+			(*bnpd + 0)->cho.bs->num_banana = 0;
+			ooc_bananashower_init((*bnpd + 0), spinner_hit_object);
+			ooc_bananashower_createnestedbananas((*bnpd + 0));
+			if ((*bnpd + 0)->cho.bs->num_banana > banana_num) {
+				make_new = false;
+				oos_hitobject_freebulk(spinner_hit_object, 1);
+				break;
+			} else if ((*bnpd + 0)->cho.bs->end_time >= (predictor.points.bs + *index)->time + (predictor.points.bs + *index)->length) {
+				// If unable to extend slider anymore
+				break;
+			}
+			spinner_hit_object->ho.spinner.end_time++;
+		}
 	}
 
-	ooc_bananashower_init((*bnpd + 0), spinner_hit_object);
-	ooc_bananashower_createnestedbananas((*bnpd + 0));
+	if (make_new) {
+		*bnpd = realloc(*bnpd, ++*bnpd_len * sizeof(**bnpd));
+		for (int i = *bnpd_len - 1; i > 0; i--) {
+			*(*bnpd + i) = *(*bnpd + i - 1);
+		}
 
-	*index = (*index + 1) % predictor.points_len;
+		ooc_bananashower_init((*bnpd + 0), spinner_hit_object);
+		ooc_bananashower_createnestedbananas((*bnpd + 0));
+
+		*index = (*index + 1) % predictor.points_len;
+	}
 }
 
 /* Returns if we need to retry or store the current positions of the objects */

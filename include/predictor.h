@@ -62,6 +62,7 @@ typedef struct Predictor {
 	TypePointsEnum points_type;
 	TypePoints points;
 	unsigned int points_len;
+	bool nonvisual;
 
 	double distance;
 

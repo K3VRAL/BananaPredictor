@@ -180,6 +180,10 @@ void args_bananashower_point(char *option) {
 	free(copy);
 }
 
+void args_nonvisual_point(void) {
+	predictor.nonvisual = true;
+}
+
 void args_distance(char *option) {
 	predictor.distance = strtod(option, NULL);
 }
@@ -219,7 +223,7 @@ typedef struct Args {
 		void (*v)(void);
 	} function;
 } Args;
-#define args_num 12
+#define args_num 13
 Args args_arg[args_num] = {
 	{
 		.i = "-b",
@@ -272,10 +276,18 @@ Args args_arg[args_num] = {
 	{
 		.i = "-w",
 		.item = "--bananashower-points",
-		.argument = "[offset:length]",
+		.argument = "[start:length]",
 		.description = "the points for the vector of the Banana Shower",
 		.e_function = vcp,
 		.function.vcp = args_bananashower_point
+	},
+	{
+		.i = "-v",
+		.item = "--non-visual-points",
+		.argument = "",
+		.description = "removes the placed points from the experience",
+		.e_function = vcp,
+		.function.v = args_nonvisual_point
 	},
 	{
 		.i = "-d",
